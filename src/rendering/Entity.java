@@ -9,33 +9,24 @@ import java.io.IOException;
  * Entity of the game (characters, obstacles etc..)
  */
 public class Entity implements IEntity {
-    private BufferedImage sprite;
+    private Sprite sprite;
     private final Point position;
     private final boolean visible;
 
-    public Entity() {
-        sprite = null;
+    public Entity(Sprite sprite) {
+        this.sprite = sprite;
         position = new Point();
         visible = false;
     }
+
 
     /**
      * Returns the sprite of the entity
      *
      * @return BufferedImage
      */
-    public BufferedImage getSprite() {
+    public Sprite getSprite() {
         return sprite;
-    }
-
-    /**
-     * Set the sprite of the entity from a file path
-     *
-     * @param path path of the image file
-     * @throws IOException image not found or invalid path
-     */
-    public void setSprite(String path) throws IOException {
-        sprite = ImageIO.read(new File(path));
     }
 
     /**

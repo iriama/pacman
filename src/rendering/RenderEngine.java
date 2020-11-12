@@ -1,35 +1,31 @@
 package rendering;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.Vector;
 
 /**
  * Engine responsable of rendering entities and other game elements
  */
-public class RenderEngine extends JPanel implements IRenderEngine, IBuild {
+public class RenderEngine implements IRenderEngine {
 
     private final Vector<Entity> entities;
+    private RenderPanel panel;
 
     public RenderEngine() {
-        super();
-
+        RenderEngine _this = this;
         entities = new Vector<Entity>();
-        build();
-    }
+        panel = new RenderPanel();
 
-    /**
-     * Builds the render engine
-     */
-    public void build() {
-        setBackground(Color.black);
-    }
+        panel.drawEvents.add(new IDrawEvent() {
+            @Override
+            public void draw(Graphics2D g) {
+                _this.draw(g);
+            }
+        });
 
-    @Override
-    public void paint(Graphics g) {
-        super.paint(g);
-        draw((Graphics2D) g);
+        panel.setBackground(Color.black);
     }
 
 
@@ -49,22 +45,34 @@ public class RenderEngine extends JPanel implements IRenderEngine, IBuild {
         entities.add(entity);
     }
 
+    @Override
+    public void addEntity(String spritePath, int spriteWidth, int spriteCount) {
+        SpriteSheet sheet = new SpriteSheet(spritePath, spriteWidth, spriteCount);
+        Sprite sprite = new Sprite(sheet);
+        Entity entity = new Entity(sprite);
+
+        entities.add(entity);
+    }
+
     /**
      * Draws game elements
      *
      * @param g Graphics2D
      */
     public void draw(Graphics2D g) {
-
+        System.out.println("drawing");
         for (Entity entity : entities) {
             if (!shouldDraw(entity)) continue;
 
             Point position = entity.getPosition();
-            BufferedImage sprite = entity.getSprite();
+            BufferedImage image = entity.getSprite().getImage();
 
-            g.drawImage(sprite, position.X, position.Y, null);
+            g.drawImage(image, position.X, position.Y, null);
         }
-
     }
 
+    @Override
+    public RenderPanel getPanel() {
+        return panel;
+    }
 }
