@@ -1,4 +1,4 @@
-package rendering;
+package rendering.utility;
 
 import java.awt.*;
 import java.io.File;

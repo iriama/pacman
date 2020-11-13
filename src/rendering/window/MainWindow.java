@@ -1,4 +1,6 @@
-package rendering;
+package rendering.window;
+
+import rendering.engine.IRenderEngine;
 
 import javax.swing.*;
 import java.awt.*;
@@ -6,12 +8,12 @@ import java.awt.*;
 /**
  * Main Window of the Game
  */
-public class MainWindow extends JFrame implements IBuild {
+public class MainWindow extends JFrame implements IWindow {
 
     public static final int HEIGHT = 600;
     public static final int WIDTH = 600;
 
-    private IRenderEngine renderEngine;
+    private final IRenderEngine renderEngine;
 
     public MainWindow(IRenderEngine renderEngine) {
         super();

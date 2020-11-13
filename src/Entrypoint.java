@@ -1,4 +1,9 @@
-import rendering.*;
+import rendering.engine.IRenderEngine;
+import rendering.engine.RenderEngine;
+import rendering.game.Entity;
+import rendering.utility.FontsEngine;
+import rendering.window.MainWindow;
+import rendering.window.SplashWindow;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -25,13 +30,8 @@ public class Entrypoint {
         });
 
         // TEST
-        Entity pacman = new Entity(
-                new Sprite(
-                        new SpriteSheet("ressources/sprites/pacman01.png", 26, 26)
-                )
-        );
-        renderEngine.addEntity(pacman);
-        pacman.getSprite().loop(0, 2, 500);
+        Entity pacman = renderEngine.addEntity("ressources/sprites/pacman01.png", 26, 26);
+        pacman.getSprite().loop(0, 2, 1000);
     }
 
 }

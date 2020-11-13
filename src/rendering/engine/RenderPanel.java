@@ -1,4 +1,4 @@
-package rendering;
+package rendering.engine;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,18 +8,22 @@ public class RenderPanel extends JPanel {
 
     private static final int SLEEP_MS = 10;
 
-    public Vector<IDrawEvent> drawEvents;
+    private final Vector<IPaintComponentListener> paintComponentListeners;
 
     public RenderPanel() {
-        drawEvents = new Vector<IDrawEvent>();
+        paintComponentListeners = new Vector<IPaintComponentListener>();
+    }
+
+    public void addOnPaintComponentListener(IPaintComponentListener listener) {
+        paintComponentListeners.add(listener);
     }
 
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        for (IDrawEvent e: drawEvents)
-            e.draw((Graphics2D) g);
+        for (IPaintComponentListener e : paintComponentListeners)
+            e.onPaint((Graphics2D) g);
 
         try {
             Thread.sleep(SLEEP_MS);

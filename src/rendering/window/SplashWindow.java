@@ -1,4 +1,6 @@
-package rendering;
+package rendering.window;
+
+import rendering.utility.FontsEngine;
 
 import javax.swing.*;
 import java.awt.*;
@@ -6,7 +8,7 @@ import java.awt.*;
 /**
  * Splash window of the game logo
  */
-public class SplashWindow extends JFrame implements IBuild {
+public class SplashWindow extends JFrame implements IWindow {
 
     public SplashWindow() {
         super();
@@ -32,7 +34,7 @@ public class SplashWindow extends JFrame implements IBuild {
         setContentPane(panel);
         setAlwaysOnTop(true);
         setUndecorated(true);
-        setBackground(new Color(1.0f, 1.0f, 1.0f, 0.5f));
+        setBackground(new Color(0, 0, 0, 0));
         pack();
     }
 }

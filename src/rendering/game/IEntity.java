@@ -1,7 +1,6 @@
-package rendering;
+package rendering.game;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
+import rendering.graphics.Sprite;
 
 public interface IEntity {
     Sprite getSprite();
