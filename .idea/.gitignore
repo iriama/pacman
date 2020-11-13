@@ -1,3 +1,7 @@
+# Output
+pacman.jar
+out/
+
 # Default ignored files
 /shelf/
 /workspace.xml
