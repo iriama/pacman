@@ -1,3 +1,8 @@
+import core.CoreEngine;
+import physics.game.Character;
+import physics.game.Direction;
+import physics.game.PhysicsEngine;
+import physics.game.Size;
 import rendering.engine.IRenderEngine;
 import rendering.engine.RenderEngine;
 import rendering.game.Entity;
@@ -14,7 +19,8 @@ public class Entrypoint {
     public static void main(String[] args) throws InterruptedException, IOException {
         FontsEngine.start();
 
-        IRenderEngine renderEngine = new RenderEngine();
+        RenderEngine renderEngine = new RenderEngine();
+
 
         JFrame splash = new SplashWindow();
         JFrame win = new MainWindow(renderEngine);
@@ -30,8 +36,17 @@ public class Entrypoint {
             win.setVisible(true);
         });
 
-        // TEST
-        for (int i = 0; i < 30; i++) {
+        // Test
+        PhysicsEngine physicsEngine = new PhysicsEngine();
+        CoreEngine coreEngine = new CoreEngine(renderEngine, physicsEngine);
+
+        coreEngine.addCharacter(0, 0, 28, 28, 2, Direction.RIGHT, "ressources/sprites/pacman.png", 10, 10);
+
+        coreEngine.run();
+
+
+        // TEST Graphique
+        /*for (int i = 0; i < 30; i++) {
             Entity entity = renderEngine.addEntity("ressources/sprites/pacman.png", 28, 10);
             int x = ThreadLocalRandom.current().nextInt(0, MainWindow.WIDTH - 100);
             int y = ThreadLocalRandom.current().nextInt(0, MainWindow.HEIGHT - 100);
@@ -51,7 +66,7 @@ public class Entrypoint {
 
             int delay = ThreadLocalRandom.current().nextInt(10, 100);
             entity.getSprite().loop(delay);
-        }
+        }*/
 
 
     }

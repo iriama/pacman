@@ -1,15 +1,23 @@
 package physics.game;
 
+import core.IEngine;
+import rendering.window.MainWindow;
+
 import java.util.Vector;
 
-public class PhysicsEngine {
+public class PhysicsEngine implements IEngine {
     private final Vector<Character> characters;
     private Vector<GameObject> objects;
     private final Plate plate;
 
     public PhysicsEngine(Plate plate) {
         this.characters = new Vector<Character>();
+        this.objects = new Vector<GameObject>();
         this.plate = plate;
+    }
+
+    public PhysicsEngine() {
+        this(new Plate(MainWindow.WIDTH, MainWindow.HEIGHT));
     }
 
     public void addObject(GameObject object) {
@@ -32,8 +40,8 @@ public class PhysicsEngine {
 
     public void move() {
         for (Character c : characters)
-            if (c.canMove(this.plate))
-                move();
+            //if (c.canMove(this.plate))
+                c.move();
     }
 
     public Vector<PairGameObject> checkCollision() {
@@ -45,5 +53,9 @@ public class PhysicsEngine {
             }
 
         return objectsInCollision;
+    }
+
+    public void update() {
+        move();
     }
 }

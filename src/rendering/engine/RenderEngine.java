@@ -1,5 +1,6 @@
 package rendering.engine;
 
+import core.IEngine;
 import rendering.game.Entity;
 import rendering.game.Point;
 import rendering.graphics.Sprite;
@@ -13,7 +14,7 @@ import java.util.Vector;
 /**
  * Engine responsable of rendering entities and other game elements
  */
-public class RenderEngine implements IRenderEngine, IPaintComponentListener {
+public class RenderEngine implements IRenderEngine, IPaintComponentListener, IEngine {
 
     private final Vector<Entity> entities;
     private final HashMap<String, SpriteSheet> spriteSheetCache;
@@ -117,5 +118,9 @@ public class RenderEngine implements IRenderEngine, IPaintComponentListener {
                 System.err.println("can't paint " + entity);
             }
         }
+    }
+
+    public void update() {
+        panel.repaint();
     }
 }

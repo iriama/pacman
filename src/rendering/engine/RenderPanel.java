@@ -6,7 +6,7 @@ import java.util.Vector;
 
 public class RenderPanel extends JPanel {
 
-    private static final int SLEEP_MS = 10;
+    // private static final int SLEEP_MS = 10;
 
     private final Vector<IPaintComponentListener> paintComponentListeners;
 
@@ -25,12 +25,12 @@ public class RenderPanel extends JPanel {
         for (IPaintComponentListener e : paintComponentListeners)
             e.onPaint((Graphics2D) g);
 
-        try {
+        /*try {
             Thread.sleep(SLEEP_MS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        repaint();
+        repaint();*/
     }
 
 }
