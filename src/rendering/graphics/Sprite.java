@@ -40,6 +40,10 @@ public class Sprite {
         state = ESpriteState.PAUSED; // paused
     }
 
+    public int getCurrentFrame() {
+        return currentFrame;
+    }
+
     /**
      * Play a sequence of frames
      * @param frames sequence of frames
@@ -48,6 +52,7 @@ public class Sprite {
     public void play(int[] frames, int delay) {
         this.frames = frames;
         playIndex = 0;
+        currentFrame = frames[playIndex];
         this.delay = delay;
         nextFrameTime = System.currentTimeMillis() + delay;
         state = ESpriteState.PLAYING;
@@ -115,7 +120,6 @@ public class Sprite {
                 if (playIndex + 1 < frames.length)
                     playIndex++;
                 else {
-                    playIndex = 0;
                     state = ESpriteState.PAUSED;
                 }
                 break;

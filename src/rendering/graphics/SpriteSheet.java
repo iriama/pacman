@@ -16,7 +16,7 @@ public class SpriteSheet {
     private final int spriteHeight;
     private BufferedImage image = null;
 
-    public SpriteSheet(String path, int spriteCount, int spriteWidth) {
+    public SpriteSheet(String path, int spriteWidth,int spriteCount) {
         this.path = path;
         this.spriteCount = spriteCount;
         this.spriteWidth = spriteWidth;

@@ -12,6 +12,7 @@ public class MainWindow extends JFrame implements IWindow {
 
     public static final int HEIGHT = 600;
     public static final int WIDTH = 600;
+    public static final String TITLE = "Groupe 27 - PACMAN";
 
     private final IRenderEngine renderEngine;
 
@@ -25,7 +26,7 @@ public class MainWindow extends JFrame implements IWindow {
      * Builds the main window
      */
     public void build() {
-        setTitle("Groupe 27 - PACMAN");
+        setTitle(TITLE);
         setSize(new Dimension(WIDTH, HEIGHT));
         setResizable(false);
         setLocationRelativeTo(null);

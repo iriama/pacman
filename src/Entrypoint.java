@@ -30,8 +30,11 @@ public class Entrypoint {
         });
 
         // TEST
-        Entity pacman = renderEngine.addEntity("ressources/sprites/pacman01.png", 26, 26);
-        pacman.getSprite().loop(0, 2, 1000);
+        Entity player = renderEngine.addEntity("ressources/sprites/test.png", 128, 4);
+        player.getSprite().loop(50);
+
+
+        System.out.println("hello !");
     }
 
 }
