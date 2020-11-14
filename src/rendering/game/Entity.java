@@ -77,4 +77,14 @@ public class Entity implements IEntity {
 
         return getId() == other.getId();
     }
+
+    @Override
+    public String toString() {
+        return "Entity{" +
+                "position=" + position +
+                ", visible=" + visible +
+                ", sprite=" + sprite +
+                ", id=" + id +
+                '}';
+    }
 }

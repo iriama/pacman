@@ -7,6 +7,7 @@ import rendering.graphics.SpriteSheet;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
 import java.util.Vector;
 
 /**
@@ -15,12 +16,14 @@ import java.util.Vector;
 public class RenderEngine implements IRenderEngine, IPaintComponentListener {
 
     private final Vector<Entity> entities;
+    private final HashMap<String, SpriteSheet> spriteSheetCache;
     private final RenderPanel panel;
     private int entityIds;
 
     public RenderEngine() {
         entityIds = Integer.MIN_VALUE;
         entities = new Vector<Entity>();
+        spriteSheetCache = new HashMap<String, SpriteSheet>();
         panel = new RenderPanel();
         panel.addOnPaintComponentListener(this);
 
@@ -60,7 +63,12 @@ public class RenderEngine implements IRenderEngine, IPaintComponentListener {
      * @return the added entity
      */
     public Entity addEntity(String spriteSheetPath, int spriteWidth, int spriteCount) {
-        SpriteSheet sheet = new SpriteSheet(spriteSheetPath, spriteWidth, spriteCount);
+        SpriteSheet sheet;
+        if (spriteSheetCache.containsKey(spriteSheetPath))
+            sheet = spriteSheetCache.get(spriteSheetPath);
+        else
+            sheet = new SpriteSheet(spriteSheetPath, spriteWidth, spriteCount);
+
         Sprite sprite = new Sprite(sheet);
         Entity entity = new Entity(sprite, nextId());
 
@@ -96,13 +104,18 @@ public class RenderEngine implements IRenderEngine, IPaintComponentListener {
      * @param g Graphics2D brush
      */
     public void onPaint(Graphics2D g) {
-        for (Entity entity : entities) {
+        for (int i = 0; i < entities.size(); i++) {
+            Entity entity = entities.get(i);
             if (!shouldDraw(entity)) continue;
 
-            Point position = entity.getPosition();
-            BufferedImage image = entity.getSprite().getImage();
+            try {
+                Point position = entity.getPosition();
+                BufferedImage image = entity.getSprite().getImage();
 
-            g.drawImage(image, position.getX(), position.getY(), null);
+                g.drawImage(image, position.getX(), position.getY(), null);
+            } catch (Exception e) {
+                System.err.println("can't paint " + entity);
+            }
         }
     }
 }

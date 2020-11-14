@@ -111,4 +111,10 @@ class SpriteTest {
         assertEquals(0.8f, sprite.getScale());
     }
 
+    @Test
+    void rotate() {
+        assertEquals(0, sprite.getOrientationAngle());
+        sprite.rotate(90f);
+        assertEquals(90f, sprite.getOrientationAngle());
+    }
 }

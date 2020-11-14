@@ -22,6 +22,7 @@ public class Sprite {
     private ESpriteOrientation orientationX;
     private ESpriteOrientation orientationY;
     private float scale;
+    private float orientationAngle;
 
     public Sprite(SpriteSheet spriteSheet) {
         this.spriteSheet = spriteSheet;
@@ -30,6 +31,7 @@ public class Sprite {
         scale = 1;
         orientationX = ESpriteOrientation.INITIAL;
         orientationY = ESpriteOrientation.INITIAL;
+        orientationAngle = 0;
     }
 
     private int[] getRange(int start, int end) {
@@ -155,11 +157,23 @@ public class Sprite {
             float orX = orientationX == ESpriteOrientation.FLIP ? -scale : scale;
             float orY = orientationY == ESpriteOrientation.FLIP ? -scale : scale;
 
-            AffineTransform at = AffineTransform.getScaleInstance(orX, orY);
+            AffineTransform at = new AffineTransform();
+            at.scale(orX, orY);
             at.translate(orX > 0 ? 0 : -img.getWidth(), orY > 0 ? 0 : -img.getHeight());
             AffineTransformOp op = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
             img = op.filter(img, null);
         }
+
+
+        if (orientationAngle > 0) {
+            AffineTransform at = new AffineTransform();
+            double offset = (img.getWidth() - img.getHeight()) / 2;
+            at.rotate(Math.toRadians(orientationAngle), img.getWidth() / 2, img.getHeight() / 2);
+            at.translate(offset, offset);
+            AffineTransformOp op = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+            img = op.filter(img, null);
+        }
+
 
         return img;
     }
@@ -211,9 +225,41 @@ public class Sprite {
 
     /**
      * Return the sprite scale
+     *
      * @return sprite scale
      */
     public float getScale() {
         return scale;
+    }
+
+    /**
+     * Rotate the sprite image
+     *
+     * @param degree rotation degree
+     */
+    public void rotate(float degree) {
+        orientationAngle = degree;
+    }
+
+    /**
+     * Returns the rotation angle
+     *
+     * @return rotation angle
+     */
+    public float getOrientationAngle() {
+        return orientationAngle;
+    }
+
+    @Override
+    public String toString() {
+        return "Sprite{" +
+                "currentFrame=" + currentFrame +
+                ", state=" + state +
+                ", playIndex=" + playIndex +
+                ", delay=" + delay +
+                ", orientationX=" + orientationX +
+                ", orientationY=" + orientationY +
+                ", scale=" + scale +
+                '}';
     }
 }

@@ -1,14 +1,5 @@
 package physics.game;
 
-import java.util.Vector;
-
-enum Direction {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT
-}
-
 public class Character extends GameObject {
 
     private int speed;
@@ -36,77 +27,48 @@ public class Character extends GameObject {
         return speed;
     }
 
-    public boolean canMove(Direction direction, int speed, Plate plate) {
+    public boolean canMove(Plate plate) {
         switch (direction) {
-            case Direction.UP:
+            case UP:
                 if (this.Y < speed)
                     return false;
 
-            case Direction.DOWN:
-                if ((this.Y + speed) > plate.getHeight())
+            case DOWN:
+                if ((this.Y + speed + this.size.getHeight()) > plate.getHeight())
                     return false;
 
-            case Direction.LEFT:
+            case LEFT:
                 if (this.X < speed)
                     return false;
 
-            case Direction.RIGHT:
-                if ((this.X + speed) > plate.getWidth())
+            case RIGHT:
+                if ((this.X + speed + this.size.getWidth()) > plate.getWidth())
                     return false;
 
         }
         return true;
     }
 
-    public void move(Direction direction, int speed){
+    public void move() {
 
-            switch(direction){
-                case Direction.UP:
-                    this.Y -= speed;
+        switch (direction) {
+            case UP:
+                this.Y -= speed;
 
-                case Direction.DOWN:
-                    this.Y += speed;
+            case DOWN:
+                this.Y += speed;
 
-                case Direction.LEFT:
-                    this.X -= speed;
+            case LEFT:
+                this.X -= speed;
 
-                case Direction.RIGHT:
-                    this.X += speed;
-            }
-    }
-}
-
-public  class Plate{
-
-    private int width;
-    private int height;
-
-    public Plate(int w, int h){
-        this.width = w;
-        this.height = h;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-}
-
-/*public class simulMovement{
-    public static void main(String []args){
-        Plate p = new Plate(300,600);
-        GameObject obj = new Character(0, 0, 2, Direction.DOWN);
-        while(obj.canMove(obj.getDirection, obj.getSpeed, p)){
-            obj.move(obj.getDirection, obj.getSpeed);
-            System.out.println("new X : "+obj.getX+" new Y : "+obj.getY);
-            Thread.sleep(200);
+            case RIGHT:
+                this.X += speed;
         }
     }
-}*/
 
-public class PhysEngine{
-    private Vector<GameObject> characters;
+    public boolean isTouch(GameObject object) {
+        return (object.getX() < this.getX() + this.size.getWidth()) && (object.getX() + object.size.getWidth() < this.getX())
+                && (object.getY() < this.getY() + this.size.getHeight()) && (object.getY() + this.size.getHeight() < this.getY());
+    }
 }
+
