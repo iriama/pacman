@@ -7,7 +7,7 @@ import rendering.graphics.Sprite;
  */
 public class Entity implements IEntity {
     private final Point position;
-    private final boolean visible;
+    private boolean visible;
     private final Sprite sprite;
     private final int id;
 
@@ -15,7 +15,7 @@ public class Entity implements IEntity {
         this.sprite = sprite;
         this.id = id;
         position = new Point();
-        visible = false;
+        visible = true;
     }
 
     /**
@@ -45,6 +45,20 @@ public class Entity implements IEntity {
      */
     public boolean isVisible() {
         return visible;
+    }
+
+    /**
+     * Set the entity visibility to visible
+     */
+    public void show() {
+        visible = true;
+    }
+
+    /**
+     * Set the entity visibility to hidden
+     */
+    public void hide() {
+        visible = false;
     }
 
     /**

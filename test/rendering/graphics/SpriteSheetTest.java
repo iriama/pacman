@@ -44,6 +44,6 @@ class SpriteSheetTest {
         ImageIO.write(img1, "png", img1out);
         ImageIO.write(img2, "png", img2out);
 
-        assertNotEquals(img1out.toByteArray(), img2out.toByteArray());
+        assertFalse(Arrays.equals(img1out.toByteArray(), img2out.toByteArray()));
     }
 }

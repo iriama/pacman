@@ -1,5 +1,7 @@
 package rendering.graphics;
 
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
 /**
@@ -17,10 +19,17 @@ public class Sprite {
     private int delay;
     private long nextFrameTime;
 
+    private ESpriteOrientation orientationX;
+    private ESpriteOrientation orientationY;
+    private float scale;
+
     public Sprite(SpriteSheet spriteSheet) {
         this.spriteSheet = spriteSheet;
         currentFrame = 0;
         state = ESpriteState.PAUSED;
+        scale = 1;
+        orientationX = ESpriteOrientation.INITIAL;
+        orientationY = ESpriteOrientation.INITIAL;
     }
 
     private int[] getRange(int start, int end) {
@@ -40,6 +49,10 @@ public class Sprite {
         state = ESpriteState.PAUSED; // paused
     }
 
+    /**
+     * Returns the current frame of the sprite
+     * @return current frame
+     */
     public int getCurrentFrame() {
         return currentFrame;
     }
@@ -136,7 +149,71 @@ public class Sprite {
      */
     public BufferedImage getImage() {
         updateSprite();
-        return spriteSheet.getSpriteImage(currentFrame);
+        BufferedImage img = spriteSheet.getSpriteImage(currentFrame);
+
+        if (scale != 1 || orientationX == ESpriteOrientation.FLIP || orientationY == ESpriteOrientation.FLIP) {
+            float orX = orientationX == ESpriteOrientation.FLIP ? -scale : scale;
+            float orY = orientationY == ESpriteOrientation.FLIP ? -scale : scale;
+
+            AffineTransform at = AffineTransform.getScaleInstance(orX, orY);
+            at.translate(orX > 0 ? 0 : -img.getWidth(), orY > 0 ? 0 : -img.getHeight());
+            AffineTransformOp op = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+            img = op.filter(img, null);
+        }
+
+        return img;
     }
 
+
+    /**
+     * Returns the X axis orientation
+     * @return X axis orientation
+     */
+    public ESpriteOrientation getOrientationX() {
+        return orientationX;
+    }
+
+    /**
+     * Returns the Y axis orientation
+     * @return Y axis orientation
+     */
+    public ESpriteOrientation getOrientationY() {
+        return orientationY;
+    }
+
+    /**
+     * Flips the sprite image on the X axis
+     */
+    public void flipX() {
+        if (orientationX == ESpriteOrientation.FLIP)
+            orientationX = ESpriteOrientation.INITIAL;
+        else
+            orientationX = ESpriteOrientation.FLIP;
+    }
+
+    /**
+     * Flips the sprite image on the Y axis
+     */
+    public void flipY() {
+        if (orientationY == ESpriteOrientation.FLIP)
+            orientationY = ESpriteOrientation.INITIAL;
+        else
+            orientationY = ESpriteOrientation.FLIP;
+    }
+
+    /**
+     * Set the sprite scale
+     * @param scale sprite scale
+     */
+    public void setScale(float scale) {
+        this.scale = scale;
+    }
+
+    /**
+     * Return the sprite scale
+     * @return sprite scale
+     */
+    public float getScale() {
+        return scale;
+    }
 }

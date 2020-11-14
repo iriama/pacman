@@ -10,4 +10,8 @@ public interface IEntity {
     boolean isVisible();
 
     void setPosition(int X, int Y);
+
+    void show();
+
+    void hide();
 }

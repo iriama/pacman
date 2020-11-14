@@ -30,11 +30,8 @@ public class Entrypoint {
         });
 
         // TEST
-        Entity player = renderEngine.addEntity("ressources/sprites/test.png", 128, 4);
+        Entity player = renderEngine.addEntity("ressources/sprites/test.png", 128, 4);;
         player.getSprite().loop(50);
-
-
-        System.out.println("hello !");
     }
 
 }

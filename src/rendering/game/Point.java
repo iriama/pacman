@@ -1,5 +1,7 @@
 package rendering.game;
 
+import java.util.Objects;
+
 /**
  * Point X,Y coordinates of objects
  */
@@ -46,5 +48,15 @@ public class Point {
      */
     public void setY(int y) {
         Y = y;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Point point = (Point) o;
+        return X == point.X &&
+                Y == point.Y;
     }
 }

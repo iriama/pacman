@@ -31,7 +31,7 @@ public class RenderEngine implements IRenderEngine, IPaintComponentListener {
     private boolean shouldDraw(Entity entity) {
         rendering.game.Point position = entity.getPosition();
 
-        return !entity.isVisible() || position.getX() < 0 || position.getY() < 0 || position.getX() > panel.getWidth() || position.getY() > panel.getHeight();
+        return entity.isVisible() && position.getX() >= 0 && position.getY() >= 0 && position.getX() <= panel.getWidth() && position.getY() <= panel.getHeight();
     }
 
     private int nextId() {
