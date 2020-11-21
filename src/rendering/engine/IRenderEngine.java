@@ -1,17 +1,19 @@
 package rendering.engine;
 
+import geometry.Point;
 import rendering.game.Entity;
-
-import javax.swing.*;
+import rendering.game.IEntity;
 
 public interface IRenderEngine {
-    Entity addEntity(Entity entity);
+    IEntity addEntity(IEntity entity);
 
-    Entity addEntity(String spriteSheetPath, int spriteWidth, int spriteCount);
+    IEntity addEntity(String spriteSheetPath, int spriteWidth, int spriteCount);
 
     void removeEntity(Entity entity);
 
-    void removeEntity(int entityId);
+    void removeEntity(int index);
 
-    JPanel getPanel();
+    Point getCameraPosition();
+
+    void moveCamera(int x, int y);
 }

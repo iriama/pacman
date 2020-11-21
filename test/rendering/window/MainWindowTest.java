@@ -7,7 +7,7 @@ import rendering.engine.RenderEngine;
 
 import javax.swing.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MainWindowTest {
 

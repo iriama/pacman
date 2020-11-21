@@ -1,6 +1,6 @@
 package rendering.window;
 
-import rendering.engine.IRenderEngine;
+import rendering.engine.RenderEngine;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,9 +14,9 @@ public class MainWindow extends JFrame implements IWindow {
     public static final int WIDTH = 600;
     public static final String TITLE = "Groupe 27 - PACMAN";
 
-    private final IRenderEngine renderEngine;
+    private final RenderEngine renderEngine;
 
-    public MainWindow(IRenderEngine renderEngine) {
+    public MainWindow(RenderEngine renderEngine) {
         super();
         this.renderEngine = renderEngine;
         build();

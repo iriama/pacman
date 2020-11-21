@@ -1,8 +1,9 @@
 package rendering.engine;
 
-import core.IEngine;
+import core.engine.IEngine;
+import geometry.Point;
 import rendering.game.Entity;
-import rendering.game.Point;
+import rendering.game.IEntity;
 import rendering.graphics.Sprite;
 import rendering.graphics.SpriteSheet;
 
@@ -16,26 +17,37 @@ import java.util.Vector;
  */
 public class RenderEngine implements IRenderEngine, IPaintComponentListener, IEngine {
 
-    private final Vector<Entity> entities;
+    private final Vector<IEntity> entities;
     private final HashMap<String, SpriteSheet> spriteSheetCache;
     private final RenderPanel panel;
     private int entityIds;
+    private Point camera;
 
     public RenderEngine() {
         entityIds = Integer.MIN_VALUE;
-        entities = new Vector<Entity>();
+        entities = new Vector<IEntity>();
         spriteSheetCache = new HashMap<String, SpriteSheet>();
+        camera = new Point(0, 0);
         panel = new RenderPanel();
         panel.addOnPaintComponentListener(this);
-
         panel.setBackground(Color.black);
     }
 
 
-    private boolean shouldDraw(Entity entity) {
-        rendering.game.Point position = entity.getPosition();
+    private boolean shouldDraw(IEntity entity) {
+        Point position = entity.getPosition();
 
-        return entity.isVisible() && position.getX() >= 0 && position.getY() >= 0 && position.getX() <= panel.getWidth() && position.getY() <= panel.getHeight();
+        int minX = camera.getX();
+        int minY = camera.getY();
+        int maxX = minX + panel.getWidth();
+        int maxY = minY + panel.getHeight();
+
+        return entity.isVisible() && position.getX() >= minX && position.getY() >= minY && position.getX() <= maxX && position.getY() <= maxY;
+    }
+
+
+    private Point translate(Point position) {
+        return new Point(position.getX() - camera.getX(), position.getY() - camera.getY());
     }
 
     private int nextId() {
@@ -48,22 +60,24 @@ public class RenderEngine implements IRenderEngine, IPaintComponentListener, IEn
 
     /**
      * Adds an entity to the render engine
+     *
      * @param entity entity to add
      * @return added entity
      */
-    public Entity addEntity(Entity entity) {
+    public IEntity addEntity(IEntity entity) {
         entities.add(entity);
         return entity;
     }
 
     /**
      * Adds an entity to the render engine
+     *
      * @param spriteSheetPath path to the sprite sheet file
-     * @param spriteWidth width of one sprite
-     * @param spriteCount number of sprites on the sprite sheet
+     * @param spriteWidth     width of one sprite
+     * @param spriteCount     number of sprites on the sprite sheet
      * @return the added entity
      */
-    public Entity addEntity(String spriteSheetPath, int spriteWidth, int spriteCount) {
+    public IEntity addEntity(String spriteSheetPath, int spriteWidth, int spriteCount) {
         SpriteSheet sheet;
         if (spriteSheetCache.containsKey(spriteSheetPath))
             sheet = spriteSheetCache.get(spriteSheetPath);
@@ -78,6 +92,7 @@ public class RenderEngine implements IRenderEngine, IPaintComponentListener, IEn
 
     /**
      * Removes an entity from the render engine
+     *
      * @param entity entity to remove
      */
     public void removeEntity(Entity entity) {
@@ -86,6 +101,7 @@ public class RenderEngine implements IRenderEngine, IPaintComponentListener, IEn
 
     /**
      * Removes an entity from the render engine by id
+     *
      * @param entityId id of the entity to remove
      */
     public void removeEntity(int entityId) {
@@ -94,6 +110,7 @@ public class RenderEngine implements IRenderEngine, IPaintComponentListener, IEn
 
     /**
      * Return the JPanel instance
+     *
      * @return JPanel instance
      */
     public RenderPanel getPanel() {
@@ -102,15 +119,16 @@ public class RenderEngine implements IRenderEngine, IPaintComponentListener, IEn
 
     /**
      * To be called on every onPaint JPanel API
+     *
      * @param g Graphics2D brush
      */
     public void onPaint(Graphics2D g) {
         for (int i = 0; i < entities.size(); i++) {
-            Entity entity = entities.get(i);
+            IEntity entity = entities.get(i);
             if (!shouldDraw(entity)) continue;
 
             try {
-                Point position = entity.getPosition();
+                Point position = translate(entity.getPosition());
                 BufferedImage image = entity.getSprite().getImage();
 
                 g.drawImage(image, position.getX(), position.getY(), null);
@@ -122,5 +140,24 @@ public class RenderEngine implements IRenderEngine, IPaintComponentListener, IEn
 
     public void update() {
         panel.repaint();
+    }
+
+    /**
+     * Returns the postion of the camera
+     *
+     * @return position of the camera
+     */
+    public Point getCameraPosition() {
+        return camera;
+    }
+
+    /**
+     * Sets the position of the camera
+     *
+     * @param x x coords
+     * @param y y coords
+     */
+    public void moveCamera(int x, int y) {
+        camera.set(x, y);
     }
 }

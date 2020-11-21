@@ -1,5 +1,6 @@
 package rendering.game;
 
+import geometry.Point;
 import rendering.graphics.Sprite;
 
 /**
@@ -7,9 +8,9 @@ import rendering.graphics.Sprite;
  */
 public class Entity implements IEntity {
     private final Point position;
-    private boolean visible;
     private final Sprite sprite;
     private final int id;
+    private boolean visible;
 
     public Entity(Sprite sprite, int id) {
         this.sprite = sprite;
@@ -20,6 +21,7 @@ public class Entity implements IEntity {
 
     /**
      * Returns the sprite of the entity
+     *
      * @return sprite
      */
     public Sprite getSprite() {
@@ -27,12 +29,12 @@ public class Entity implements IEntity {
     }
 
     public void setPosition(int X, int Y) {
-        position.setX(X);
-        position.setY(Y);
+        position.set(X, Y);
     }
 
     /**
      * Returns the position of the entity
+     *
      * @return position
      */
     public Point getPosition() {
@@ -41,6 +43,7 @@ public class Entity implements IEntity {
 
     /**
      * Returns if the entity is visible
+     *
      * @return returns true if the entity is visible
      */
     public boolean isVisible() {
@@ -63,6 +66,7 @@ public class Entity implements IEntity {
 
     /**
      * Return the Id of the entity
+     *
      * @return Id of the entity
      */
     public int getId() {

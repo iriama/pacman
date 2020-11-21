@@ -1,22 +1,15 @@
-import core.CoreEngine;
-import physics.game.Character;
-import physics.game.Direction;
-import physics.game.PhysicsEngine;
-import physics.game.Size;
-import rendering.engine.IRenderEngine;
+import core.engine.CoreEngine;
+import physics.engine.PhysicsEngine;
 import rendering.engine.RenderEngine;
-import rendering.game.Entity;
 import rendering.utility.FontsEngine;
 import rendering.window.MainWindow;
 import rendering.window.SplashWindow;
 
 import javax.swing.*;
-import java.io.IOException;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Entrypoint {
 
-    public static void main(String[] args) throws InterruptedException, IOException {
+    public static void main(String[] args) throws InterruptedException {
         FontsEngine.start();
 
         RenderEngine renderEngine = new RenderEngine();
@@ -40,35 +33,9 @@ public class Entrypoint {
         PhysicsEngine physicsEngine = new PhysicsEngine();
         CoreEngine coreEngine = new CoreEngine(renderEngine, physicsEngine);
 
-        coreEngine.addCharacter(0, 0, 28, 28, 2, Direction.RIGHT, "ressources/sprites/pacman.png", 10, 10);
+        coreEngine.addCharacter(0, 28, 0, 28, 2, 0, "ressources/sprites/pacman.png", 28, 10, 10);
 
         coreEngine.run();
-
-
-        // TEST Graphique
-        /*for (int i = 0; i < 30; i++) {
-            Entity entity = renderEngine.addEntity("ressources/sprites/pacman.png", 28, 10);
-            int x = ThreadLocalRandom.current().nextInt(0, MainWindow.WIDTH - 100);
-            int y = ThreadLocalRandom.current().nextInt(0, MainWindow.HEIGHT - 100);
-            entity.setPosition(x, y);
-            float scale = ThreadLocalRandom.current().nextInt(1, 30) / 10f;
-
-            entity.getSprite().setScale(scale);
-
-            if (ThreadLocalRandom.current().nextBoolean())
-                entity.getSprite().flipX();
-
-            if (ThreadLocalRandom.current().nextBoolean())
-                entity.getSprite().flipY();
-
-            if (ThreadLocalRandom.current().nextBoolean())
-                entity.getSprite().rotate(90);
-
-            int delay = ThreadLocalRandom.current().nextInt(10, 100);
-            entity.getSprite().loop(delay);
-        }*/
-
-
     }
 
 }

@@ -44,6 +44,7 @@ public class Sprite {
 
     /**
      * Sets the current frame of the sprite
+     *
      * @param frame frame
      */
     public void setFrame(int frame) {
@@ -53,6 +54,7 @@ public class Sprite {
 
     /**
      * Returns the current frame of the sprite
+     *
      * @return current frame
      */
     public int getCurrentFrame() {
@@ -61,8 +63,9 @@ public class Sprite {
 
     /**
      * Play a sequence of frames
+     *
      * @param frames sequence of frames
-     * @param delay delay between each frame
+     * @param delay  delay between each frame
      */
     public void play(int[] frames, int delay) {
         this.frames = frames;
@@ -75,9 +78,10 @@ public class Sprite {
 
     /**
      * Play a range of frames
+     *
      * @param startFrame the first frame
-     * @param endFrame the last frame
-     * @param delay delay between each frame
+     * @param endFrame   the last frame
+     * @param delay      delay between each frame
      */
     public void play(int startFrame, int endFrame, int delay) {
         play(getRange(startFrame, endFrame), delay);
@@ -85,6 +89,7 @@ public class Sprite {
 
     /**
      * Play from the current frame to the last frame
+     *
      * @param delay delay between each frame
      */
     public void play(int delay) {
@@ -93,8 +98,9 @@ public class Sprite {
 
     /**
      * Play and loop a sequence of frames
+     *
      * @param frames sequence of frames
-     * @param delay delay between each frame
+     * @param delay  delay between each frame
      */
     public void loop(int[] frames, int delay) {
         play(frames, delay);
@@ -103,9 +109,10 @@ public class Sprite {
 
     /**
      * Play and loop a range of frames
+     *
      * @param startFrame the first frame
-     * @param endFrame the last frame
-     * @param delay delay between each frame
+     * @param endFrame   the last frame
+     * @param delay      delay between each frame
      */
     public void loop(int startFrame, int endFrame, int delay) {
         loop(getRange(startFrame, endFrame), delay);
@@ -113,6 +120,7 @@ public class Sprite {
 
     /**
      * Play and loop from the current frame to the last frame
+     *
      * @param delay delay between each frame
      */
     public void loop(int delay) {
@@ -147,6 +155,7 @@ public class Sprite {
 
     /**
      * Return the current Image (snapshot) of the current frame
+     *
      * @return Image of the current sprite frame
      */
     public BufferedImage getImage() {
@@ -181,6 +190,7 @@ public class Sprite {
 
     /**
      * Returns the X axis orientation
+     *
      * @return X axis orientation
      */
     public ESpriteOrientation getOrientationX() {
@@ -189,6 +199,7 @@ public class Sprite {
 
     /**
      * Returns the Y axis orientation
+     *
      * @return Y axis orientation
      */
     public ESpriteOrientation getOrientationY() {
@@ -216,20 +227,21 @@ public class Sprite {
     }
 
     /**
-     * Set the sprite scale
-     * @param scale sprite scale
-     */
-    public void setScale(float scale) {
-        this.scale = scale;
-    }
-
-    /**
      * Return the sprite scale
      *
      * @return sprite scale
      */
     public float getScale() {
         return scale;
+    }
+
+    /**
+     * Set the sprite scale
+     *
+     * @param scale sprite scale
+     */
+    public void setScale(float scale) {
+        this.scale = scale;
     }
 
     /**

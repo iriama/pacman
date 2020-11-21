@@ -1,4 +1,5 @@
-package physics.game;
+package core.game;
 
 public interface ICharacter {
+
 }

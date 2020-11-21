@@ -10,7 +10,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SpriteTest {
 
@@ -45,34 +46,34 @@ class SpriteTest {
     @Test
     void play() throws InterruptedException {
         sprite.play(0);
-        for (int i = 0; i<10; i++) sprite.getImage();
+        for (int i = 0; i < 10; i++) sprite.getImage();
         assertEquals(3, sprite.getCurrentFrame());
 
         sprite.play(1, 2, 0);
         assertEquals(1, sprite.getCurrentFrame());
-        for (int i = 0; i<10; i++)  sprite.getImage();
+        for (int i = 0; i < 10; i++) sprite.getImage();
         assertEquals(2, sprite.getCurrentFrame());
 
         sprite.play(new int[]{2, 0, 1}, 0);
         assertEquals(2, sprite.getCurrentFrame());
-        for (int i = 0; i<10; i++)  sprite.getImage();
+        for (int i = 0; i < 10; i++) sprite.getImage();
         assertEquals(1, sprite.getCurrentFrame());
     }
 
     @Test
     void loop() {
         sprite.loop(0);
-        for (int i = 0; i<2; i++) sprite.getImage();
+        for (int i = 0; i < 2; i++) sprite.getImage();
         assertEquals(2, sprite.getCurrentFrame());
 
         sprite.loop(1, 2, 0);
         assertEquals(1, sprite.getCurrentFrame());
-        for (int i = 0; i<2; i++)  sprite.getImage();
+        for (int i = 0; i < 2; i++) sprite.getImage();
         assertEquals(1, sprite.getCurrentFrame());
 
         sprite.loop(new int[]{2, 0, 1}, 0);
         assertEquals(2, sprite.getCurrentFrame());
-        for (int i = 0; i<3; i++)  sprite.getImage();
+        for (int i = 0; i < 3; i++) sprite.getImage();
         assertEquals(2, sprite.getCurrentFrame());
     }
 
