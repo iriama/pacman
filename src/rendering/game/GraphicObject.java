@@ -8,7 +8,7 @@ import rendering.graphics.Sprite;
  */
 public class GraphicObject implements IGraphicObject {
     private final Point position;
-    private final Sprite sprite;
+    private Sprite sprite;
     private final int id;
     private boolean visible;
 
@@ -26,6 +26,10 @@ public class GraphicObject implements IGraphicObject {
      */
     public Sprite getSprite() {
         return sprite;
+    }
+
+    public void setSprite(Sprite sprite) {
+        this.sprite = sprite;
     }
 
     public void setPosition(int X, int Y) {

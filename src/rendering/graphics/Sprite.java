@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
  */
 public class Sprite {
 
-    private final SpriteSheet spriteSheet;
+    private SpriteSheet spriteSheet;
     private int currentFrame;
 
     private ESpriteState state;
@@ -25,8 +25,8 @@ public class Sprite {
     private float orientationAngle;
 
     public Sprite(SpriteSheet spriteSheet) {
-        this.spriteSheet = spriteSheet;
         currentFrame = 0;
+        this.spriteSheet = spriteSheet;
         state = ESpriteState.PAUSED;
         scale = 1;
         orientationX = ESpriteOrientation.INITIAL;

@@ -9,5 +9,7 @@ public interface ICoreEngine {
 
     ICharacter addCharacter(IGraphicObject graphicObject, IPhyObject phyObject);
 
+    ICharacter addCharacter(ICharacter character);
+
     void removeCharacter(int characterId);
 }

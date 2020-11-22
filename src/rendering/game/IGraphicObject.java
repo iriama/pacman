@@ -5,6 +5,7 @@ import rendering.graphics.Sprite;
 
 public interface IGraphicObject {
     Sprite getSprite();
+    void setSprite(Sprite sprite);
 
     int getId();
 

@@ -59,6 +59,10 @@ public class PhyObject implements IPhyObject {
         return position.getX();
     }
 
+    public void setX(int x) {
+        position.setX(x);
+    }
+
     /**
      * Return Y position
      *
@@ -66,6 +70,10 @@ public class PhyObject implements IPhyObject {
      */
     public int getY() {
         return position.getY();
+    }
+
+    public void setY(int y) {
+        position.setY(y);
     }
 
     /**
@@ -148,7 +156,12 @@ public class PhyObject implements IPhyObject {
      * @return hitbox rectangle
      */
     public Rect getHitbox() {
-        return hitbox;
+        return new Rect(
+                hitbox.getX() + getX(),
+                hitbox.getWidth(),
+                hitbox.getY() + getY(),
+                hitbox.getHeight()
+        );
     }
 
     /**

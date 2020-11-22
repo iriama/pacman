@@ -11,8 +11,10 @@ public interface IPhyObject {
     void setPosition(Point position);
 
     int getX();
+    void setX(int x);
 
     int getY();
+    void setY(int y);
 
     void setPosition(int x, int y);
 

@@ -1,6 +1,6 @@
 package physics.engine;
 
-import core.engine.IEngine;
+import core.IEngine;
 import core.utility.IdFactory;
 import physics.game.IPhyObject;
 import physics.game.PhyObject;

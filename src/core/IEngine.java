@@ -1,4 +1,4 @@
-package core.engine;
+package core;
 
 public interface IEngine {
     void update();

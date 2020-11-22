@@ -1,6 +1,6 @@
 package rendering.engine;
 
-import core.engine.IEngine;
+import core.IEngine;
 import core.utility.IdFactory;
 import geometry.Point;
 import rendering.game.GraphicObject;
@@ -41,7 +41,7 @@ public class RenderEngine implements IRenderEngine, IPaintComponentListener, IEn
         int maxX = minX + panel.getWidth();
         int maxY = minY + panel.getHeight();
 
-        return object.isVisible() && position.getX() >= minX && position.getY() >= minY && position.getX() <= maxX && position.getY() <= maxY;
+        return object.isVisible(); //&& position.getX() >= minX && position.getY() >= minY && position.getX() <= maxX && position.getY() <= maxY;
     }
 
 
