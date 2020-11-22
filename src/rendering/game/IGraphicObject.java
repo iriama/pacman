@@ -3,7 +3,7 @@ package rendering.game;
 import geometry.Point;
 import rendering.graphics.Sprite;
 
-public interface IEntity {
+public interface IGraphicObject {
     Sprite getSprite();
 
     int getId();

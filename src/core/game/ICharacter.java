@@ -1,5 +1,12 @@
 package core.game;
 
-public interface ICharacter {
+import physics.game.IPhyObject;
+import rendering.game.IGraphicObject;
 
+public interface ICharacter {
+    IGraphicObject getGraphicObject();
+
+    IPhyObject getPhyObject();
+
+    int getId();
 }

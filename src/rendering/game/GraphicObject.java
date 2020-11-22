@@ -4,15 +4,15 @@ import geometry.Point;
 import rendering.graphics.Sprite;
 
 /**
- * Generic graphic representation of any entity of the game
+ * Generic graphic representation of any object of the game
  */
-public class Entity implements IEntity {
+public class GraphicObject implements IGraphicObject {
     private final Point position;
     private final Sprite sprite;
     private final int id;
     private boolean visible;
 
-    public Entity(Sprite sprite, int id) {
+    public GraphicObject(Sprite sprite, int id) {
         this.sprite = sprite;
         this.id = id;
         position = new Point();
@@ -20,7 +20,7 @@ public class Entity implements IEntity {
     }
 
     /**
-     * Returns the sprite of the entity
+     * Returns the sprite of the object
      *
      * @return sprite
      */
@@ -33,7 +33,7 @@ public class Entity implements IEntity {
     }
 
     /**
-     * Returns the position of the entity
+     * Returns the position of the object
      *
      * @return position
      */
@@ -42,32 +42,32 @@ public class Entity implements IEntity {
     }
 
     /**
-     * Returns if the entity is visible
+     * Returns if the object is visible
      *
-     * @return returns true if the entity is visible
+     * @return returns true if the object is visible
      */
     public boolean isVisible() {
         return visible;
     }
 
     /**
-     * Set the entity visibility to visible
+     * Set the object visibility to visible
      */
     public void show() {
         visible = true;
     }
 
     /**
-     * Set the entity visibility to hidden
+     * Set the object visibility to hidden
      */
     public void hide() {
         visible = false;
     }
 
     /**
-     * Return the Id of the entity
+     * Return the Id of the object
      *
-     * @return Id of the entity
+     * @return Id of the object
      */
     public int getId() {
         return id;
@@ -75,16 +75,16 @@ public class Entity implements IEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof Entity)) return false;
+        if (!(obj instanceof GraphicObject)) return false;
 
-        Entity other = (Entity) obj;
+        GraphicObject other = (GraphicObject) obj;
 
         return getId() == other.getId();
     }
 
     @Override
     public String toString() {
-        return "Entity{" +
+        return "GraphicObject{" +
                 "position=" + position +
                 ", visible=" + visible +
                 ", sprite=" + sprite +

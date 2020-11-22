@@ -15,9 +15,9 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class EntityTest {
+class GraphicObjectTest {
 
-    Entity entity;
+    GraphicObject GraphicObject;
     Sprite sprite;
 
     @BeforeEach
@@ -26,19 +26,19 @@ class EntityTest {
                 new SpriteSheet("ressources/sprites/test.png", 128, 4)
         );
 
-        entity = new Entity(sprite, 1337);
+        GraphicObject = new GraphicObject(sprite, 1337);
     }
 
     @AfterEach
     void tearDown() {
         sprite = null;
-        entity = null;
+        GraphicObject = null;
     }
 
     @Test
     void getSprite() throws IOException {
         BufferedImage img1 = sprite.getImage();
-        BufferedImage img2 = entity.getSprite().getImage();
+        BufferedImage img2 = GraphicObject.getSprite().getImage();
         ByteArrayOutputStream img1out = new ByteArrayOutputStream();
         ByteArrayOutputStream img2out = new ByteArrayOutputStream();
 
@@ -50,28 +50,28 @@ class EntityTest {
 
     @Test
     void position() {
-        assertEquals(new Point(0, 0), entity.getPosition());
-        entity.setPosition(2, 2);
-        assertEquals(new Point(2, 2), entity.getPosition());
+        assertEquals(new Point(0, 0), GraphicObject.getPosition());
+        GraphicObject.setPosition(2, 2);
+        assertEquals(new Point(2, 2), GraphicObject.getPosition());
     }
 
     @Test
     void visibility() {
-        assertTrue(entity.isVisible());
-        entity.hide();
-        assertFalse(entity.isVisible());
-        entity.show();
-        assertTrue(entity.isVisible());
+        assertTrue(GraphicObject.isVisible());
+        GraphicObject.hide();
+        assertFalse(GraphicObject.isVisible());
+        GraphicObject.show();
+        assertTrue(GraphicObject.isVisible());
     }
 
     @Test
     void getId() {
-        assertEquals(1337, entity.getId());
+        assertEquals(1337, GraphicObject.getId());
     }
 
     @Test
     void testEquals() {
-        Entity other = new Entity(null, 1337);
-        assertEquals(entity, other);
+        GraphicObject other = new GraphicObject(null, 1337);
+        assertEquals(GraphicObject, other);
     }
 }

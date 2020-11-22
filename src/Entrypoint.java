@@ -1,4 +1,5 @@
 import core.engine.CoreEngine;
+import core.game.ICharacter;
 import physics.engine.PhysicsEngine;
 import rendering.engine.RenderEngine;
 import rendering.utility.FontsEngine;
@@ -33,7 +34,10 @@ public class Entrypoint {
         PhysicsEngine physicsEngine = new PhysicsEngine();
         CoreEngine coreEngine = new CoreEngine(renderEngine, physicsEngine);
 
-        coreEngine.addCharacter(0, 28, 0, 28, 2, 0, "ressources/sprites/pacman.png", 28, 10, 10);
+        ICharacter pacman = coreEngine.addCharacter("ressources/sprites/pacman.png", 28, 10, 0, 28, 0, 28);
+
+        pacman.getGraphicObject().getSprite().loop(10);
+        pacman.getPhyObject().setVelocityX(2);
 
         coreEngine.run();
     }

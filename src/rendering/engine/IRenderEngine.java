@@ -1,17 +1,17 @@
 package rendering.engine;
 
 import geometry.Point;
-import rendering.game.Entity;
-import rendering.game.IEntity;
+import rendering.game.GraphicObject;
+import rendering.game.IGraphicObject;
 
 public interface IRenderEngine {
-    IEntity addEntity(IEntity entity);
+    IGraphicObject addObject(IGraphicObject object);
 
-    IEntity addEntity(String spriteSheetPath, int spriteWidth, int spriteCount);
+    IGraphicObject addObject(String spriteSheetPath, int spriteWidth, int spriteCount);
 
-    void removeEntity(Entity entity);
+    void removeObject(GraphicObject object);
 
-    void removeEntity(int index);
+    void removeObject(int objectId);
 
     Point getCameraPosition();
 

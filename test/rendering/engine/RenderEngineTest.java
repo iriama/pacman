@@ -3,8 +3,8 @@ package rendering.engine;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import rendering.game.Entity;
-import rendering.game.IEntity;
+import rendering.game.GraphicObject;
+import rendering.game.IGraphicObject;
 import rendering.graphics.Sprite;
 import rendering.graphics.SpriteSheet;
 
@@ -36,13 +36,13 @@ class RenderEngineTest {
     @Test
     void entity() {
 
-        IEntity entity = new Entity(new Sprite(
+        IGraphicObject entity = new GraphicObject(new Sprite(
                 new SpriteSheet("ressources/sprites/test.png", 128, 4)
         ), 1337);
 
-        IEntity res = engine.addEntity(entity);
+        IGraphicObject res = engine.addObject(entity);
         assertEquals(1337, res.getId());
-        res = engine.addEntity("ressources/sprites/test.png", 128, 4);
+        res = engine.addObject("ressources/sprites/test.png", 128, 4);
         assertEquals(Integer.MIN_VALUE + 1, res.getId());
 
     }

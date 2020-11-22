@@ -1,6 +1,7 @@
 package physics.engine;
 
 import core.engine.IEngine;
+import core.utility.IdFactory;
 import physics.game.IPhyObject;
 import physics.game.PhyObject;
 
@@ -9,19 +10,9 @@ import java.util.Vector;
 public class PhysicsEngine implements IPhysicsEngine, IEngine {
 
     private Vector<IPhyObject> objects;
-    private int objectIds;
 
     public PhysicsEngine() {
         objects = new Vector<IPhyObject>();
-        objectIds = Integer.MIN_VALUE;
-    }
-
-    private int nextId() {
-        if (objectIds > Integer.MAX_VALUE - 2)
-            objectIds = Integer.MIN_VALUE;
-
-        objectIds++;
-        return objectIds;
     }
 
     /**
@@ -45,7 +36,7 @@ public class PhysicsEngine implements IPhysicsEngine, IEngine {
      * @return added object
      */
     public IPhyObject addObject(int x, int width, int y, int height) {
-        IPhyObject object = new PhyObject(x, width, y, height, nextId());
+        IPhyObject object = new PhyObject(x, width, y, height, IdFactory.nextId());
         return addObject(object);
     }
 
