@@ -36,8 +36,8 @@ public class Entrypoint {
 
         ICharacter pacman = coreEngine.addCharacter("ressources/sprites/pacman.png", 28, 10, 0, 28, 0, 28);
 
-        pacman.getGraphicObject().getSprite().loop(10);
-        pacman.getPhyObject().setVelocityX(2);
+        pacman.getGraphicObject().getSprite().loop(100);
+        pacman.getPhyObject().setVelocityX(10);
 
         coreEngine.run();
     }

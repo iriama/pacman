@@ -14,11 +14,15 @@ import rendering.graphics.SpriteSheet;
 
 import java.util.Vector;
 
-public class CoreEngine implements ICoreEngine {
+public class CoreEngine implements ICoreEngine, IEngine, Runnable {
 
     private IRenderEngine renderEngine;
     private IPhysicsEngine physicsEngine;
     private Vector<ICharacter> characters;
+
+    final int TICKS_PER_SECOND = 25;
+    final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
+    final int MAX_FRAMESKIP = 5;
 
     public CoreEngine(IRenderEngine renderEngine, IPhysicsEngine physicsEngine) {
         this.renderEngine = renderEngine;
@@ -26,19 +30,37 @@ public class CoreEngine implements ICoreEngine {
         this.characters = new Vector<ICharacter>();
     }
 
-    public void run() throws InterruptedException {
-        for (; ; ) {
-            ((IEngine) physicsEngine).update();
+    /**
+     * Update the core engine
+     */
+    public void update() {
+        ((IEngine) physicsEngine).update();
 
-            for (ICharacter character : characters) {
-                IPhyObject phyObject = character.getPhyObject();
-                character.getGraphicObject().setPosition(phyObject.getX(), phyObject.getY());
+        for (ICharacter character : characters) {
+            IPhyObject phyObject = character.getPhyObject();
+            character.getGraphicObject().setPosition(phyObject.getX(), phyObject.getY());
+        }
+    }
+
+    @Override
+    public void run() {
+        double next_game_tick = System.currentTimeMillis();
+        int loops;
+
+        while (true) {
+            loops = 0;
+            while (System.currentTimeMillis() > next_game_tick && loops < MAX_FRAMESKIP) {
+
+                update();
+
+                next_game_tick += SKIP_TICKS;
+                loops++;
             }
 
             ((IEngine) renderEngine).update();
-            Thread.sleep(20);
         }
     }
+
 
     public ICharacter addCharacter(String spriteSheetPath, int spriteWidth, int spriteCount, int x, int width, int y, int height) {
         IGraphicObject graphicObject = new GraphicObject(
