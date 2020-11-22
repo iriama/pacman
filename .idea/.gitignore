@@ -1,6 +1,7 @@
 # Output
 pacman.jar
 out/
+javadoc/
 
 # Default ignored files
 /shelf/
