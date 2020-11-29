@@ -16,12 +16,20 @@ import pacman.windows.MainWindow;
 import pacman.windows.SplashWindow;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Pacman {
 
-    static RenderEngine renderEngine = new RenderEngine();
+    public static JPanel panel = new JPanel() {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            renderEngine.draw((Graphics2D) g);
+        }
+    };
+    static RenderEngine renderEngine = new RenderEngine(() -> panel.repaint());
     static PhysicsEngine physicsEngine = new PhysicsEngine();
     static InputEngine inputEngine = new InputEngine();
     static CoreEngine coreEngine;

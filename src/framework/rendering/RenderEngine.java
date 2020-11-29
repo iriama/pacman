@@ -13,32 +13,18 @@ import java.util.Vector;
 /**
  * Engine responsable of framework.rendering graphic objects
  */
-public class RenderEngine implements IRenderEngine, IPaintComponentListener {
+public class RenderEngine implements IRenderEngine {
 
     private final Vector<GraphicObject> objects;
     private final HashMap<String, SpriteSheet> spriteSheetCache;
-    private final RenderPanel panel;
     private Point camera;
+    private IPanel panel;
 
-    public RenderEngine() {
+    public RenderEngine(IPanel panel) {
         objects = new Vector<GraphicObject>();
         spriteSheetCache = new HashMap<String, SpriteSheet>();
         camera = new Point(0, 0);
-        panel = new RenderPanel();
-        panel.addOnPaintComponentListener(this);
-        panel.setBackground(Color.black);
-    }
-
-
-    private boolean shouldDraw(GraphicObject object) {
-        Point position = object.getPosition();
-
-        int minX = camera.getX();
-        int minY = camera.getY();
-        int maxX = minX + panel.getWidth();
-        int maxY = minY + panel.getHeight();
-
-        return object.isVisible(); //&& position.getX() >= minX && position.getY() >= minY && position.getX() <= maxX && position.getY() <= maxY;
+        this.panel = panel;
     }
 
 
@@ -87,25 +73,15 @@ public class RenderEngine implements IRenderEngine, IPaintComponentListener {
         objects.remove(graphicObject);
     }
 
-
     /**
-     * Return the JPanel instance
+     * Paint scene into the graphics object provided
      *
-     * @return JPanel instance
+     * @param g Graphics2D object
      */
-    public RenderPanel getPanel() {
-        return panel;
-    }
-
-    /**
-     * To be called on every onPaint JPanel API
-     *
-     * @param g Graphics2D brush
-     */
-    public void onPaint(Graphics2D g) {
+    public void draw(Graphics2D g) {
         for (int i = 0; i < objects.size(); i++) {
             GraphicObject object = objects.get(i);
-            if (!shouldDraw(object)) continue;
+            if (!object.isVisible()) continue;
 
             try {
                 Point position = translate(object.getPosition());

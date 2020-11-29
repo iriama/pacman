@@ -1,7 +1,7 @@
 package framework.rendering.utility;
 
-import pacman.utility.FontsEngine;
 import org.junit.jupiter.api.Test;
+import pacman.utility.FontsEngine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

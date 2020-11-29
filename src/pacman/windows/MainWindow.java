@@ -1,6 +1,7 @@
 package pacman.windows;
 
 import framework.rendering.RenderEngine;
+import pacman.Pacman;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,8 +33,9 @@ public class MainWindow extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-        renderEngine.getPanel().setSize(WIDTH, HEIGHT);
-        setContentPane(renderEngine.getPanel());
+        Pacman.panel.setSize(WIDTH, HEIGHT);
+        Pacman.panel.setBackground(Color.black);
+        setContentPane(Pacman.panel);
     }
 
 

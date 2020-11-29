@@ -8,15 +8,19 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.swing.*;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RenderEngineTest {
 
+    JPanel panel;
     RenderEngine engine;
 
     @BeforeEach
     void setUp() {
-        engine = new RenderEngine();
+        panel = new JPanel();
+        engine = new RenderEngine(() -> panel.repaint());
     }
 
     @AfterEach
