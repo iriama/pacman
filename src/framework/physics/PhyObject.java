@@ -19,7 +19,7 @@ public class PhyObject {
     public PhyObject(int x, int width, int y, int height, int id) {
         this.id = id;
         this.position = new Point(x, y);
-        this.hitbox = new Rect(x, width, y, height);
+        this.hitbox = new Rect(0, width, 0, height);
         this.velocity = new Point(0, 0);
     }
 

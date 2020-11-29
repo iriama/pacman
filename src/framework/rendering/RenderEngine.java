@@ -89,11 +89,14 @@ public class RenderEngine implements IRenderEngine {
 
                 g.drawImage(image, position.getX(), position.getY(), null);
             } catch (Exception e) {
-                System.err.println("can't paint " + object);
+                System.err.println("can't draw " + object);
             }
         }
     }
 
+    /**
+     * Updates the render engine
+     */
     public void update() {
         panel.repaint();
     }

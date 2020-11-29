@@ -76,7 +76,7 @@ public class Pacman {
         SpriteSheet ghost_down = new SpriteSheet("ressources/sprites/ghost/cyan_down.png", 28, 4);
         SpriteSheet ghost_up = new SpriteSheet("ressources/sprites/ghost/cyan_up.png", 28, 4);
 
-        Character ghost = new Character(new GraphicObject(new Sprite(ghost_left), 1), new PhyObject(0, 28, 0, 28, 1), 1);
+        Character ghost = new Character(new GraphicObject(new Sprite(ghost_left), 1), new PhyObject(0, 28, 30, 28, 1), 1);
         ghost.getGraphicObject().getSprite().loop(40);
         ghost.getPhyObject().setX(MainWindow.WIDTH - 28);
         ghost.getPhyObject().setVelocityX(-5);
