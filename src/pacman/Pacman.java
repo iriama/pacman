@@ -33,6 +33,9 @@ public class Pacman {
             super.paintComponent(g);
             renderEngine.draw((Graphics2D) g);
 
+            g.setColor(Color.green);
+            g.drawRect(renderEngine.getCameraPosition().getX(), renderEngine.getCameraPosition().getY(), MainWindow.WIDTH, MainWindow.HEIGHT);
+
             // DEBUG
             if (_pacman != null) {
                 Rect hitbox = _pacman.getPhyObject().getHitbox();
@@ -167,29 +170,29 @@ public class Pacman {
                 gameOver.set(true);
             }
 
-            if (pacman.getPhyObject().getX() < -10 && pacman.getPhyObject().getVelocityX() < 0) {
-                pacman.getPhyObject().setX(MainWindow.WIDTH - 10);
-            } else if (pacman.getPhyObject().getX() > MainWindow.WIDTH && pacman.getPhyObject().getVelocityX() > 0) {
-                pacman.getPhyObject().setX(-20);
+            if (pacman.getPhyObject().getX() <= -28 && pacman.getPhyObject().getVelocityX() < 0) {
+                pacman.getPhyObject().setX(MainWindow.WIDTH);
+            } else if (pacman.getPhyObject().getX() >= MainWindow.WIDTH && pacman.getPhyObject().getVelocityX() > 0) {
+                pacman.getPhyObject().setX(-28);
             }
 
-            if (pacman.getPhyObject().getY() < -10 && pacman.getPhyObject().getVelocityY() < 0) {
-                pacman.getPhyObject().setY(MainWindow.HEIGHT - 20);
-            } else if (pacman.getPhyObject().getY() > MainWindow.HEIGHT - 20 && pacman.getPhyObject().getVelocityY() > 0) {
-                pacman.getPhyObject().setY(-10);
+            if (pacman.getPhyObject().getY() <= -28 && pacman.getPhyObject().getVelocityY() < 0) {
+                pacman.getPhyObject().setY(MainWindow.HEIGHT);
+            } else if (pacman.getPhyObject().getY() >= MainWindow.HEIGHT && pacman.getPhyObject().getVelocityY() > 0) {
+                pacman.getPhyObject().setY(-28);
             }
 
             // GHOST
-            if (ghost.getPhyObject().getX() < -10 && ghost.getPhyObject().getVelocityX() < 0) {
-                ghost.getPhyObject().setX(MainWindow.WIDTH - 10);
-            } else if (ghost.getPhyObject().getX() > MainWindow.WIDTH && ghost.getPhyObject().getVelocityX() > 0) {
-                ghost.getPhyObject().setX(-20);
+            if (ghost.getPhyObject().getX() <= -28 && ghost.getPhyObject().getVelocityX() < 0) {
+                ghost.getPhyObject().setX(MainWindow.WIDTH);
+            } else if (ghost.getPhyObject().getX() >= MainWindow.WIDTH && ghost.getPhyObject().getVelocityX() > 0) {
+                ghost.getPhyObject().setX(-28);
             }
 
-            if (ghost.getPhyObject().getY() < -10 && ghost.getPhyObject().getVelocityY() < 0) {
-                ghost.getPhyObject().setY(MainWindow.HEIGHT - 20);
-            } else if (ghost.getPhyObject().getY() > MainWindow.HEIGHT - 20 && ghost.getPhyObject().getVelocityY() > 0) {
-                ghost.getPhyObject().setY(-10);
+            if (ghost.getPhyObject().getY() <= -28 && ghost.getPhyObject().getVelocityY() < 0) {
+                ghost.getPhyObject().setY(MainWindow.HEIGHT);
+            } else if (ghost.getPhyObject().getY() >= MainWindow.HEIGHT - 5 && ghost.getPhyObject().getVelocityY() > 0) {
+                ghost.getPhyObject().setY(-28);
             }
 
         });

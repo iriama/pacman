@@ -28,14 +28,13 @@ public class MainWindow extends JFrame {
      */
     public void build() {
         setTitle(TITLE);
-        setSize(new Dimension(WIDTH, HEIGHT));
-        setResizable(false);
-        setLocationRelativeTo(null);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-        Pacman.panel.setSize(WIDTH, HEIGHT);
         Pacman.panel.setBackground(Color.black);
         setContentPane(Pacman.panel);
+        getContentPane().setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        pack();
+        setLocationRelativeTo(null);
     }
 
 
