@@ -4,7 +4,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import rendering.game.GraphicObject;
-import rendering.game.IGraphicObject;
 import rendering.graphics.Sprite;
 import rendering.graphics.SpriteSheet;
 
@@ -36,11 +35,11 @@ class RenderEngineTest {
     @Test
     void entity() {
 
-        IGraphicObject entity = new GraphicObject(new Sprite(
+        GraphicObject entity = new GraphicObject(new Sprite(
                 new SpriteSheet("ressources/sprites/test.png", 128, 4)
         ), 1337);
 
-        IGraphicObject res = engine.addObject(entity);
+        GraphicObject res = engine.addObject(entity);
         assertEquals(1337, res.getId());
         res = engine.addObject("ressources/sprites/test.png", 128, 4);
         assertEquals(Integer.MIN_VALUE + 1, res.getId());

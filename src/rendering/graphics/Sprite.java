@@ -24,7 +24,11 @@ public class Sprite {
     private float scale;
     private float orientationAngle;
 
+    private ISpriteEvent onFinish;
+
+
     public Sprite(SpriteSheet spriteSheet) {
+        onFinish = null;
         currentFrame = 0;
         this.spriteSheet = spriteSheet;
         state = ESpriteState.PAUSED;
@@ -40,6 +44,15 @@ public class Sprite {
             t[i] = i + start;
 
         return t;
+    }
+
+    /**
+     * Replaces the current spritesheet
+     *
+     * @param spriteSheet new sprite sheet
+     */
+    public void setSpriteSheet(SpriteSheet spriteSheet) {
+        this.spriteSheet = spriteSheet;
     }
 
     /**
@@ -127,6 +140,15 @@ public class Sprite {
         loop(getRange(currentFrame, spriteSheet.getSpriteCount() - 1), delay);
     }
 
+    /**
+     * Execute an event when finish playing
+     *
+     * @param event event to execute
+     */
+    public void onPlayFinish(ISpriteEvent event) {
+        onFinish = event;
+    }
+
     private void updateSprite() {
         // PAUSED
         if (state == ESpriteState.PAUSED || System.currentTimeMillis() < nextFrameTime)
@@ -151,6 +173,12 @@ public class Sprite {
 
         currentFrame = frames[playIndex];
         nextFrameTime = System.currentTimeMillis() + delay;
+
+        // Finished playing
+        if (onFinish != null && playIndex == frames.length - 1) {
+            onFinish.action();
+            onFinish = null;
+        }
     }
 
     /**

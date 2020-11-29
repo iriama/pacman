@@ -1,6 +1,7 @@
 package input.sources;
 
 public interface ISource {
-    void process();
+    void update();
+
     int getId();
 }

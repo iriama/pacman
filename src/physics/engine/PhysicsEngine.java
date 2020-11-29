@@ -1,18 +1,16 @@
 package physics.engine;
 
-import core.IEngine;
 import core.utility.IdFactory;
-import physics.game.IPhyObject;
 import physics.game.PhyObject;
 
 import java.util.Vector;
 
-public class PhysicsEngine implements IPhysicsEngine, IEngine {
+public class PhysicsEngine implements IPhysicsEngine {
 
-    private Vector<IPhyObject> objects;
+    private Vector<PhyObject> objects;
 
     public PhysicsEngine() {
-        objects = new Vector<IPhyObject>();
+        objects = new Vector<PhyObject>();
     }
 
     /**
@@ -21,7 +19,7 @@ public class PhysicsEngine implements IPhysicsEngine, IEngine {
      * @param object object to add
      * @return added object
      */
-    public IPhyObject addObject(IPhyObject object) {
+    public PhyObject addObject(PhyObject object) {
         objects.add(object);
         return object;
     }
@@ -35,8 +33,8 @@ public class PhysicsEngine implements IPhysicsEngine, IEngine {
      * @param height object height
      * @return added object
      */
-    public IPhyObject addObject(int x, int width, int y, int height) {
-        IPhyObject object = new PhyObject(x, width, y, height, IdFactory.nextId());
+    public PhyObject addObject(int x, int width, int y, int height) {
+        PhyObject object = new PhyObject(x, width, y, height, IdFactory.nextId());
         return addObject(object);
     }
 
@@ -45,24 +43,16 @@ public class PhysicsEngine implements IPhysicsEngine, IEngine {
      *
      * @param object object to remove
      */
-    public void removeObject(IPhyObject object) {
+    public void removeObject(PhyObject object) {
         objects.remove(object);
     }
 
-    /**
-     * Remove an object from the physics engine
-     *
-     * @param objectId object's id to remove
-     */
-    public void removeObject(int objectId) {
-        removeObject(new PhyObject(objectId));
-    }
 
     /**
      * Update the objects within the physics engine
      */
     public void update() {
-        for (IPhyObject object : objects) {
+        for (PhyObject object : objects) {
             object.setPosition(object.getPosition().extend(object.getVelocity()));
         }
     }

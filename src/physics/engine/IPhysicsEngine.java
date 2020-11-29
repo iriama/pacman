@@ -1,13 +1,11 @@
 package physics.engine;
 
-import physics.game.IPhyObject;
+import physics.game.PhyObject;
 
 public interface IPhysicsEngine {
-    IPhyObject addObject(IPhyObject object);
+    PhyObject addObject(PhyObject object);
 
-    IPhyObject addObject(int x, int width, int y, int height);
+    void removeObject(PhyObject object);
 
-    void removeObject(IPhyObject object);
-
-    void removeObject(int objectId);
+    void update();
 }

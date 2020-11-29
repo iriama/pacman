@@ -8,6 +8,7 @@ public class IdFactory {
 
     /**
      * Return unique id
+     *
      * @return next unique id
      */
     public static int nextId() {

@@ -3,7 +3,7 @@ package physics.game;
 import geometry.Point;
 import geometry.Rect;
 
-public class PhyObject implements IPhyObject {
+public class PhyObject {
     private Point position;
     private Point velocity;
     private Rect hitbox;
@@ -182,7 +182,7 @@ public class PhyObject implements IPhyObject {
      * @param phyObject the other object
      * @return true if collides with
      */
-    public boolean collideWith(IPhyObject phyObject) {
+    public boolean collideWith(PhyObject phyObject) {
         return getHitbox().intersect(phyObject.getHitbox());
     }
 

@@ -1,6 +1,7 @@
 import core.engine.CoreEngine;
 import core.game.Character;
 import input.engine.InputEngine;
+import input.sources.KeyStateEnum;
 import input.sources.Keyboard;
 import physics.engine.PhysicsEngine;
 import physics.game.PhyObject;
@@ -70,72 +71,49 @@ public class Entrypoint {
         ghost.getPhyObject().setVelocityX(-5);
 
 
-        // Z = up ; S = down; Q = left; D = right
-        Keyboard pacman_keyboard = new Keyboard((int key, boolean state) -> {
-            if (gameOver.get() || !state)
-                return;
+        Keyboard pacman_keyboard = new Keyboard();
 
-            switch (key) {
-                case KeyEvent.VK_Z:
-                    Sprite up = new Sprite(pacman_up);
-                    up.loop(20);
-                    pacman.getGraphicObject().setSprite(up);
-                    pacman.getPhyObject().setVelocity(0, -5);
-                    break;
-                case KeyEvent.VK_S:
-                    Sprite down = new Sprite(pacman_down);
-                    down.loop(20);
-                    pacman.getGraphicObject().setSprite(down);
-                    pacman.getPhyObject().setVelocity(0, 5);
-                    break;
-                case KeyEvent.VK_Q:
-                    Sprite left = new Sprite(pacman_left);
-                    left.loop(20);
-                    pacman.getGraphicObject().setSprite(left);
-                    pacman.getPhyObject().setVelocity(-5, 0);
-                    break;
-                case KeyEvent.VK_D:
-                    Sprite right = new Sprite(pacman_right);
-                    right.loop(20);
-                    pacman.getGraphicObject().setSprite(right);
-                    pacman.getPhyObject().setVelocity(5, 0);
-                    break;
-
-            }
+        pacman_keyboard.mapKey(KeyEvent.VK_Z, KeyStateEnum.PRESSED, () -> {
+            pacman.getGraphicObject().setSpriteSheet(pacman_up);
+            pacman.getPhyObject().setVelocity(0, -5);
         });
 
-        // GHOST
-        Keyboard ghost_keyboard = new Keyboard((int key, boolean state) -> {
-            if (gameOver.get() || !state)
-                return;
+        pacman_keyboard.mapKey(KeyEvent.VK_S, KeyStateEnum.PRESSED, () -> {
+            pacman.getGraphicObject().setSpriteSheet(pacman_down);
+            pacman.getPhyObject().setVelocity(0, 5);
+        });
 
-            switch (key) {
-                case KeyEvent.VK_UP:
-                    Sprite up = new Sprite(ghost_up);
-                    up.loop(20);
-                    ghost.getGraphicObject().setSprite(up);
-                    ghost.getPhyObject().setVelocity(0, -5);
-                    break;
-                case KeyEvent.VK_DOWN:
-                    Sprite down = new Sprite(ghost_down);
-                    down.loop(20);
-                    ghost.getGraphicObject().setSprite(down);
-                    ghost.getPhyObject().setVelocity(0, 5);
-                    break;
-                case KeyEvent.VK_LEFT:
-                    Sprite left = new Sprite(ghost_left);
-                    left.loop(20);
-                    ghost.getGraphicObject().setSprite(left);
-                    ghost.getPhyObject().setVelocity(-5, 0);
-                    break;
-                case KeyEvent.VK_RIGHT:
-                    Sprite right = new Sprite(ghost_right);
-                    right.loop(20);
-                    ghost.getGraphicObject().setSprite(right);
-                    ghost.getPhyObject().setVelocity(5, 0);
-                    break;
+        pacman_keyboard.mapKey(KeyEvent.VK_Q, KeyStateEnum.PRESSED, () -> {
+            pacman.getGraphicObject().setSpriteSheet(pacman_left);
+            pacman.getPhyObject().setVelocity(-5, 0);
+        });
 
-            }
+        pacman_keyboard.mapKey(KeyEvent.VK_D, KeyStateEnum.PRESSED, () -> {
+            pacman.getGraphicObject().setSpriteSheet(pacman_right);
+            pacman.getPhyObject().setVelocity(5, 0);
+        });
+
+
+        Keyboard ghost_keyboard = new Keyboard();
+
+        ghost_keyboard.mapKey(KeyEvent.VK_UP, KeyStateEnum.PRESSED, () -> {
+            ghost.getGraphicObject().setSpriteSheet(ghost_up);
+            ghost.getPhyObject().setVelocity(0, -5);
+        });
+
+        ghost_keyboard.mapKey(KeyEvent.VK_DOWN, KeyStateEnum.PRESSED, () -> {
+            ghost.getGraphicObject().setSpriteSheet(ghost_down);
+            ghost.getPhyObject().setVelocity(0, 5);
+        });
+
+        ghost_keyboard.mapKey(KeyEvent.VK_LEFT, KeyStateEnum.PRESSED, () -> {
+            ghost.getGraphicObject().setSpriteSheet(ghost_left);
+            ghost.getPhyObject().setVelocity(-5, 0);
+        });
+
+        ghost_keyboard.mapKey(KeyEvent.VK_RIGHT, KeyStateEnum.PRESSED, () -> {
+            ghost.getGraphicObject().setSpriteSheet(ghost_right);
+            ghost.getPhyObject().setVelocity(5, 0);
         });
 
         inputEngine.addSource(pacman_keyboard);
@@ -146,40 +124,41 @@ public class Entrypoint {
             if (gameOver.get()) return;
 
             if (pacman.getPhyObject().collideWith(ghost.getPhyObject())) {
+
+                pacman_keyboard.disable();
+                ghost_keyboard.disable();
+
                 pacman.getPhyObject().setVelocity(0, 0);
                 ghost.getPhyObject().setVelocity(0, 0);
                 Sprite death = new Sprite(pacman_death);
                 death.play(20);
+                death.onPlayFinish(() -> coreEngine.removeCharacter(pacman));
                 pacman.getGraphicObject().setSprite(death);
                 gameOver.set(true);
             }
 
             if (pacman.getPhyObject().getX() < -10 && pacman.getPhyObject().getVelocityX() < 0) {
                 pacman.getPhyObject().setX(MainWindow.WIDTH - 10);
-            }
-            else if (pacman.getPhyObject().getX() > MainWindow.WIDTH && pacman.getPhyObject().getVelocityX() > 0) {
+            } else if (pacman.getPhyObject().getX() > MainWindow.WIDTH && pacman.getPhyObject().getVelocityX() > 0) {
                 pacman.getPhyObject().setX(-20);
             }
 
             if (pacman.getPhyObject().getY() < -10 && pacman.getPhyObject().getVelocityY() < 0) {
                 pacman.getPhyObject().setY(MainWindow.HEIGHT - 20);
-            }
-            else if (pacman.getPhyObject().getY() > MainWindow.HEIGHT - 20 && pacman.getPhyObject().getVelocityY() > 0) {
+            } else if (pacman.getPhyObject().getY() > MainWindow.HEIGHT - 20 && pacman.getPhyObject().getVelocityY() > 0) {
                 pacman.getPhyObject().setY(-10);
             }
 
             // GHOST
             if (ghost.getPhyObject().getX() < -10 && ghost.getPhyObject().getVelocityX() < 0) {
                 ghost.getPhyObject().setX(MainWindow.WIDTH - 10);
-            }
-            else if (ghost.getPhyObject().getX() > MainWindow.WIDTH && ghost.getPhyObject().getVelocityX() > 0) {
+            } else if (ghost.getPhyObject().getX() > MainWindow.WIDTH && ghost.getPhyObject().getVelocityX() > 0) {
                 ghost.getPhyObject().setX(-20);
             }
 
             if (ghost.getPhyObject().getY() < -10 && ghost.getPhyObject().getVelocityY() < 0) {
                 ghost.getPhyObject().setY(MainWindow.HEIGHT - 20);
-            }
-            else if (ghost.getPhyObject().getY() > MainWindow.HEIGHT - 20 && ghost.getPhyObject().getVelocityY() > 0) {
+            } else if (ghost.getPhyObject().getY() > MainWindow.HEIGHT - 20 && ghost.getPhyObject().getVelocityY() > 0) {
                 ghost.getPhyObject().setY(-10);
             }
 

@@ -1,10 +1,8 @@
 package rendering.engine;
 
-import core.IEngine;
 import core.utility.IdFactory;
 import geometry.Point;
 import rendering.game.GraphicObject;
-import rendering.game.IGraphicObject;
 import rendering.graphics.Sprite;
 import rendering.graphics.SpriteSheet;
 
@@ -16,15 +14,15 @@ import java.util.Vector;
 /**
  * Engine responsable of rendering graphic objects
  */
-public class RenderEngine implements IRenderEngine, IPaintComponentListener, IEngine {
+public class RenderEngine implements IRenderEngine, IPaintComponentListener {
 
-    private final Vector<IGraphicObject> objects;
+    private final Vector<GraphicObject> objects;
     private final HashMap<String, SpriteSheet> spriteSheetCache;
     private final RenderPanel panel;
     private Point camera;
 
     public RenderEngine() {
-        objects = new Vector<IGraphicObject>();
+        objects = new Vector<GraphicObject>();
         spriteSheetCache = new HashMap<String, SpriteSheet>();
         camera = new Point(0, 0);
         panel = new RenderPanel();
@@ -33,7 +31,7 @@ public class RenderEngine implements IRenderEngine, IPaintComponentListener, IEn
     }
 
 
-    private boolean shouldDraw(IGraphicObject object) {
+    private boolean shouldDraw(GraphicObject object) {
         Point position = object.getPosition();
 
         int minX = camera.getX();
@@ -55,7 +53,7 @@ public class RenderEngine implements IRenderEngine, IPaintComponentListener, IEn
      * @param object object to add
      * @return added object
      */
-    public IGraphicObject addObject(IGraphicObject object) {
+    public GraphicObject addObject(GraphicObject object) {
         objects.add(object);
         return object;
     }
@@ -68,7 +66,7 @@ public class RenderEngine implements IRenderEngine, IPaintComponentListener, IEn
      * @param spriteCount     number of sprites on the sprite sheet
      * @return the added object
      */
-    public IGraphicObject addObject(String spriteSheetPath, int spriteWidth, int spriteCount) {
+    public GraphicObject addObject(String spriteSheetPath, int spriteWidth, int spriteCount) {
         SpriteSheet sheet;
         if (spriteSheetCache.containsKey(spriteSheetPath))
             sheet = spriteSheetCache.get(spriteSheetPath);
@@ -84,20 +82,12 @@ public class RenderEngine implements IRenderEngine, IPaintComponentListener, IEn
     /**
      * Removes an GraphicObject from the render engine
      *
-     * @param GraphicObject GraphicObject to remove
+     * @param graphicObject GraphicObject to remove
      */
-    public void removeObject(GraphicObject GraphicObject) {
-        objects.remove(GraphicObject);
+    public void removeObject(GraphicObject graphicObject) {
+        objects.remove(graphicObject);
     }
 
-    /**
-     * Removes an object from the render engine by id
-     *
-     * @param objectId id of the object to remove
-     */
-    public void removeObject(int objectId) {
-        removeObject(new GraphicObject(null, objectId));
-    }
 
     /**
      * Return the JPanel instance
@@ -115,7 +105,7 @@ public class RenderEngine implements IRenderEngine, IPaintComponentListener, IEn
      */
     public void onPaint(Graphics2D g) {
         for (int i = 0; i < objects.size(); i++) {
-            IGraphicObject object = objects.get(i);
+            GraphicObject object = objects.get(i);
             if (!shouldDraw(object)) continue;
 
             try {

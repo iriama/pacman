@@ -1,15 +1,15 @@
 package core.game;
 
-import physics.game.IPhyObject;
-import rendering.game.IGraphicObject;
+import physics.game.PhyObject;
+import rendering.game.GraphicObject;
 
-public class Character implements ICharacter {
+public class Character {
 
-    private IGraphicObject graphicObject;
-    private IPhyObject phyObject;
+    private GraphicObject graphicObject;
+    private PhyObject phyObject;
     private int id;
 
-    public Character(IGraphicObject graphicObject, IPhyObject phyObject, int id) {
+    public Character(GraphicObject graphicObject, PhyObject phyObject, int id) {
         this.graphicObject = graphicObject;
         this.phyObject = phyObject;
         this.id = id;
@@ -21,7 +21,7 @@ public class Character implements ICharacter {
      *
      * @return graphic object instance
      */
-    public IGraphicObject getGraphicObject() {
+    public GraphicObject getGraphicObject() {
         return graphicObject;
     }
 
@@ -30,7 +30,7 @@ public class Character implements ICharacter {
      *
      * @return physical object instance
      */
-    public IPhyObject getPhyObject() {
+    public PhyObject getPhyObject() {
         return phyObject;
     }
 

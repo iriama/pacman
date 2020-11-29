@@ -2,14 +2,15 @@ package rendering.game;
 
 import geometry.Point;
 import rendering.graphics.Sprite;
+import rendering.graphics.SpriteSheet;
 
 /**
  * Generic graphic representation of any object of the game
  */
-public class GraphicObject implements IGraphicObject {
+public class GraphicObject {
     private final Point position;
-    private Sprite sprite;
     private final int id;
+    private Sprite sprite;
     private boolean visible;
 
     public GraphicObject(Sprite sprite, int id) {
@@ -28,8 +29,23 @@ public class GraphicObject implements IGraphicObject {
         return sprite;
     }
 
+    /**
+     * Set a new sprite to the graphic object
+     *
+     * @param sprite new sprite
+     */
     public void setSprite(Sprite sprite) {
         this.sprite = sprite;
+    }
+
+    /**
+     * Set a new spritesheet for the current sprite
+     *
+     * @param spriteSheet new spriteSheet
+     */
+    public void setSpriteSheet(SpriteSheet spriteSheet) {
+        this.sprite.setSpriteSheet(spriteSheet);
+
     }
 
     public void setPosition(int X, int Y) {

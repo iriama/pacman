@@ -7,52 +7,119 @@ import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.HashSet;
 
+/**
+ * Physical keyboard
+ */
 public class Keyboard implements ISource, KeyEventDispatcher {
-    private int id;
     static Object _lock = new Object();
-    private HashMap<Integer, Boolean> keyStates;
-    private IKeyboardEvent listener;
+    private int id;
     private HashSet<Integer> pressed;
     private HashSet<Integer> released;
+    private HashSet<Integer> newPressed;
+    private HashSet<Integer> newReleased;
 
-    public Keyboard(IKeyboardEvent listener) {
-        this.listener = listener;
+    private HashMap<Integer, IKeyboardEvent> pressedEvents;
+    private HashMap<Integer, IKeyboardEvent> releasedEvents;
+
+    private boolean active;
+
+    public Keyboard() {
+        active = true;
         pressed = new HashSet<Integer>();
         released = new HashSet<Integer>();
-        keyStates = new HashMap<Integer, Boolean>();
+        newPressed = new HashSet<Integer>();
+        newReleased = new HashSet<Integer>();
+
         id = IdFactory.nextId();
+        this.pressedEvents = new HashMap<Integer, IKeyboardEvent>();
+        this.releasedEvents = new HashMap<Integer, IKeyboardEvent>();
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
     }
 
-    public boolean isKeyDown(int key) {
-        return keyStates.containsKey(key) && keyStates.get(key);
+    /**
+     * Update the keyboard and fire events
+     */
+    public void update() {
+        if (active) {
+            for (int key : newPressed) {
+                if (pressedEvents.containsKey(key)) pressedEvents.get(key).action();
+            }
+
+            for (int key : newReleased) {
+                if (releasedEvents.containsKey(key)) releasedEvents.get(key).action();
+            }
+        }
+
+        newPressed.clear();
+        newReleased.clear();
     }
 
-    public void process() { }
 
+    /**
+     * Map a key state to an action
+     *
+     * @param key   key code
+     * @param state key state
+     * @param event action
+     */
+    public void mapKey(int key, KeyStateEnum state, IKeyboardEvent event) {
+        switch (state) {
+            case PRESSED:
+                pressedEvents.put(key, event);
+                break;
+            case RELEASED:
+                releasedEvents.put(key, event);
+                break;
+        }
+    }
+
+    /**
+     * Return the id of the keyboard
+     *
+     * @return id
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * Enable the keyboard
+     */
+    public void enable() {
+        active = true;
+    }
+
+    /**
+     * Disable the keyboard
+     */
+    public void disable() {
+        active = false;
+    }
+
+    /**
+     * Handle keys event
+     *
+     * @param e event
+     * @return boolean
+     */
     public boolean dispatchKeyEvent(KeyEvent e) {
         synchronized (_lock) {
+            int key = e.getKeyCode();
             switch (e.getID()) {
                 case KeyEvent.KEY_PRESSED:
-                    keyStates.put(e.getKeyCode(), true);
-                    if (!pressed.contains(e.getKeyCode())) {
-                        pressed.add(e.getKeyCode());
-                        listener.onKey(e.getKeyCode(), true);
+                    if (!pressed.contains(key)) {
+                        pressed.add(key);
+                        newPressed.add(key);
                     }
-                    if (released.contains(e.getKeyCode())) {
-                        released.remove(e.getKeyCode());
+                    if (released.contains(key)) {
+                        released.remove(key);
                     }
                     break;
 
                 case KeyEvent.KEY_RELEASED:
-                    keyStates.put(e.getKeyCode(), false);
-                    if (!released.contains(e.getKeyCode())) {
-                        released.add(e.getKeyCode());
-                        listener.onKey(e.getKeyCode(), false);
+                    if (!released.contains(key)) {
+                        released.add(key);
+                        newReleased.add(key);
                     }
                     if (pressed.contains(e.getKeyCode())) {
                         pressed.remove(e.getKeyCode());
