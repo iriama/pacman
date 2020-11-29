@@ -1,7 +1,7 @@
 package pacman.windows;
 
 import framework.rendering.RenderEngine;
-import pacman.Pacman;
+import pacman.PacmanDemo;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,11 +15,11 @@ public class MainWindow extends JFrame {
     public static final int WIDTH = 600;
     public static final String TITLE = "Groupe 27 - PACMAN";
 
-    private final RenderEngine renderEngine;
+    private JPanel panel;
 
-    public MainWindow(RenderEngine renderEngine) {
+    public MainWindow(JPanel panel) {
         super();
-        this.renderEngine = renderEngine;
+        this.panel = panel;
         build();
     }
 
@@ -27,11 +27,11 @@ public class MainWindow extends JFrame {
      * Builds the main window
      */
     public void build() {
-        setTitle(TITLE);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-        Pacman.panel.setBackground(Color.black);
-        setContentPane(Pacman.panel);
+        setTitle(TITLE);
+        setResizable(false);
+        panel.setBackground(Color.black);
+        setContentPane(panel);
         getContentPane().setPreferredSize(new Dimension(WIDTH, HEIGHT));
         pack();
         setLocationRelativeTo(null);

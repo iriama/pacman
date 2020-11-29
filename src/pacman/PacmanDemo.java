@@ -22,7 +22,7 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class Pacman {
+public class PacmanDemo {
 
     private static Character _pacman = null;
     private static Character _ghost = null;
@@ -33,10 +33,11 @@ public class Pacman {
             super.paintComponent(g);
             renderEngine.draw((Graphics2D) g);
 
+            // DEBUG
+            /*
             g.setColor(Color.green);
             g.drawRect(renderEngine.getCameraPosition().getX(), renderEngine.getCameraPosition().getY(), MainWindow.WIDTH, MainWindow.HEIGHT);
 
-            // DEBUG
             if (_pacman != null) {
                 Rect hitbox = _pacman.getPhyObject().getHitbox();
                 g.setColor(Color.green);
@@ -45,7 +46,7 @@ public class Pacman {
                 Rect ghitbox = _ghost.getPhyObject().getHitbox();
                 g.setColor(Color.red);
                 g.drawRect(ghitbox.getX(), ghitbox.getY(), ghitbox.getWidth(), ghitbox.getHeight());
-            }
+            }*/
 
         }
     };
@@ -60,13 +61,13 @@ public class Pacman {
         FontsEngine.start();
 
         JFrame splash = new SplashWindow();
-        JFrame win = new MainWindow(renderEngine);
+        JFrame win = new MainWindow(panel);
 
         SwingUtilities.invokeLater(() -> {
             splash.setVisible(true);
         });
 
-        Thread.sleep(2000);
+        Thread.sleep(1000);
 
         SwingUtilities.invokeLater(() -> {
             splash.setVisible(false);
