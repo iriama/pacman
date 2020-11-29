@@ -2,6 +2,7 @@ package pacman;
 
 import framework.core.Character;
 import framework.core.CoreEngine;
+import framework.geometry.Rect;
 import framework.input.InputEngine;
 import framework.input.sources.KeyStateEnum;
 import framework.input.sources.Keyboard;
@@ -18,15 +19,31 @@ import pacman.windows.SplashWindow;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Pacman {
+
+    private static Character _pacman = null;
+    private static Character _ghost = null;
 
     public static JPanel panel = new JPanel() {
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             renderEngine.draw((Graphics2D) g);
+
+            // DEBUG
+            if (_pacman != null) {
+                Rect hitbox = _pacman.getPhyObject().getHitbox();
+                g.setColor(Color.green);
+                g.drawRect(hitbox.getX(), hitbox.getY(), hitbox.getWidth(), hitbox.getHeight());
+
+                Rect ghitbox = _ghost.getPhyObject().getHitbox();
+                g.setColor(Color.red);
+                g.drawRect(ghitbox.getX(), ghitbox.getY(), ghitbox.getWidth(), ghitbox.getHeight());
+            }
+
         }
     };
     static RenderEngine renderEngine = new RenderEngine(() -> panel.repaint());
@@ -68,6 +85,7 @@ public class Pacman {
 
 
         Character pacman = new Character(new GraphicObject(new Sprite(pacman_right), 0), new PhyObject(0, 28, 0, 28, 0), 0);
+        _pacman = pacman;
         pacman.getGraphicObject().getSprite().loop(20);
         pacman.getPhyObject().setVelocityX(5);
 
@@ -77,6 +95,7 @@ public class Pacman {
         SpriteSheet ghost_up = new SpriteSheet("ressources/sprites/ghost/cyan_up.png", 28, 4);
 
         Character ghost = new Character(new GraphicObject(new Sprite(ghost_left), 1), new PhyObject(0, 28, 30, 28, 1), 1);
+        _ghost = ghost;
         ghost.getGraphicObject().getSprite().loop(40);
         ghost.getPhyObject().setX(MainWindow.WIDTH - 28);
         ghost.getPhyObject().setVelocityX(-5);
