@@ -126,4 +126,10 @@ public class CoreEngine implements ICoreEngine, Runnable {
         renderEngine.removeObject(character.getGraphicObject());
         characters.remove(character);
     }
+
+    public void clear() {
+        for(Character character: characters) {
+            removeCharacter(character);
+        }
+    }
 }

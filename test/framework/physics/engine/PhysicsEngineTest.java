@@ -22,10 +22,4 @@ class PhysicsEngineTest {
         engine = null;
     }
 
-    @Test
-    void addObject() {
-        PhyObject cmp = new PhyObject(0, 100, 20, 100, Integer.MIN_VALUE + 1);
-        PhyObject object = engine.addObject(0, 100, 20, 100);
-        assertTrue(cmp.equals(object));
-    }
 }

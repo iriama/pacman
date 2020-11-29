@@ -36,18 +36,4 @@ class RenderEngineTest {
         assertEquals(100, engine.getCameraPosition().getX());
         assertEquals(200, engine.getCameraPosition().getY());
     }
-
-    @Test
-    void entity() {
-
-        GraphicObject entity = new GraphicObject(new Sprite(
-                new SpriteSheet("ressources/sprites/test.png", 128, 4)
-        ), 1337);
-
-        GraphicObject res = engine.addObject(entity);
-        assertEquals(1337, res.getId());
-        res = engine.addObject("ressources/sprites/test.png", 128, 4);
-        assertEquals(Integer.MIN_VALUE + 1, res.getId());
-
-    }
 }

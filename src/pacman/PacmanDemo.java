@@ -19,7 +19,6 @@ import pacman.windows.SplashWindow;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PacmanDemo {
@@ -60,8 +59,10 @@ public class PacmanDemo {
 
         FontsEngine.start();
 
-        JFrame splash = new SplashWindow();
-        JFrame win = new MainWindow(panel);
+        SplashWindow splash = new SplashWindow();
+        MainWindow win = new MainWindow();
+        panel.setBackground(Color.black);
+        win.setPanel(panel);
 
         SwingUtilities.invokeLater(() -> {
             splash.setVisible(true);
@@ -98,10 +99,9 @@ public class PacmanDemo {
         SpriteSheet ghost_down = new SpriteSheet("ressources/sprites/ghost/cyan_down.png", 28, 4);
         SpriteSheet ghost_up = new SpriteSheet("ressources/sprites/ghost/cyan_up.png", 28, 4);
 
-        Character ghost = new Character(new GraphicObject(new Sprite(ghost_left), 1), new PhyObject(0, 28, 30, 28, 1), 1);
+        Character ghost = new Character(new GraphicObject(new Sprite(ghost_left), 1), new PhyObject(MainWindow.WIDTH, 28, 30, 28, 1), 1);
         _ghost = ghost;
         ghost.getGraphicObject().getSprite().loop(40);
-        ghost.getPhyObject().setX(MainWindow.WIDTH - 28);
         ghost.getPhyObject().setVelocityX(-5);
 
 

@@ -16,13 +16,12 @@ import java.util.Vector;
 public class RenderEngine implements IRenderEngine {
 
     private final Vector<GraphicObject> objects;
-    private final HashMap<String, SpriteSheet> spriteSheetCache;
+    private static final HashMap<String, SpriteSheet> spriteSheetCache = new HashMap<>();
     private Point camera;
     private IPanel panel;
 
     public RenderEngine(IPanel panel) {
         objects = new Vector<GraphicObject>();
-        spriteSheetCache = new HashMap<String, SpriteSheet>();
         camera = new Point(0, 0);
         this.panel = panel;
     }
@@ -44,14 +43,14 @@ public class RenderEngine implements IRenderEngine {
     }
 
     /**
-     * Adds an object to the render engine
+     * Creates an object
      *
      * @param spriteSheetPath path to the sprite sheet file
      * @param spriteWidth     width of one sprite
      * @param spriteCount     number of sprites on the sprite sheet
      * @return the added object
      */
-    public GraphicObject addObject(String spriteSheetPath, int spriteWidth, int spriteCount) {
+    public static GraphicObject createObject(String spriteSheetPath, int spriteWidth, int spriteCount) {
         SpriteSheet sheet;
         if (spriteSheetCache.containsKey(spriteSheetPath))
             sheet = spriteSheetCache.get(spriteSheetPath);
@@ -59,9 +58,7 @@ public class RenderEngine implements IRenderEngine {
             sheet = new SpriteSheet(spriteSheetPath, spriteWidth, spriteCount);
 
         Sprite sprite = new Sprite(sheet);
-        GraphicObject GraphicObject = new GraphicObject(sprite, IdFactory.nextId());
-
-        return addObject(GraphicObject);
+        return new GraphicObject(sprite, IdFactory.nextId());
     }
 
     /**

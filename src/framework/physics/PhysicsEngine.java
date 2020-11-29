@@ -24,7 +24,7 @@ public class PhysicsEngine implements IPhysicsEngine {
     }
 
     /**
-     * Adds an object to the framework.physics engine
+     * Creates an object
      *
      * @param x      object X coord
      * @param width  object width
@@ -32,9 +32,8 @@ public class PhysicsEngine implements IPhysicsEngine {
      * @param height object height
      * @return added object
      */
-    public PhyObject addObject(int x, int width, int y, int height) {
-        PhyObject object = new PhyObject(x, width, y, height, IdFactory.nextId());
-        return addObject(object);
+    public static PhyObject createObject(int x, int width, int y, int height) {
+        return new PhyObject(x, width, y, height, IdFactory.nextId());
     }
 
     /**
