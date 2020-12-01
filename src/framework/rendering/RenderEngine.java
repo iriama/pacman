@@ -4,9 +4,14 @@ import framework.geometry.Point;
 import framework.rendering.graphics.Sprite;
 import framework.rendering.graphics.SpriteSheet;
 import framework.utility.IdFactory;
+import sun.awt.SunToolkit;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.AWTEventListener;
+import java.awt.event.PaintEvent;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -16,7 +21,6 @@ import java.util.Vector;
 public class RenderEngine implements IRenderEngine {
 
     private final Vector<GraphicObject> objects;
-    private static final HashMap<String, SpriteSheet> spriteSheetCache = new HashMap<>();
     private Point camera;
     private IPanel panel;
 
@@ -48,16 +52,20 @@ public class RenderEngine implements IRenderEngine {
      * @param spriteSheetPath path to the sprite sheet file
      * @param spriteWidth     width of one sprite
      * @param spriteCount     number of sprites on the sprite sheet
-     * @return the added object
+     * @return graphic object
      */
-    public static GraphicObject createObject(String spriteSheetPath, int spriteWidth, int spriteCount) {
-        SpriteSheet sheet;
-        if (spriteSheetCache.containsKey(spriteSheetPath))
-            sheet = spriteSheetCache.get(spriteSheetPath);
-        else
-            sheet = new SpriteSheet(spriteSheetPath, spriteWidth, spriteCount);
+    public static GraphicObject createObject(String spriteSheetPath, int spriteWidth, int spriteCount) throws IOException {
+        return createObject(new SpriteSheet(spriteSheetPath, spriteWidth, spriteCount));
+    }
 
-        Sprite sprite = new Sprite(sheet);
+
+    /**
+     * Creates an object from spriteSheet
+     * @param spriteSheet spriteSheet
+     * @return graphic object
+     */
+    public static GraphicObject createObject(SpriteSheet spriteSheet) {
+        Sprite sprite = new Sprite(spriteSheet);
         return new GraphicObject(sprite, IdFactory.nextId());
     }
 

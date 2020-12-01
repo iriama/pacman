@@ -14,6 +14,7 @@ public class Sprite {
     private int currentFrame;
 
     private ESpriteState state;
+    private boolean loop;
     private int[] frames;
     private int playIndex;
     private int delay;
@@ -26,10 +27,10 @@ public class Sprite {
 
     private ISpriteEvent onFinish;
 
-
     public Sprite(SpriteSheet spriteSheet) {
         onFinish = null;
         currentFrame = 0;
+        loop = false;
         this.spriteSheet = spriteSheet;
         state = ESpriteState.PAUSED;
         scale = 1;
@@ -65,6 +66,10 @@ public class Sprite {
         state = ESpriteState.PAUSED; // paused
     }
 
+    public boolean isPaused() {
+        return state == ESpriteState.PAUSED;
+    }
+
     /**
      * Returns the current frame of the sprite
      *
@@ -72,6 +77,10 @@ public class Sprite {
      */
     public int getCurrentFrame() {
         return currentFrame;
+    }
+
+    public int getFrameCount() {
+        return frames.length;
     }
 
     /**
@@ -109,35 +118,25 @@ public class Sprite {
         play(getRange(currentFrame, spriteSheet.getSpriteCount() - 1), delay);
     }
 
-    /**
-     * Play and loop a sequence of frames
-     *
-     * @param frames sequence of frames
-     * @param delay  delay between each frame
-     */
-    public void loop(int[] frames, int delay) {
-        play(frames, delay);
-        this.state = ESpriteState.LOOP;
+    public void resume() {
+        state = ESpriteState.PLAYING;
     }
 
-    /**
-     * Play and loop a range of frames
-     *
-     * @param startFrame the first frame
-     * @param endFrame   the last frame
-     * @param delay      delay between each frame
-     */
-    public void loop(int startFrame, int endFrame, int delay) {
-        loop(getRange(startFrame, endFrame), delay);
+    public void pause() {
+        state = ESpriteState.PAUSED;
     }
 
-    /**
-     * Play and loop from the current frame to the last frame
-     *
-     * @param delay delay between each frame
-     */
     public void loop(int delay) {
-        loop(getRange(currentFrame, spriteSheet.getSpriteCount() - 1), delay);
+        play(delay);
+        setLoop(true);
+    }
+
+    public void setLoop(boolean loop) {
+        this.loop = loop;
+    }
+
+    public int getDelay() {
+        return delay;
     }
 
     /**
@@ -155,17 +154,14 @@ public class Sprite {
             return;
 
         switch (state) {
-            case LOOP:
-                if (playIndex + 1 < frames.length)
-                    playIndex++;
-                else
-                    playIndex = 0;
-                break;
             case PLAYING:
                 if (playIndex + 1 < frames.length)
                     playIndex++;
                 else {
-                    state = ESpriteState.PAUSED;
+                    if (loop)
+                        playIndex = 0;
+                    else
+                        state = ESpriteState.PAUSED;
                 }
                 break;
         }

@@ -22,7 +22,7 @@ class GraphicObjectTest {
     Sprite sprite;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         sprite = new Sprite(
                 new SpriteSheet("ressources/sprites/test.png", 128, 4)
         );

@@ -1,7 +1,5 @@
 package pacman.windows;
 
-import framework.rendering.RenderEngine;
-import pacman.PacmanDemo;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,9 +8,6 @@ import java.awt.*;
  * Main Window of the Game
  */
 public class MainWindow extends JFrame {
-
-    public static final int HEIGHT = 550;
-    public static final int WIDTH = 450;
     public static final String TITLE = "Groupe 27 - PACMAN";
 
     public MainWindow() {
@@ -26,12 +21,15 @@ public class MainWindow extends JFrame {
      * Set the main panel
      * @param panel main panel
      */
-    public void setPanel(JPanel panel) {
+    public void setPanel(JPanel panel, int width, int height) {
         setContentPane(panel);
-        getContentPane().setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        getContentPane().setPreferredSize(new Dimension(width, height));
+        pack();
+        // workaround
+        Dimension size = getContentPane().getPreferredSize();
+        getContentPane().setPreferredSize(new Dimension(width - (size.width - width), height - (size.height - height)));
         pack();
         setLocationRelativeTo(null);
         toFront();
     }
-
 }

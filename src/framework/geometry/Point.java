@@ -4,14 +4,14 @@ package framework.geometry;
  * Point X,Y coordinates of objects
  */
 public class Point {
-    private int X;
-    private int Y;
+    private float X;
+    private float Y;
 
     public Point() {
         this(0, 0);
     }
 
-    public Point(int x, int y) {
+    public Point(float x, float y) {
         set(x, y);
     }
 
@@ -21,7 +21,7 @@ public class Point {
      * @return X coordinate
      */
     public int getX() {
-        return X;
+        return (int)X;
     }
 
     /**
@@ -39,7 +39,7 @@ public class Point {
      * @return Y coordinate
      */
     public int getY() {
-        return Y;
+        return (int)Y;
     }
 
     /**
@@ -58,7 +58,7 @@ public class Point {
      * @param x x coord
      * @param y y coord
      */
-    public void set(int x, int y) {
+    public void set(float x, float y) {
         X = x;
         Y = y;
     }

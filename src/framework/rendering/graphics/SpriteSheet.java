@@ -16,16 +16,12 @@ public class SpriteSheet {
     private final int spriteHeight;
     private BufferedImage image = null;
 
-    public SpriteSheet(String path, int spriteWidth, int spriteCount) {
+    public SpriteSheet(String path, int spriteWidth, int spriteCount) throws IOException {
         this.path = path;
         this.spriteCount = spriteCount;
         this.spriteWidth = spriteWidth;
 
-        try {
-            loadToMemory();
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
+        loadToMemory();
 
         spriteHeight = image.getHeight();
     }

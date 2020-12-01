@@ -1,0 +1,12 @@
+framework
+framework.core
+framework.geometry
+framework.input
+framework.input.sources
+framework.physics
+framework.rendering
+framework.rendering.graphics
+framework.utility
+pacman
+pacman.utility
+pacman.windows

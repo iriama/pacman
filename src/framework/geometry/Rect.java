@@ -29,6 +29,7 @@ public class Rect {
         return x;
     }
 
+
     /**
      * Set new X of the rectangle
      *
@@ -46,6 +47,7 @@ public class Rect {
     public int getY() {
         return y;
     }
+
 
     /**
      * Set new Y of the rectangle
@@ -120,6 +122,15 @@ public class Rect {
                         rect.getY() + rect.getHeight() > getY() &&
                         getX() + getWidth() > rect.getX() &&
                         getY() + getHeight() > rect.getY();
+    }
+
+    public Rect extend(int X, int Y) {
+        return new Rect(
+                getX() + X,
+                getWidth(),
+                getY() + Y,
+                getHeight()
+        );
     }
 
     @Override

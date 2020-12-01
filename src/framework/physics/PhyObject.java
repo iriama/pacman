@@ -92,7 +92,7 @@ public class PhyObject {
      * @param x X velocity
      * @param y Y velocity
      */
-    public void setVelocity(int x, int y) {
+    public void setVelocity(float x, float y) {
         velocity.set(x, y);
     }
 
@@ -183,7 +183,16 @@ public class PhyObject {
      * @return true if collides with
      */
     public boolean collideWith(PhyObject phyObject) {
-        return getHitbox().intersect(phyObject.getHitbox());
+        return collideWith(phyObject.getHitbox());
+    }
+
+    /**
+     * Determines if the object is colliding with a rectangle
+     * @param rect rectangle
+     * @return true if collides with
+     */
+    public boolean collideWith(Rect rect) {
+        return getHitbox().intersect(rect);
     }
 
     @Override

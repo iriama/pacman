@@ -2,33 +2,37 @@ package framework.core;
 
 import framework.IGameEngine;
 import framework.input.I_InputEngine;
+import framework.input.InputEngine;
+import framework.input.sources.ISource;
 import framework.physics.IPhysicsEngine;
 import framework.physics.PhyObject;
+import framework.physics.PhysicsEngine;
 import framework.rendering.GraphicObject;
+import framework.rendering.IPanel;
 import framework.rendering.IRenderEngine;
-import framework.rendering.graphics.Sprite;
-import framework.rendering.graphics.SpriteSheet;
+import framework.rendering.RenderEngine;
 import framework.utility.IdFactory;
 
+import java.awt.*;
 import java.util.Vector;
 
 public class CoreEngine implements ICoreEngine, Runnable {
 
-    final int TICKS_PER_SECOND = 25;
-    final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
-    final int MAX_FRAMESKIP = 5;
+    final int TICKS = 50;
+    final int FPS = 60;
+
     private IRenderEngine renderEngine;
     private IPhysicsEngine physicsEngine;
     private I_InputEngine inputEngine;
     private IGameEngine gameEngine;
     private Vector<Character> characters;
 
-    public CoreEngine(IRenderEngine renderEngine, IPhysicsEngine physicsEngine, I_InputEngine inputEngine, IGameEngine gameEngine) {
-        this.renderEngine = renderEngine;
-        this.physicsEngine = physicsEngine;
-        this.inputEngine = inputEngine;
+    public CoreEngine(IPanel panel, IGameEngine gameEngine) {
+        renderEngine = new RenderEngine(panel);
+        physicsEngine = new PhysicsEngine();
+        inputEngine = new InputEngine();
         this.gameEngine = gameEngine;
-        this.characters = new Vector<Character>();
+        characters = new Vector<Character>();
     }
 
     /**
@@ -36,6 +40,8 @@ public class CoreEngine implements ICoreEngine, Runnable {
      */
     public void update() {
         for (Character character : characters) {
+            if (character.getPhyObject() == null || character.getGraphicObject() == null) continue;
+
             PhyObject phyObject = character.getPhyObject();
             character.getGraphicObject().setPosition(phyObject.getX(), phyObject.getY());
         }
@@ -43,50 +49,42 @@ public class CoreEngine implements ICoreEngine, Runnable {
 
     @Override
     public void run() {
-        double next_game_tick = System.currentTimeMillis();
-        int loops;
-
-        while (true) {
-            loops = 0;
-            while (System.currentTimeMillis() > next_game_tick && loops < MAX_FRAMESKIP) {
-
-                inputEngine.update();
-                physicsEngine.update();
-                update();
-                gameEngine.update();
-
-                next_game_tick += SKIP_TICKS;
-                loops++;
+        Thread render = new Thread(()->{
+            long start, elapsed;
+            while (true) {
+                start = System.currentTimeMillis();
+                renderEngine.update();
+                elapsed = System.currentTimeMillis() - start;
+                try {
+                    Thread.sleep(Math.max(0, 1000/FPS - elapsed));
+                } catch (InterruptedException e) { e.printStackTrace(); }
             }
+        });
 
-            renderEngine.update();
-        }
+        Thread others = new Thread(() -> {
+            int ticks;
+            long start, elapsed;
+            while(true) {
+                ticks = 0;
+                start = System.currentTimeMillis();
+                while (ticks < TICKS) {
+                    ticks++;
+                    inputEngine.update();
+                    physicsEngine.update();
+                    update();
+                    gameEngine.update();
+                }
+                elapsed = System.currentTimeMillis() - start;
+                try {
+                    Thread.sleep(Math.max(0, 10 - elapsed));
+                } catch (InterruptedException e) { e.printStackTrace(); }
+            }
+        });
+
+        render.start();
+        others.start();
     }
 
-
-    /**
-     * Adds a character to the framework.core engine
-     *
-     * @param spriteSheetPath spriteSheetPath
-     * @param spriteWidth     spriteWidth
-     * @param spriteCount     spriteCount
-     * @param x               x
-     * @param width           width
-     * @param y               y
-     * @param height          height
-     * @return added character
-     */
-    public Character addCharacter(String spriteSheetPath, int spriteWidth, int spriteCount, int x, int width, int y, int height) {
-        GraphicObject graphicObject = new GraphicObject(
-                new Sprite(
-                        new SpriteSheet(spriteSheetPath, spriteWidth, spriteCount)
-                ), IdFactory.nextId()
-        );
-
-        PhyObject phyObject = new PhyObject(x, width, y, height, IdFactory.nextId());
-
-        return addCharacter(graphicObject, phyObject);
-    }
 
     /**
      * Adds a character to the framework.core engine
@@ -101,6 +99,10 @@ public class CoreEngine implements ICoreEngine, Runnable {
         return addCharacter(character);
     }
 
+    public ISource addInputSource(ISource source) {
+        return inputEngine.addSource(source);
+    }
+
     /**
      * Adds a character to the framework.core engine
      *
@@ -109,8 +111,11 @@ public class CoreEngine implements ICoreEngine, Runnable {
      */
     public Character addCharacter(Character character) {
         characters.add(character);
-        renderEngine.addObject(character.getGraphicObject());
-        physicsEngine.addObject(character.getPhyObject());
+        if (character.getGraphicObject() != null)
+            renderEngine.addObject(character.getGraphicObject());
+        if (character.getPhyObject() != null)
+            physicsEngine.addObject(character.getPhyObject());
+
         characters.add(character);
 
         return character;
@@ -122,9 +127,16 @@ public class CoreEngine implements ICoreEngine, Runnable {
      * @param character character
      */
     public void removeCharacter(Character character) {
-        physicsEngine.removeObject(character.getPhyObject());
-        renderEngine.removeObject(character.getGraphicObject());
+        if (character.getPhyObject() != null)
+            physicsEngine.removeObject(character.getPhyObject());
+        if (character.getGraphicObject() != null)
+            renderEngine.removeObject(character.getGraphicObject());
+
         characters.remove(character);
+    }
+
+    public void renderDraw(Graphics2D g) {
+        renderEngine.draw(g);
     }
 
     public void clear() {
