@@ -9,6 +9,8 @@ import framework.rendering.GraphicObject;
 import framework.rendering.IPanel;
 import framework.rendering.RenderEngine;
 import framework.rendering.graphics.SpriteSheet;
+import pacman.AI.BlinkyAI;
+import pacman.AI.GhostController;
 import pacman.utility.FontsEngine;
 import pacman.windows.MainWindow;
 import pacman.windows.SplashWindow;
@@ -25,6 +27,8 @@ public class Pacman extends JPanel implements IPanel, IGameEngine {
     static Pacman game;
     static SplashWindow splashWindow;
     static MainWindow mainWindow;
+    public static final int TILE_SIZE = 8;
+    public static final int PLAYER_SIZE = 32;
 
     public static void main(String[] args) {
         if (args.length != 1) {
@@ -143,6 +147,7 @@ public class Pacman extends JPanel implements IPanel, IGameEngine {
                             loadPreset("zsqd")
                     )
             );
+            coreEngine.addAIController(new GhostController(ghosts.get(0), new BlinkyAI(ghosts.get(0), pacmans.get(0))));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -196,12 +201,12 @@ public class Pacman extends JPanel implements IPanel, IGameEngine {
 
         // Pacmans hitboxes
         for (Player pacman: pacmans) {
-            debugCharacter(g, Color.green, pacman, pacman.direction.name());
+            debugCharacter(g, Color.green, pacman, pacman.getDirection().name());
         }
 
         // Ghosts hitboxes
         for (Player ghost: ghosts) {
-            debugCharacter(g, Color.yellow, ghost, ghost.direction.name());
+            debugCharacter(g, Color.yellow, ghost, ghost.getDirection().name());
         }
     }
 

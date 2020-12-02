@@ -69,8 +69,8 @@ public class Point {
      * @param p point
      * @return squared distance
      */
-    public float distanceSquared(Point p) {
-        return (float) Math.sqrt(Math.pow(getX() - p.getX(), 2) + Math.pow(getY() - p.getY(), 2));
+    public int distanceSquared(Point p) {
+        return (int) Math.sqrt(Math.pow(getX() - p.getX(), 2) + Math.pow(getY() - p.getY(), 2));
     }
 
     /**

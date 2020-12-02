@@ -1,5 +1,9 @@
 package framework.core;
 
+import framework.AI.AIEngine;
+import framework.AI.IAIController;
+import framework.AI.IAIEngine;
+import framework.AI.IAIModel;
 import framework.IGameEngine;
 import framework.input.I_InputEngine;
 import framework.input.InputEngine;
@@ -25,12 +29,14 @@ public class CoreEngine implements ICoreEngine, Runnable {
     private IPhysicsEngine physicsEngine;
     private I_InputEngine inputEngine;
     private IGameEngine gameEngine;
+    private IAIEngine aiEngine;
     private Vector<Character> characters;
 
     public CoreEngine(IPanel panel, IGameEngine gameEngine) {
         renderEngine = new RenderEngine(panel);
         physicsEngine = new PhysicsEngine();
         inputEngine = new InputEngine();
+        aiEngine = new AIEngine();
         this.gameEngine = gameEngine;
         characters = new Vector<Character>();
     }
@@ -71,6 +77,7 @@ public class CoreEngine implements ICoreEngine, Runnable {
                     ticks++;
                     inputEngine.update();
                     physicsEngine.update();
+                    aiEngine.update();
                     update();
                     gameEngine.update();
                 }
@@ -101,6 +108,10 @@ public class CoreEngine implements ICoreEngine, Runnable {
 
     public ISource addInputSource(ISource source) {
         return inputEngine.addSource(source);
+    }
+
+    public IAIController addAIController(IAIController controller) {
+        return aiEngine.addController(controller);
     }
 
     /**

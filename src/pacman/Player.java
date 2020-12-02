@@ -11,21 +11,13 @@ import framework.rendering.graphics.Sprite;
 import framework.rendering.graphics.SpriteSheet;
 import java.util.HashMap;
 
-enum PlayerDirection {
-    NONE,
-    UP,
-    DOWN,
-    RIGHT,
-    LEFT
-}
-
 public class Player {
-    public Character character;
-    public PlayerDirection direction;
+    private Character character;
+    private PlayerDirection direction;
     private int currentVelocityCount;
     private int currentVelocity;
-    public int speed;
-    HashMap<PlayerDirection, SpriteSheet> directionsSheet;
+    private int speed;
+    private HashMap<PlayerDirection, SpriteSheet> directionsSheet;
     private Keyboard keyboard;
     private PlayerDirection queue;
 
@@ -41,15 +33,19 @@ public class Player {
         this.speed = speed;
     }
 
+    public PlayerDirection getDirection() {
+        return direction;
+    }
+
     public void bindDirection(PlayerDirection direction, SpriteSheet sheet) {
         directionsSheet.put(direction, sheet);
     }
 
     public Keyboard bindControls(Preset preset) {
-        keyboard.mapKey(preset.keyUp, KeyStateEnum.PRESSED, () -> changeDirection(PlayerDirection.UP));
-        keyboard.mapKey(preset.keyDown, KeyStateEnum.PRESSED, () -> changeDirection(PlayerDirection.DOWN));
-        keyboard.mapKey(preset.keyLeft, KeyStateEnum.PRESSED, () -> changeDirection(PlayerDirection.LEFT));
-        keyboard.mapKey(preset.keyRight, KeyStateEnum.PRESSED, () -> changeDirection(PlayerDirection.RIGHT));
+        keyboard.mapKey(preset.keyUp, KeyStateEnum.PRESSED, () -> attemptChangeDirection(PlayerDirection.UP));
+        keyboard.mapKey(preset.keyDown, KeyStateEnum.PRESSED, () -> attemptChangeDirection(PlayerDirection.DOWN));
+        keyboard.mapKey(preset.keyLeft, KeyStateEnum.PRESSED, () -> attemptChangeDirection(PlayerDirection.LEFT));
+        keyboard.mapKey(preset.keyRight, KeyStateEnum.PRESSED, () -> attemptChangeDirection(PlayerDirection.RIGHT));
 
         return keyboard;
     }
@@ -57,11 +53,10 @@ public class Player {
     private Rect nextWallHitbox(PlayerDirection direction) {
         int modX = direction == PlayerDirection.LEFT ? -1 : direction == PlayerDirection.RIGHT ? 1 : 0;
         int modY = direction == PlayerDirection.UP ? -1 : direction == PlayerDirection.DOWN ? 1 : 0;
-
         return getWallHitbox().extend(modX, modY);
     }
 
-    private boolean willHitWall(PlayerDirection direction) {
+    public boolean willHitWall(PlayerDirection direction) {
         if (direction == PlayerDirection.NONE) return false;
 
         Rect nextWallHitbox = nextWallHitbox(direction);
@@ -74,20 +69,29 @@ public class Player {
         return false;
     }
 
-    public void changeDirection(PlayerDirection direction) {
-        PhyObject phyObject = character.getPhyObject();
-
+    private void attemptChangeDirection(PlayerDirection direction) {
         if (willHitWall(direction)) {
             queue = direction;
             return;
         }
 
+        changeDirection(direction);
+    }
+
+    public void changeDirection(PlayerDirection direction) {
         this.direction = direction;
         getSprite().resume();
         queue = null;
         character.getGraphicObject().getSprite().setSpriteSheet(
                 directionsSheet.get(direction)
         );
+    }
+
+    private void stop() {
+        direction = PlayerDirection.NONE;
+        Sprite sprite = getSprite();
+        sprite.pause();
+        sprite.setFrame(Math.min(sprite.getFrameCount() - 1, 3));
     }
 
     private void updateCurrentVelocity() {
@@ -102,23 +106,19 @@ public class Player {
 
 
     public void update() {
+
+        if (onTile()) {
+            if (queue != null) {
+                attemptChangeDirection(queue);
+            }
+            if (direction != PlayerDirection.NONE && willHitWall(direction)) {
+                stop();
+            }
+        }
+
+
         updateCurrentVelocity();
-
-        //System.out.println(speed);
-
-        if (queue != null) {
-            changeDirection(queue);
-        }
-
-        // stop if will hit wall
         PhyObject phyObject = character.getPhyObject();
-        if (direction != PlayerDirection.NONE && willHitWall(direction)) {
-            direction = PlayerDirection.NONE;
-            Sprite sprite = getSprite();
-            sprite.pause();
-            sprite.setFrame(Math.min(sprite.getFrameCount() - 1, 3));
-        }
-
         switch (direction) {
             case NONE:
                 phyObject.setVelocity(0, 0);
@@ -151,13 +151,19 @@ public class Player {
         Rect hitbox = getHitbox();
         return new Rect(
                 hitbox.getX(),
-                32,
+                Pacman.PLAYER_SIZE,
                 hitbox.getY(),
-                32
+                Pacman.PLAYER_SIZE
         );
     }
 
+
     public Point getPosition() {
         return character.getPhyObject().getPosition();
+    }
+
+    public boolean onTile() {
+        Point position = getPosition();
+        return position.getX() % Pacman.TILE_SIZE == 0 && position.getY() % Pacman.TILE_SIZE == 0;
     }
 }
