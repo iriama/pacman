@@ -30,6 +30,10 @@ public class Rect {
     }
 
 
+    public Point getCenter() {
+        return new Point(getX() + getWidth() / 2, getY() + getHeight() / 2);
+    }
+
     /**
      * Set new X of the rectangle
      *

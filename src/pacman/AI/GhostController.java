@@ -26,7 +26,7 @@ public class GhostController implements IAIController {
     }
 
     private boolean prioritize(PlayerDirection direction, PlayerDirection other) {
-        if (direction == other || other == PlayerDirection.NONE) return true;
+        if (direction == other) return true;
         if (direction == PlayerDirection.UP) return true;
         if (direction == PlayerDirection.LEFT && other != PlayerDirection.UP) return  true;
         if (direction == PlayerDirection.DOWN && other != PlayerDirection.UP && other != PlayerDirection.LEFT) return true;
@@ -46,7 +46,7 @@ public class GhostController implements IAIController {
                 return PlayerDirection.RIGHT;
         }
 
-        return PlayerDirection.NONE;
+        return null;
     }
 
     public void update() {
@@ -59,10 +59,10 @@ public class GhostController implements IAIController {
         int shortestDistance = Integer.MAX_VALUE;
         PlayerDirection bestDirection = currentDirection;
         for (PlayerDirection direction: PlayerDirection.values()) {
-            if (direction == PlayerDirection.NONE || direction == reverse(currentDirection) || ghost.willHitWall(direction)) continue;
+            if (direction == reverse(currentDirection) || ghost.willHitWall(direction)) continue;
 
-            int modX = direction == PlayerDirection.LEFT ? -Pacman.TILE_SIZE : direction == PlayerDirection.RIGHT ? Pacman.TILE_SIZE : 0;
-            int modY = direction == PlayerDirection.UP ? -Pacman.TILE_SIZE : direction == PlayerDirection.DOWN ? Pacman.TILE_SIZE : 0;
+            int modX = direction == PlayerDirection.LEFT ? -Pacman.STEP_SIZE : direction == PlayerDirection.RIGHT ? Pacman.STEP_SIZE : 0;
+            int modY = direction == PlayerDirection.UP ? -Pacman.STEP_SIZE : direction == PlayerDirection.DOWN ? Pacman.STEP_SIZE : 0;
 
             Point nextPosition = new Point(
                     currentPosition.getX() + modX,

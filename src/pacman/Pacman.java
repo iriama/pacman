@@ -1,5 +1,6 @@
 package pacman;
 
+import framework.AI.IAIModel;
 import framework.IGameEngine;
 import framework.core.CoreEngine;
 import framework.geometry.Point;
@@ -9,8 +10,7 @@ import framework.rendering.GraphicObject;
 import framework.rendering.IPanel;
 import framework.rendering.RenderEngine;
 import framework.rendering.graphics.SpriteSheet;
-import pacman.AI.BlinkyAI;
-import pacman.AI.GhostController;
+import pacman.AI.*;
 import pacman.utility.FontsEngine;
 import pacman.windows.MainWindow;
 import pacman.windows.SplashWindow;
@@ -24,11 +24,12 @@ import java.util.Vector;
 public class Pacman extends JPanel implements IPanel, IGameEngine {
 
     // --- Statics
-    static Pacman game;
+    public static Pacman game;
     static SplashWindow splashWindow;
     static MainWindow mainWindow;
-    public static final int TILE_SIZE = 8;
+    public static final int STEP_SIZE = 8;
     public static final int PLAYER_SIZE = 32;
+    public static final int TILE_SIZE = STEP_SIZE * 2;
 
     public static void main(String[] args) {
         if (args.length != 1) {
@@ -92,6 +93,8 @@ public class Pacman extends JPanel implements IPanel, IGameEngine {
     Vector<Player> pacmans;
     Vector<Player> ghosts;
 
+    Vector<IAIModel> aiModels;
+
     private Player loadPlayer(Actor actor, int spriteWidth, int spriteCount, int loopDelay) throws IOException {
         SpriteSheet left = getSpriteSheet(actor.modelId + "/left", spriteWidth, spriteCount);
         SpriteSheet right = getSpriteSheet(actor.modelId + "/right", spriteWidth, spriteCount);
@@ -147,7 +150,23 @@ public class Pacman extends JPanel implements IPanel, IGameEngine {
                             loadPreset("zsqd")
                     )
             );
-            coreEngine.addAIController(new GhostController(ghosts.get(0), new BlinkyAI(ghosts.get(0), pacmans.get(0))));
+
+            // for debug
+            aiModels = new Vector<>();
+            BlinkyAI blinkyAI = new BlinkyAI(pacmans.get(0));
+            PinkyAI pinkyAI = new PinkyAI(pacmans.get(0));
+            InkyAI inkyAI = new InkyAI(pacmans.get(0), ghosts.get(0));
+            ClydeAI clydeAI = new ClydeAI(pacmans.get(0), ghosts.get(3));
+            aiModels.add(blinkyAI);
+            aiModels.add(pinkyAI);
+            aiModels.add(inkyAI);
+            aiModels.add(clydeAI);
+
+
+            coreEngine.addAIController(new GhostController(ghosts.get(0), blinkyAI));
+            coreEngine.addAIController(new GhostController(ghosts.get(1), pinkyAI));
+            coreEngine.addAIController(new GhostController(ghosts.get(2), inkyAI));
+            coreEngine.addAIController(new GhostController(ghosts.get(3), clydeAI));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -179,16 +198,25 @@ public class Pacman extends JPanel implements IPanel, IGameEngine {
         coreEngine.run();
     }
 
-    private void debugCharacter(Graphics g, Color color, Player pacman, String text) {
+    private void debugPlayer(Graphics g, Color color, Player player) {
         g.setColor(color);
-        Rect hitbox = pacman.getHitbox();
+        Rect hitbox = player.getHitbox();
         g.drawRect(hitbox.getX(), hitbox.getY(), hitbox.getWidth(), hitbox.getHeight());
         g.setColor(Color.white);
-        Rect wallHitbox = pacman.getWallHitbox();
+        Rect wallHitbox = player.getWallHitbox();
         g.drawRect(wallHitbox.getX(), wallHitbox.getY(), wallHitbox.getWidth(), wallHitbox.getHeight());
         g.setColor(color);
-        Point pos = pacman.getPosition();
-        g.drawString(text, pos.getX(), pos.getY() - 1);
+    }
+
+    private void debugAI(Graphics g, IAIModel ai) {
+        if (ai instanceof BlinkyAI) g.setColor(Color.red);
+        else if (ai instanceof PinkyAI) g.setColor(Color.pink);
+        else if (ai instanceof InkyAI)g.setColor(Color.cyan);
+        else if (ai instanceof ClydeAI)g.setColor(Color.orange);
+
+        Point prediction = ai.getPrediction();
+        g.fillRect(prediction.getX(), prediction.getY(), Pacman.STEP_SIZE, Pacman.STEP_SIZE);
+        g.drawString(ai.getClass().getSimpleName(), prediction.getX(), prediction.getY() - 2);
     }
 
 
@@ -201,12 +229,17 @@ public class Pacman extends JPanel implements IPanel, IGameEngine {
 
         // Pacmans hitboxes
         for (Player pacman: pacmans) {
-            debugCharacter(g, Color.green, pacman, pacman.getDirection().name());
+            debugPlayer(g, Color.green, pacman);
         }
 
         // Ghosts hitboxes
         for (Player ghost: ghosts) {
-            debugCharacter(g, Color.yellow, ghost, ghost.getDirection().name());
+            debugPlayer(g, Color.yellow, ghost);
+        }
+
+        // AI targets
+        for (IAIModel ai: aiModels) {
+            debugAI(g, ai);
         }
     }
 

@@ -6,7 +6,6 @@ import framework.geometry.Rect;
 import framework.input.sources.KeyStateEnum;
 import framework.input.sources.Keyboard;
 import framework.physics.PhyObject;
-import framework.rendering.GraphicObject;
 import framework.rendering.graphics.Sprite;
 import framework.rendering.graphics.SpriteSheet;
 import java.util.HashMap;
@@ -20,12 +19,14 @@ public class Player {
     private HashMap<PlayerDirection, SpriteSheet> directionsSheet;
     private Keyboard keyboard;
     private PlayerDirection queue;
+    private boolean stopped;
 
 
     public Player(Character character, int speed) {
-        direction = PlayerDirection.NONE;
+        direction = PlayerDirection.RIGHT;
         currentVelocity = 0;
         currentVelocityCount = 0;
+        stopped = false;
         queue = null;
         keyboard = new Keyboard();
         directionsSheet = new HashMap<>();
@@ -50,14 +51,24 @@ public class Player {
         return keyboard;
     }
 
+
+    public int getModX(PlayerDirection direction, int step) {
+        return direction == PlayerDirection.LEFT ? -step : direction == PlayerDirection.RIGHT ? step : 0;
+    }
+
+    public int getModY(PlayerDirection direction, int step) {
+        return direction == PlayerDirection.UP ? -step : direction == PlayerDirection.DOWN ? step : 0;
+    }
+
     private Rect nextWallHitbox(PlayerDirection direction) {
-        int modX = direction == PlayerDirection.LEFT ? -1 : direction == PlayerDirection.RIGHT ? 1 : 0;
-        int modY = direction == PlayerDirection.UP ? -1 : direction == PlayerDirection.DOWN ? 1 : 0;
+        int modX = getModX(direction, 1);
+        int modY = getModY(direction, 1);
+
         return getWallHitbox().extend(modX, modY);
     }
 
     public boolean willHitWall(PlayerDirection direction) {
-        if (direction == PlayerDirection.NONE) return false;
+        if (stopped) return false;
 
         Rect nextWallHitbox = nextWallHitbox(direction);
         for (Rect wall: Pacman.game.currentMap.walls) {
@@ -79,6 +90,7 @@ public class Player {
     }
 
     public void changeDirection(PlayerDirection direction) {
+        stopped = false;
         this.direction = direction;
         getSprite().resume();
         queue = null;
@@ -88,7 +100,8 @@ public class Player {
     }
 
     private void stop() {
-        direction = PlayerDirection.NONE;
+        //direction = PlayerDirection.NONE;
+        stopped = true;
         Sprite sprite = getSprite();
         sprite.pause();
         sprite.setFrame(Math.min(sprite.getFrameCount() - 1, 3));
@@ -111,7 +124,7 @@ public class Player {
             if (queue != null) {
                 attemptChangeDirection(queue);
             }
-            if (direction != PlayerDirection.NONE && willHitWall(direction)) {
+            if (!stopped && willHitWall(direction)) {
                 stop();
             }
         }
@@ -119,10 +132,10 @@ public class Player {
 
         updateCurrentVelocity();
         PhyObject phyObject = character.getPhyObject();
-        switch (direction) {
-            case NONE:
-                phyObject.setVelocity(0, 0);
-                break;
+        if (stopped) {
+            phyObject.setVelocity(0, 0);
+        }
+        else switch (direction) {
             case UP:
                 phyObject.setVelocity(0, -currentVelocity);
                 break;
@@ -162,8 +175,12 @@ public class Player {
         return character.getPhyObject().getPosition();
     }
 
+    public Point getCentredPosition() {
+        return getHitbox().getCenter();
+    }
+
     public boolean onTile() {
         Point position = getPosition();
-        return position.getX() % Pacman.TILE_SIZE == 0 && position.getY() % Pacman.TILE_SIZE == 0;
+        return position.getX() % Pacman.STEP_SIZE == 0 && position.getY() % Pacman.STEP_SIZE == 0;
     }
 }
