@@ -1,8 +1,7 @@
 map_1
-1
-pacman 3 8 8 26 26
+pacman player 3 8 8 26 26
 4
-blinky 2 208 168 26 26
-pinky 2 208 168 26 26
-inky 2 208 168 26 26
-clyde 2 208 168 26 26
+red blinky 2 208 168 26 26
+pink pinky 2 208 168 26 26
+cyan inky 2 208 168 26 26
+orange clyde 2 208 168 26 26

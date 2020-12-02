@@ -2,7 +2,6 @@ package pacman;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.HashMap;
 
 public class Preset {
     public int keyUp;

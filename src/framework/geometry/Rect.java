@@ -29,11 +29,6 @@ public class Rect {
         return x;
     }
 
-
-    public Point getCenter() {
-        return new Point(getX() + getWidth() / 2, getY() + getHeight() / 2);
-    }
-
     /**
      * Set new X of the rectangle
      *
@@ -41,6 +36,10 @@ public class Rect {
      */
     public void setX(int x) {
         this.x = x;
+    }
+
+    public Point getCenter() {
+        return new Point(getX() + getWidth() / 2, getY() + getHeight() / 2);
     }
 
     /**

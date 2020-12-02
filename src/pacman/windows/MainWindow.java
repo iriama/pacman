@@ -19,6 +19,7 @@ public class MainWindow extends JFrame {
 
     /**
      * Set the main panel
+     *
      * @param panel main panel
      */
     public void setPanel(JPanel panel, int width, int height) {

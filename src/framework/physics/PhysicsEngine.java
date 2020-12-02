@@ -13,17 +13,6 @@ public class PhysicsEngine implements IPhysicsEngine {
     }
 
     /**
-     * Adds an object to the framework.physics engine
-     *
-     * @param object object to add
-     * @return added object
-     */
-    public PhyObject addObject(PhyObject object) {
-        objects.add(object);
-        return object;
-    }
-
-    /**
      * Creates an object
      *
      * @param x      object X coord
@@ -34,6 +23,17 @@ public class PhysicsEngine implements IPhysicsEngine {
      */
     public static PhyObject createObject(int x, int width, int y, int height) {
         return new PhyObject(x, width, y, height, IdFactory.nextId());
+    }
+
+    /**
+     * Adds an object to the framework.physics engine
+     *
+     * @param object object to add
+     * @return added object
+     */
+    public PhyObject addObject(PhyObject object) {
+        objects.add(object);
+        return object;
     }
 
     /**

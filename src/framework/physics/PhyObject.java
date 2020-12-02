@@ -188,6 +188,7 @@ public class PhyObject {
 
     /**
      * Determines if the object is colliding with a rectangle
+     *
      * @param rect rectangle
      * @return true if collides with
      */

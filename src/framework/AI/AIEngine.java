@@ -2,7 +2,7 @@ package framework.AI;
 
 import java.util.Vector;
 
-public class AIEngine implements IAIEngine{
+public class AIEngine implements IAIEngine {
     Vector<IAIController> controllers;
 
     public AIEngine() {
@@ -19,7 +19,7 @@ public class AIEngine implements IAIEngine{
     }
 
     public void update() {
-        for(IAIController controller: controllers)
+        for (IAIController controller : controllers)
             controller.update();
     }
 }

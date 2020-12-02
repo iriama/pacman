@@ -3,7 +3,6 @@ package framework.core;
 import framework.AI.AIEngine;
 import framework.AI.IAIController;
 import framework.AI.IAIEngine;
-import framework.AI.IAIModel;
 import framework.IGameEngine;
 import framework.input.I_InputEngine;
 import framework.input.InputEngine;
@@ -55,22 +54,24 @@ public class CoreEngine implements ICoreEngine, Runnable {
 
     @Override
     public void run() {
-        Thread render = new Thread(()->{
+        Thread render = new Thread(() -> {
             long start, elapsed;
             while (true) {
                 start = System.currentTimeMillis();
                 renderEngine.update();
                 elapsed = System.currentTimeMillis() - start;
                 try {
-                    Thread.sleep(Math.max(0, 1000/FPS - elapsed));
-                } catch (InterruptedException e) { e.printStackTrace(); }
+                    Thread.sleep(Math.max(0, 1000 / FPS - elapsed));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
         Thread others = new Thread(() -> {
             int ticks;
             long start, elapsed;
-            while(true) {
+            while (true) {
                 ticks = 0;
                 start = System.currentTimeMillis();
                 while (ticks < TICKS) {
@@ -84,7 +85,9 @@ public class CoreEngine implements ICoreEngine, Runnable {
                 elapsed = System.currentTimeMillis() - start;
                 try {
                     Thread.sleep(Math.max(0, 10 - elapsed));
-                } catch (InterruptedException e) { e.printStackTrace(); }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -151,7 +154,7 @@ public class CoreEngine implements ICoreEngine, Runnable {
     }
 
     public void clear() {
-        for(Character character: characters) {
+        for (Character character : characters) {
             removeCharacter(character);
         }
     }

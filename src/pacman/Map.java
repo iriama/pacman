@@ -4,7 +4,9 @@ import framework.geometry.Rect;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.nio.file.Paths;
 import java.util.Vector;
 
@@ -32,7 +34,7 @@ public class Map {
 
         int n = Integer.parseInt(reader.readLine());
 
-        for (int i=0; i<n; i++) {
+        for (int i = 0; i < n; i++) {
             String[] split = reader.readLine().split(" ");
             walls.add(new Rect(
                     Integer.parseInt(split[0]),

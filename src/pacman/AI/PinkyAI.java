@@ -9,6 +9,7 @@ import pacman.PlayerDirection;
 public class PinkyAI implements IAIModel {
 
     Player pacman;
+
     public PinkyAI(Player pacman) {
         this.pacman = pacman;
     }

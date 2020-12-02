@@ -8,6 +8,7 @@ import framework.input.sources.Keyboard;
 import framework.physics.PhyObject;
 import framework.rendering.graphics.Sprite;
 import framework.rendering.graphics.SpriteSheet;
+
 import java.util.HashMap;
 
 public class Player {
@@ -20,9 +21,10 @@ public class Player {
     private Keyboard keyboard;
     private PlayerDirection queue;
     private boolean stopped;
+    private String typeId;
 
 
-    public Player(Character character, int speed) {
+    public Player(String typeId, Character character, int speed) {
         direction = PlayerDirection.RIGHT;
         currentVelocity = 0;
         currentVelocityCount = 0;
@@ -32,6 +34,11 @@ public class Player {
         directionsSheet = new HashMap<>();
         this.character = character;
         this.speed = speed;
+        this.typeId = typeId;
+    }
+
+    public String getTypeId() {
+        return typeId;
     }
 
     public PlayerDirection getDirection() {
@@ -71,7 +78,7 @@ public class Player {
         if (stopped) return false;
 
         Rect nextWallHitbox = nextWallHitbox(direction);
-        for (Rect wall: Pacman.game.currentMap.walls) {
+        for (Rect wall : Pacman.game.currentMap.walls) {
             if (nextWallHitbox.intersect(wall)) {
                 return true;
             }
@@ -108,7 +115,7 @@ public class Player {
     }
 
     private void updateCurrentVelocity() {
-        if (currentVelocityCount >= 100/speed) {
+        if (currentVelocityCount >= 100 / speed) {
             currentVelocityCount = 0;
             currentVelocity = 1;
             return;
@@ -134,8 +141,7 @@ public class Player {
         PhyObject phyObject = character.getPhyObject();
         if (stopped) {
             phyObject.setVelocity(0, 0);
-        }
-        else switch (direction) {
+        } else switch (direction) {
             case UP:
                 phyObject.setVelocity(0, -currentVelocity);
                 break;

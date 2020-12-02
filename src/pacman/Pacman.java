@@ -22,36 +22,29 @@ import java.util.HashMap;
 import java.util.Vector;
 
 public class Pacman extends JPanel implements IPanel, IGameEngine {
-
     // --- Statics
-    public static Pacman game;
-    static SplashWindow splashWindow;
-    static MainWindow mainWindow;
     public static final int STEP_SIZE = 8;
     public static final int PLAYER_SIZE = 32;
     public static final int TILE_SIZE = STEP_SIZE * 2;
-
-    public static void main(String[] args) {
-        if (args.length != 1) {
-            System.err.println("no map path");
-            System.exit(1);
-        }
-
-        FontsEngine.start();
-        splashWindow = new SplashWindow();
-        mainWindow = new MainWindow();
-        game = new Pacman();
-
-        game.play("test");
-    }
-
+    final static int SPRITE_WIDTH = 28;
+    final static int PAC_SPRITE_COUNT = 10;
+    final static int PAC_DEATH_SPRITE_COUNT = 17;
+    final static int GHOST_SPRITE_COUNT = 4;
+    public static Pacman game;
+    static SplashWindow splashWindow;
+    static MainWindow mainWindow;
+    static boolean DEBUG = false;
     // ---
     private HashMap<String, Map> maps;
     private HashMap<String, SpriteSheet> spriteSheets;
     private HashMap<String, Level> levels;
     private HashMap<String, Preset> presets;
-
+    private HashMap<String, IAIModel> models;
+    private Player pacman;
+    private Vector<Player> ghosts;
     private CoreEngine coreEngine;
+    public Map currentMap;
+    public Level currentLevel;
 
     public Pacman() {
         maps = new HashMap<>();
@@ -60,6 +53,24 @@ public class Pacman extends JPanel implements IPanel, IGameEngine {
         presets = new HashMap<>();
         coreEngine = new CoreEngine(this, this);
         setBackground(Color.black);
+    }
+
+    public static void main(String[] args) {
+        for (String arg : args) {
+            if (!arg.startsWith("-")) continue;
+            switch (arg) {
+                case "-debug":
+                    DEBUG = true;
+                    break;
+            }
+        }
+
+        FontsEngine.start();
+        splashWindow = new SplashWindow();
+        mainWindow = new MainWindow();
+        game = new Pacman();
+
+        game.play("test");
     }
 
     private Map getMap(String identifier) throws Exception {
@@ -90,21 +101,18 @@ public class Pacman extends JPanel implements IPanel, IGameEngine {
         return preset;
     }
 
-    Vector<Player> pacmans;
-    Vector<Player> ghosts;
 
-    Vector<IAIModel> aiModels;
-
-    private Player loadPlayer(Actor actor, int spriteWidth, int spriteCount, int loopDelay) throws IOException {
-        SpriteSheet left = getSpriteSheet(actor.modelId + "/left", spriteWidth, spriteCount);
-        SpriteSheet right = getSpriteSheet(actor.modelId + "/right", spriteWidth, spriteCount);
-        SpriteSheet up = getSpriteSheet(actor.modelId + "/up", spriteWidth, spriteCount);
-        SpriteSheet down = getSpriteSheet(actor.modelId + "/down", spriteWidth, spriteCount);
+    private Player loadPlayer(Level.Actor actor, int spriteWidth, int spriteCount) throws IOException {
+        SpriteSheet left = getSpriteSheet(actor.skinId + "/left", spriteWidth, spriteCount);
+        SpriteSheet right = getSpriteSheet(actor.skinId + "/right", spriteWidth, spriteCount);
+        SpriteSheet up = getSpriteSheet(actor.skinId + "/up", spriteWidth, spriteCount);
+        SpriteSheet down = getSpriteSheet(actor.skinId + "/down", spriteWidth, spriteCount);
 
         GraphicObject pGraph = RenderEngine.createObject(right);
-        pGraph.getSprite().loop(loopDelay);
+        pGraph.getSprite().loop(200 / spriteCount);
 
         Player player = new Player(
+                actor.typeId,
                 coreEngine.addCharacter(pGraph, PhysicsEngine.createObject(actor.x, actor.width, actor.y, actor.height)),
                 actor.speed
         );
@@ -126,47 +134,46 @@ public class Pacman extends JPanel implements IPanel, IGameEngine {
             // Map
             currentMap = getMap(currentLevel.mapIdentifier);
 
-            // Players
-            pacmans = new Vector<>();
-            for (Actor p: currentLevel.pacmans) {
-                pacmans.add(loadPlayer(p, 28, 10, 20));
-            }
+            // Pacman
+            pacman = loadPlayer(currentLevel.pacman, SPRITE_WIDTH, PAC_SPRITE_COUNT);
+
 
             ghosts = new Vector<>();
-            for (Actor p: currentLevel.ghosts) {
-                ghosts.add(loadPlayer(p, 28, 4, 40));
+            for (Level.Actor p : currentLevel.ghosts) {
+                ghosts.add(loadPlayer(p, SPRITE_WIDTH, GHOST_SPRITE_COUNT));
             }
 
-            // Set preset arrows to pac 1
+            // Set preset arrows to pacman
             coreEngine.addInputSource(
-                pacmans.get(0).bindControls(
-                        loadPreset("arrows")
-                )
-            );
-
-            // Set preset ZSQD to ghost 1
-            coreEngine.addInputSource(
-                    ghosts.get(0).bindControls(
-                            loadPreset("zsqd")
+                    pacman.bindControls(
+                            loadPreset("arrows")
                     )
             );
 
-            // for debug
-            aiModels = new Vector<>();
-            BlinkyAI blinkyAI = new BlinkyAI(pacmans.get(0));
-            PinkyAI pinkyAI = new PinkyAI(pacmans.get(0));
-            InkyAI inkyAI = new InkyAI(pacmans.get(0), ghosts.get(0));
-            ClydeAI clydeAI = new ClydeAI(pacmans.get(0), ghosts.get(3));
-            aiModels.add(blinkyAI);
-            aiModels.add(pinkyAI);
-            aiModels.add(inkyAI);
-            aiModels.add(clydeAI);
+            // Set AI's based on typeId
+            models = new HashMap<>(); // for debug drawings
+            for (Player ghost : ghosts) {
+                IAIModel model = null;
 
+                if (ghost.getTypeId().equals("clyde")) {
+                    model = new ClydeAI(pacman, ghost);
+                } else if (ghost.getTypeId().equals("pinky")) {
+                    model = new PinkyAI(pacman);
+                } else if (ghost.getTypeId().equals("inky")) {
+                    innerLoop:
+                    for (Player g : ghosts) {
+                        if (g.getTypeId().equals("blinky")) {
+                            model = new InkyAI(pacman, g);
+                            break innerLoop;
+                        }
+                    }
+                }
 
-            coreEngine.addAIController(new GhostController(ghosts.get(0), blinkyAI));
-            coreEngine.addAIController(new GhostController(ghosts.get(1), pinkyAI));
-            coreEngine.addAIController(new GhostController(ghosts.get(2), inkyAI));
-            coreEngine.addAIController(new GhostController(ghosts.get(3), clydeAI));
+                if (model == null) model = new BlinkyAI(pacman); // defaults to blinky
+
+                models.put(ghost.getTypeId(), model);
+                coreEngine.addAIController(new GhostController(ghost, model));
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -174,8 +181,6 @@ public class Pacman extends JPanel implements IPanel, IGameEngine {
         }
     }
 
-    public Map currentMap;
-    public Level currentLevel;
 
     private boolean isPlaying() {
         return currentLevel != null;
@@ -211,8 +216,8 @@ public class Pacman extends JPanel implements IPanel, IGameEngine {
     private void debugAI(Graphics g, IAIModel ai) {
         if (ai instanceof BlinkyAI) g.setColor(Color.red);
         else if (ai instanceof PinkyAI) g.setColor(Color.pink);
-        else if (ai instanceof InkyAI)g.setColor(Color.cyan);
-        else if (ai instanceof ClydeAI)g.setColor(Color.orange);
+        else if (ai instanceof InkyAI) g.setColor(Color.cyan);
+        else if (ai instanceof ClydeAI) g.setColor(Color.orange);
 
         Point prediction = ai.getPrediction();
         g.fillRect(prediction.getX(), prediction.getY(), Pacman.STEP_SIZE, Pacman.STEP_SIZE);
@@ -223,22 +228,20 @@ public class Pacman extends JPanel implements IPanel, IGameEngine {
     private void drawDebug(Graphics g) {
         // Walls hitbox
         g.setColor(Color.red);
-        for (Rect wall: currentMap.walls) {
+        for (Rect wall : currentMap.walls) {
             g.drawRect(wall.getX(), wall.getY(), wall.getWidth(), wall.getHeight());
         }
 
-        // Pacmans hitboxes
-        for (Player pacman: pacmans) {
-            debugPlayer(g, Color.green, pacman);
-        }
+        // Pacman hitboxes
+        debugPlayer(g, Color.green, pacman);
 
         // Ghosts hitboxes
-        for (Player ghost: ghosts) {
+        for (Player ghost : ghosts) {
             debugPlayer(g, Color.yellow, ghost);
         }
 
         // AI targets
-        for (IAIModel ai: aiModels) {
+        for (IAIModel ai : models.values()) {
             debugAI(g, ai);
         }
     }
@@ -252,19 +255,18 @@ public class Pacman extends JPanel implements IPanel, IGameEngine {
         // Map
         g.drawImage(currentMap.image, 0, 0, null);
 
+        // Engine
         coreEngine.renderDraw((Graphics2D) g);
 
         // Debug
-        drawDebug(g);
+        if (DEBUG) drawDebug(g);
     }
 
     @Override
     public void update() {
-        for (Player pacman: pacmans) {
-            pacman.update();
-        }
+        pacman.update();
 
-        for (Player ghost: ghosts) {
+        for (Player ghost : ghosts) {
             ghost.update();
         }
     }

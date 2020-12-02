@@ -28,10 +28,11 @@ public class GhostController implements IAIController {
     private boolean prioritize(PlayerDirection direction, PlayerDirection other) {
         if (direction == other) return true;
         if (direction == PlayerDirection.UP) return true;
-        if (direction == PlayerDirection.LEFT && other != PlayerDirection.UP) return  true;
-        if (direction == PlayerDirection.DOWN && other != PlayerDirection.UP && other != PlayerDirection.LEFT) return true;
+        if (direction == PlayerDirection.LEFT && other != PlayerDirection.UP) return true;
+        if (direction == PlayerDirection.DOWN && other != PlayerDirection.UP && other != PlayerDirection.LEFT)
+            return true;
 
-        return  false;
+        return false;
     }
 
     private PlayerDirection reverse(PlayerDirection direction) {
@@ -58,7 +59,7 @@ public class GhostController implements IAIController {
         Point currentPosition = ghost.getPosition();
         int shortestDistance = Integer.MAX_VALUE;
         PlayerDirection bestDirection = currentDirection;
-        for (PlayerDirection direction: PlayerDirection.values()) {
+        for (PlayerDirection direction : PlayerDirection.values()) {
             if (direction == reverse(currentDirection) || ghost.willHitWall(direction)) continue;
 
             int modX = direction == PlayerDirection.LEFT ? -Pacman.STEP_SIZE : direction == PlayerDirection.RIGHT ? Pacman.STEP_SIZE : 0;

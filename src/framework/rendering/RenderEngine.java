@@ -4,15 +4,10 @@ import framework.geometry.Point;
 import framework.rendering.graphics.Sprite;
 import framework.rendering.graphics.SpriteSheet;
 import framework.utility.IdFactory;
-import sun.awt.SunToolkit;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.AWTEventListener;
-import java.awt.event.PaintEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Vector;
 
 /**
@@ -30,6 +25,28 @@ public class RenderEngine implements IRenderEngine {
         this.panel = panel;
     }
 
+    /**
+     * Creates an object
+     *
+     * @param spriteSheetPath path to the sprite sheet file
+     * @param spriteWidth     width of one sprite
+     * @param spriteCount     number of sprites on the sprite sheet
+     * @return graphic object
+     */
+    public static GraphicObject createObject(String spriteSheetPath, int spriteWidth, int spriteCount) throws IOException {
+        return createObject(new SpriteSheet(spriteSheetPath, spriteWidth, spriteCount));
+    }
+
+    /**
+     * Creates an object from spriteSheet
+     *
+     * @param spriteSheet spriteSheet
+     * @return graphic object
+     */
+    public static GraphicObject createObject(SpriteSheet spriteSheet) {
+        Sprite sprite = new Sprite(spriteSheet);
+        return new GraphicObject(sprite, IdFactory.nextId());
+    }
 
     private Point translate(Point position) {
         return new Point(position.getX() - camera.getX(), position.getY() - camera.getY());
@@ -44,29 +61,6 @@ public class RenderEngine implements IRenderEngine {
     public GraphicObject addObject(GraphicObject object) {
         objects.add(object);
         return object;
-    }
-
-    /**
-     * Creates an object
-     *
-     * @param spriteSheetPath path to the sprite sheet file
-     * @param spriteWidth     width of one sprite
-     * @param spriteCount     number of sprites on the sprite sheet
-     * @return graphic object
-     */
-    public static GraphicObject createObject(String spriteSheetPath, int spriteWidth, int spriteCount) throws IOException {
-        return createObject(new SpriteSheet(spriteSheetPath, spriteWidth, spriteCount));
-    }
-
-
-    /**
-     * Creates an object from spriteSheet
-     * @param spriteSheet spriteSheet
-     * @return graphic object
-     */
-    public static GraphicObject createObject(SpriteSheet spriteSheet) {
-        Sprite sprite = new Sprite(spriteSheet);
-        return new GraphicObject(sprite, IdFactory.nextId());
     }
 
     /**
