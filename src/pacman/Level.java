@@ -30,11 +30,7 @@ public class Level {
         return new Actor(
                 split[0],
                 split[1],
-                Integer.parseInt(split[2]),
-                Integer.parseInt(split[3]),
-                Integer.parseInt(split[4]),
-                Integer.parseInt(split[5]),
-                Integer.parseInt(split[6])
+                Integer.parseInt(split[2])
         );
     }
 
@@ -52,20 +48,11 @@ public class Level {
         public String typeId;
 
         public int speed;
-        public int x;
-        public int y;
-        public int width;
-        public int height;
 
-
-        public Actor(String skinId, String typeId, int speed, int x, int y, int width, int height) {
+        public Actor(String skinId, String typeId, int speed) {
             this.skinId = skinId;
             this.typeId = typeId;
             this.speed = speed;
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
         }
     }
 

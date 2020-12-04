@@ -92,7 +92,7 @@ public class PhyObject {
      * @param x X velocity
      * @param y Y velocity
      */
-    public void setVelocity(float x, float y) {
+    public void setVelocity(int x, int y) {
         velocity.set(x, y);
     }
 

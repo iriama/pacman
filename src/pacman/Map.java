@@ -1,5 +1,6 @@
 package pacman;
 
+import framework.geometry.Point;
 import framework.geometry.Rect;
 
 import javax.imageio.ImageIO;
@@ -15,9 +16,16 @@ public class Map {
     public int width;
     public int height;
     public Vector<Rect> walls;
+    public Rect prisonWall;
+    public Point pacmanSpawn;
+    public Point ghostSpawn;
+    public Point ghostPrison;
 
     public Map(String path) throws Exception {
         walls = new Vector<>();
+        pacmanSpawn = new Point();
+        ghostSpawn = new Point();
+        ghostPrison = new Point();
         BufferedReader reader = new BufferedReader(new FileReader(path));
 
         String imgName = reader.readLine();
@@ -32,16 +40,27 @@ public class Map {
         width = Integer.parseInt(dimensions[0]);
         height = Integer.parseInt(dimensions[1]);
 
-        int n = Integer.parseInt(reader.readLine());
-
-        for (int i = 0; i < n; i++) {
-            String[] split = reader.readLine().split(" ");
-            walls.add(new Rect(
-                    Integer.parseInt(split[0]),
-                    Integer.parseInt(split[2]),
+        String line;
+        while((line = reader.readLine()) != null) {
+            String[] split = line.split(" ");
+            String type = split[0];
+            Rect rect = new Rect(
                     Integer.parseInt(split[1]),
-                    Integer.parseInt(split[3]))
+                    Integer.parseInt(split[3]),
+                    Integer.parseInt(split[2]),
+                    Integer.parseInt(split[4])
             );
+
+            if (type.equals("wall"))
+                walls.add(rect);
+            else if (type.equals("prison_wall"))
+                prisonWall = rect;
+            else if (type.equals("pacman_spawn"))
+                pacmanSpawn.set(rect.getX(), rect.getY());
+            else if (type.equals("ghost_spawn"))
+                ghostSpawn.set(rect.getX(), rect.getY());
+            else if (type.equals("ghost_prison"))
+                ghostPrison.set(rect.getX(), rect.getY());
         }
     }
 }

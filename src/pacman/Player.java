@@ -78,6 +78,9 @@ public class Player {
         if (stopped) return false;
 
         Rect nextWallHitbox = nextWallHitbox(direction);
+        // PRISON WALL
+        if (Pacman.game.currentMap.prisonWall.intersect(nextWallHitbox)) return true;
+        // Other walls
         for (Rect wall : Pacman.game.currentMap.walls) {
             if (nextWallHitbox.intersect(wall)) {
                 return true;

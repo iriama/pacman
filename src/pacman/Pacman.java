@@ -102,7 +102,7 @@ public class Pacman extends JPanel implements IPanel, IGameEngine {
     }
 
 
-    private Player loadPlayer(Level.Actor actor, int spriteWidth, int spriteCount) throws IOException {
+    private Player loadPlayer(Level.Actor actor, Point position, int spriteWidth, int spriteCount) throws IOException {
         SpriteSheet left = getSpriteSheet(actor.skinId + "/left", spriteWidth, spriteCount);
         SpriteSheet right = getSpriteSheet(actor.skinId + "/right", spriteWidth, spriteCount);
         SpriteSheet up = getSpriteSheet(actor.skinId + "/up", spriteWidth, spriteCount);
@@ -113,7 +113,7 @@ public class Pacman extends JPanel implements IPanel, IGameEngine {
 
         Player player = new Player(
                 actor.typeId,
-                coreEngine.addCharacter(pGraph, PhysicsEngine.createObject(actor.x, actor.width, actor.y, actor.height)),
+                coreEngine.addCharacter(pGraph, PhysicsEngine.createObject(position.getX(), PLAYER_SIZE, position.getY(), PLAYER_SIZE)),
                 actor.speed
         );
 
@@ -135,12 +135,12 @@ public class Pacman extends JPanel implements IPanel, IGameEngine {
             currentMap = getMap(currentLevel.mapIdentifier);
 
             // Pacman
-            pacman = loadPlayer(currentLevel.pacman, SPRITE_WIDTH, PAC_SPRITE_COUNT);
+            pacman = loadPlayer(currentLevel.pacman, currentMap.pacmanSpawn, SPRITE_WIDTH, PAC_SPRITE_COUNT);
 
 
             ghosts = new Vector<>();
             for (Level.Actor p : currentLevel.ghosts) {
-                ghosts.add(loadPlayer(p, SPRITE_WIDTH, GHOST_SPRITE_COUNT));
+                ghosts.add(loadPlayer(p, currentMap.ghostSpawn, SPRITE_WIDTH, GHOST_SPRITE_COUNT));
             }
 
             // Set preset arrows to pacman
@@ -155,7 +155,8 @@ public class Pacman extends JPanel implements IPanel, IGameEngine {
             for (Player ghost : ghosts) {
                 IAIModel model = null;
 
-                if (ghost.getTypeId().equals("clyde")) {
+                if (ghost.getTypeId().equals("player")) continue;
+                else if (ghost.getTypeId().equals("clyde")) {
                     model = new ClydeAI(pacman, ghost);
                 } else if (ghost.getTypeId().equals("pinky")) {
                     model = new PinkyAI(pacman);
@@ -231,6 +232,10 @@ public class Pacman extends JPanel implements IPanel, IGameEngine {
         for (Rect wall : currentMap.walls) {
             g.drawRect(wall.getX(), wall.getY(), wall.getWidth(), wall.getHeight());
         }
+
+        // Prison wall
+        g.setColor(Color.white);
+        g.drawRect(currentMap.prisonWall.getX(), currentMap.prisonWall.getY(), currentMap.prisonWall.getWidth(), currentMap.prisonWall.getHeight());
 
         // Pacman hitboxes
         debugPlayer(g, Color.green, pacman);
