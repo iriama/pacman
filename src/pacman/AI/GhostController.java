@@ -11,8 +11,12 @@ public class GhostController implements IAIController {
 
     Player ghost;
     IAIModel ai;
+    Point forcedTarget;
+    private Point lastPosition;
 
     public GhostController(Player ghost) {
+        forcedTarget = null;
+        lastPosition = null;
         this.ghost = ghost;
     }
 
@@ -23,6 +27,14 @@ public class GhostController implements IAIController {
 
     public void setAI(IAIModel ai) {
         this.ai = ai;
+    }
+
+    public void setForcedTarget(Point target) {
+        forcedTarget = target;
+    }
+
+    public void clearForcedTarget() {
+        forcedTarget = null;
     }
 
     private boolean prioritize(PlayerDirection direction, PlayerDirection other) {
@@ -51,9 +63,13 @@ public class GhostController implements IAIController {
     }
 
     public void update() {
-        if (ai == null || !ghost.onTile()) return;
+        if ((lastPosition != null && lastPosition.equals(ghost.getPosition())) || ghost.isDisabled() || ai == null || !ghost.onTile()) return;
 
-        Point target = ai.getPrediction();
+        // out of stage
+        if (ghost.getX() < 0 || ghost.getX() > Game.current.map.width - Game.PLAYER_SIZE) return;
+        if (ghost.getY() < 0 || ghost.getY() > Game.current.map.height - Game.PLAYER_SIZE) return;
+
+        Point target = forcedTarget == null ? ai.getPrediction() : forcedTarget;
         PlayerDirection currentDirection = ghost.getDirection();
 
         Point currentPosition = ghost.getPosition();
@@ -81,6 +97,7 @@ public class GhostController implements IAIController {
         if (bestDirection == currentDirection) return;
 
         ghost.changeDirection(bestDirection);
+        lastPosition = new Point(ghost.getX(), ghost.getY());
     }
 
 }

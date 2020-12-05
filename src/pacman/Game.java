@@ -13,6 +13,8 @@ import pacman.windows.SplashWindow;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Vector;
 
 public class Game extends JPanel implements IPanel, IGameEngine {
@@ -24,6 +26,7 @@ public class Game extends JPanel implements IPanel, IGameEngine {
     final static int PAC_SPRITE_COUNT = 10;
     final static int PAC_DEATH_SPRITE_COUNT = 17;
     final static int GHOST_SPRITE_COUNT = 4;
+    final static int GHOST_PRISON_EXIT_DELAY_MS = 500;
     public static Game current;
     static SplashWindow splashWindow;
     static MainWindow mainWindow;
@@ -36,6 +39,8 @@ public class Game extends JPanel implements IPanel, IGameEngine {
     private CoreEngine coreEngine;
     public Map map;
     public Level level;
+
+    private HashMap<Ghost, Long> ghostReleaseTime = new HashMap<>();
 
     public Game() {
         coreEngine = new CoreEngine(this, this);
@@ -76,10 +81,13 @@ public class Game extends JPanel implements IPanel, IGameEngine {
 
             // Ghosts
             ghosts = new Vector<>();
+            int i = 0;
             for (Level.Actor p : level.ghosts) {
-                Ghost ghost = Ghost.createGhost(p.skinId, p.typeId, p.speed, map.ghostSpawn, SPRITE_WIDTH, GHOST_SPRITE_COUNT);
+                Ghost ghost = Ghost.createGhost(p.skinId, p.typeId, p.speed, map.ghostPrison, SPRITE_WIDTH, GHOST_SPRITE_COUNT);
+                setInPrison(ghost, i * GHOST_PRISON_EXIT_DELAY_MS);
                 ghosts.add(ghost);
                 coreEngine.addCharacter(ghost.getCharacter());
+                i++;
             }
 
             // Set preset arrows to pacman
@@ -89,7 +97,7 @@ public class Game extends JPanel implements IPanel, IGameEngine {
                     )
             );
 
-         //Set AI's based on typeId
+         // Set AI's based on typeId
             for (Ghost ghost : ghosts) {
                 IAIModel model = null;
 
@@ -110,7 +118,7 @@ public class Game extends JPanel implements IPanel, IGameEngine {
 
                 if (model == null) model = new BlinkyAI(pacman); // defaults to blinky
                 ghost.setModel(model);
-                coreEngine.addAIController(new GhostController(ghost, model));
+                coreEngine.addAIController(ghost.getController());
             }
 
         } catch (Exception e) {
@@ -119,6 +127,14 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         }
     }
 
+    private void setInPrison(Ghost ghost, int extraDelay) {
+        ghost.changeMode(GhostMode.PRISONED);
+        ghostReleaseTime.put(ghost, System.currentTimeMillis() + GHOST_PRISON_EXIT_DELAY_MS + extraDelay);
+    }
+
+    private void setExitPrison(Ghost ghost) {
+        ghost.changeMode(GhostMode.EXIT_PRISON);
+    }
 
     private boolean isPlaying() {
         return level != null;
@@ -137,8 +153,19 @@ public class Game extends JPanel implements IPanel, IGameEngine {
             mainWindow.setVisible(true);
         });
 
-        // Run engine
-        coreEngine.run();
+        // run engine
+        Thread coreThread = new Thread(coreEngine);
+        coreThread.start();
+    }
+
+    private void start() {
+        // Get the ghosts out one at the time
+        for (Ghost ghost: ghosts) {
+            ghost.changeMode(GhostMode.EXIT_PRISON);
+            try {
+                Thread.sleep(GHOST_PRISON_EXIT_DELAY_MS);
+            } catch (InterruptedException e) { e.printStackTrace(); }
+        }
     }
 
     private void debugPlayer(Graphics g, Color color, Player player) {
@@ -203,9 +230,14 @@ public class Game extends JPanel implements IPanel, IGameEngine {
 
     @Override
     public void update() {
-        pacman.update();
+        long currentMs = System.currentTimeMillis();
 
-        for (Player ghost : ghosts) {
+        pacman.update();
+        for (Ghost ghost : ghosts) {
+            // If in prison
+            if (ghost.inPrison() && currentMs > ghostReleaseTime.get(ghost)) {
+                setExitPrison(ghost);
+            }
             ghost.update();
         }
     }

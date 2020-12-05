@@ -21,13 +21,15 @@ public class Player {
     private Keyboard keyboard;
     private PlayerDirection queue;
     private boolean stopped;
+    private boolean disabled;
 
 
     public Player( Character character, int speed) {
-        direction = PlayerDirection.RIGHT;
+        direction = PlayerDirection.UP;
         currentVelocity = 0;
         currentVelocityCount = 0;
-        stopped = false;
+        stopped = true;
+        disabled = false;
         queue = null;
         keyboard = new Keyboard();
         directionsSheet = new HashMap<>();
@@ -88,7 +90,17 @@ public class Player {
         return false;
     }
 
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
     private void attemptChangeDirection(PlayerDirection direction) {
+        if (isDisabled()) return;
+
         if (willHitWall(direction)) {
             queue = direction;
             return;
@@ -98,20 +110,24 @@ public class Player {
     }
 
     public void changeDirection(PlayerDirection direction) {
-        stopped = false;
+        resume();
         this.direction = direction;
-        getSprite().resume();
         queue = null;
         character.getGraphicObject().getSprite().setSpriteSheet(
                 directionsSheet.get(direction)
         );
     }
 
-    private void stop() {
+    protected void stop() {
         stopped = true;
         Sprite sprite = getSprite();
         sprite.pause();
         sprite.setFrame(Math.min(sprite.getFrameCount() - 1, 3));
+    }
+
+    protected void resume() {
+        stopped = false;
+        getSprite().resume();
     }
 
     private void updateCurrentVelocity() {
@@ -126,7 +142,27 @@ public class Player {
 
 
     public void update() {
+        if (isDisabled()) return;
 
+        // Teleport
+        if (getX() <= -Game.PLAYER_SIZE) {
+            setX(Game.current.map.width);
+            return;
+        }
+        if (getX() >= Game.current.map.width) {
+            setX(-Game.PLAYER_SIZE);
+            return;
+        }
+        if (getY() <= -Game.PLAYER_SIZE) {
+           setY(Game.current.map.height);
+            return;
+        }
+        if (getY() >= Game.current.map.height) {
+            setY(-Game.PLAYER_SIZE);
+            return;
+        }
+
+        // Attempt to change velocity
         if (onTile()) {
             if (queue != null) {
                 attemptChangeDirection(queue);
@@ -136,7 +172,7 @@ public class Player {
             }
         }
 
-
+        // Actually change direction speed
         updateCurrentVelocity();
         PhyObject phyObject = character.getPhyObject();
         if (stopped) {
@@ -178,6 +214,22 @@ public class Player {
 
     public Point getPosition() {
         return character.getPhyObject().getPosition();
+    }
+
+    public int getX() {
+        return getPosition().getX();
+    }
+
+    public int getY() {
+        return getPosition().getY();
+    }
+
+    public void setX(int x) {
+        getPosition().setX(x);
+    }
+
+    public void setY(int y) {
+        getPosition().setY(y);
     }
 
     public Point getCentredPosition() {

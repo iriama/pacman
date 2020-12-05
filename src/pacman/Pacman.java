@@ -22,10 +22,10 @@ public class Pacman extends Player{
         SpriteSheet up = MemoryDB.getSpriteSheet(skinId + "/up", spriteWidth, spriteCount);
         SpriteSheet down = MemoryDB.getSpriteSheet(skinId + "/down", spriteWidth, spriteCount);
 
-        GraphicObject pGraph = RenderEngine.createObject(right);
+        GraphicObject pGraph = RenderEngine.createObject(up);
         pGraph.getSprite().loop(200 / spriteCount);
 
-        Character character = CoreEngine.createCharacter(pGraph, PhysicsEngine.createObject(position.getX(), Game.PLAYER_SIZE, position.getY(), Game.PLAYER_SIZE));
+        Character character = CoreEngine.createCharacter(pGraph, PhysicsEngine.createObject(position.getX(), spriteWidth, position.getY(), spriteWidth));
         Pacman pacman = new Pacman(character, speed);
 
         pacman.bindDirection(PlayerDirection.UP, up);
@@ -36,4 +36,8 @@ public class Pacman extends Player{
         return pacman;
     }
 
+    @Override
+    public boolean willHitWall(PlayerDirection direction) {
+        return nextHitbox(direction).intersect(Game.current.map.prisonWall) || super.willHitWall(direction);
+    }
 }
