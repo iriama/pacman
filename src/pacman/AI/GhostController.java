@@ -119,7 +119,7 @@ public class GhostController implements IAIController {
 
         if (bestDirection == currentDirection) return;
 
-        ghost.changeDirection(bestDirection);
+        ghost.attemptChangeDirection(bestDirection);
         lastPosition = new Point(ghost.getX(), ghost.getY());
     }
 

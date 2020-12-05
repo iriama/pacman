@@ -11,6 +11,7 @@ import framework.rendering.graphics.SpriteSheet;
 import pacman.AI.*;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 enum GhostMode {
     PRISONED,
@@ -71,6 +72,7 @@ public class Ghost extends Player {
         return controller.getTarget();
     }
 
+    public HashMap<PlayerDirection, SpriteSheet> weakSheets;
 
     public static Ghost createGhost(String skinId, String controllerId, int speed, Point position) throws IOException {
         SpriteSheet left = MemoryDB.getSpriteSheet(skinId + "/left", Game.SPRITE_WIDTH);
@@ -78,12 +80,24 @@ public class Ghost extends Player {
         SpriteSheet up = MemoryDB.getSpriteSheet(skinId + "/up", Game.SPRITE_WIDTH);
         SpriteSheet down = MemoryDB.getSpriteSheet(skinId + "/down", Game.SPRITE_WIDTH);
 
+
+        SpriteSheet weak_left = MemoryDB.getSpriteSheet("weak/left", Game.SPRITE_WIDTH);
+        SpriteSheet weak_right = MemoryDB.getSpriteSheet("weak/right", Game.SPRITE_WIDTH);
+        SpriteSheet weak_up = MemoryDB.getSpriteSheet("weak/up", Game.SPRITE_WIDTH);
+        SpriteSheet weak_down = MemoryDB.getSpriteSheet("weak/down", Game.SPRITE_WIDTH);
+
         GraphicObject pGraph = RenderEngine.createObject(up);
         pGraph.getSprite().loop(200 / up.getSpriteCount());
 
         Character character = CoreEngine.createCharacter(pGraph, PhysicsEngine.createObject(position.getX(), Game.SPRITE_WIDTH, position.getY(), Game.SPRITE_WIDTH));
         Ghost ghost = new Ghost(character, speed);
         ghost.setControllerId(controllerId);
+
+        ghost.weakSheets = new HashMap<>();
+        ghost.weakSheets.put(PlayerDirection.UP, weak_up);
+        ghost.weakSheets.put(PlayerDirection.DOWN, weak_down);
+        ghost.weakSheets.put(PlayerDirection.LEFT, weak_left);
+        ghost.weakSheets.put(PlayerDirection.RIGHT, weak_right);
 
         ghost.bindDirection(PlayerDirection.UP, up);
         ghost.bindDirection(PlayerDirection.DOWN, down);
@@ -94,9 +108,19 @@ public class Ghost extends Player {
     }
 
 
+    @Override
+    public void changeDirection(PlayerDirection direction) {
+        super.changeDirection(direction);
+
+        if (isFrightned() || isDead()) {
+            getCharacter().getGraphicObject().getSprite().setSpriteSheet(
+                    weakSheets.get(direction)
+            );
+        }
+    }
+
     public void changeMode(GhostMode mode) {
         if (mode == this.mode) return;
-        setVelocity(0, 0); // bugfix
         switch (mode) {
             case PRISONED:
                 setSpeed(originalSpeed);
