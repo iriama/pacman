@@ -4,23 +4,28 @@ import framework.AI.IAIController;
 import framework.AI.IAIModel;
 import framework.geometry.Point;
 import pacman.Game;
+import pacman.Ghost;
 import pacman.Player;
 import pacman.PlayerDirection;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class GhostController implements IAIController {
 
-    Player ghost;
+    Ghost ghost;
     IAIModel ai;
     Point forcedTarget;
     private Point lastPosition;
 
-    public GhostController(Player ghost) {
+    public GhostController(Ghost ghost) {
         forcedTarget = null;
         lastPosition = null;
         this.ghost = ghost;
     }
 
-    public GhostController(Player ghost, IAIModel ai) {
+    public GhostController(Ghost ghost, IAIModel ai) {
         this(ghost);
         setAI(ai);
     }
@@ -79,8 +84,22 @@ public class GhostController implements IAIController {
         Point currentPosition = ghost.getPosition();
         int shortestDistance = Integer.MAX_VALUE;
         PlayerDirection bestDirection = currentDirection;
-        for (PlayerDirection direction : PlayerDirection.values()) {
+
+        boolean pickRandom = ghost.isFrightned();
+        PlayerDirection[] array = PlayerDirection.values();
+        if (pickRandom) {
+            List<PlayerDirection> list = Arrays.asList(array);
+            Collections.shuffle(list);
+            array = (PlayerDirection[])list.toArray();
+        }
+
+        for (PlayerDirection direction : array) {
             if (direction == reverse(currentDirection) || ghost.willHitWall(direction)) continue;
+
+            if (pickRandom) {
+                bestDirection = direction;
+                break;
+            }
 
             int modX = direction == PlayerDirection.LEFT ? -Game.STEP_SIZE : direction == PlayerDirection.RIGHT ? Game.STEP_SIZE : 0;
             int modY = direction == PlayerDirection.UP ? -Game.STEP_SIZE : direction == PlayerDirection.DOWN ? Game.STEP_SIZE : 0;

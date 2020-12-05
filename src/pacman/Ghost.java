@@ -15,6 +15,7 @@ import java.io.IOException;
 enum GhostMode {
     PRISONED,
     EXIT_PRISON,
+    ENTER_PRISON,
     CHASE,
     SCATTER,
     FRIGHTENED,
@@ -25,12 +26,12 @@ public class Ghost extends Player {
     private String controllerId;
     private IAIModel model = null;
     private GhostController controller;
-
     private GhostMode mode;
-
+    int originalSpeed;
 
     public Ghost(Character character, int speed) {
         super(character, speed);
+        originalSpeed = speed;
     }
 
     public boolean playerControlled() {
@@ -47,7 +48,7 @@ public class Ghost extends Player {
     }
 
     public boolean inPrison() {
-        return mode == GhostMode.PRISONED;
+        return mode == GhostMode.PRISONED || mode == GhostMode.EXIT_PRISON;
     }
 
     public boolean controllable() {
@@ -94,8 +95,12 @@ public class Ghost extends Player {
 
 
     public void changeMode(GhostMode mode) {
+        if (mode == this.mode) return;
+        setVelocity(0, 0); // bugfix
         switch (mode) {
             case PRISONED:
+                setSpeed(originalSpeed);
+                getSprite().setScale(1f);
                 setDisabled(true);
                 changeDirection(PlayerDirection.UP);
                 stop();
@@ -104,6 +109,9 @@ public class Ghost extends Player {
                 controller.setForcedTarget(Game.current.map.ghostSpawn);
                 setDisabled(false);
                 resume();
+                break;
+            case ENTER_PRISON:
+                controller.setForcedTarget(Game.current.map.ghostPrison);
                 break;
             case CHASE:
                 controller.clearForcedTarget();
@@ -121,16 +129,33 @@ public class Ghost extends Player {
                 resume();
                 break;
             case FRIGHTENED:
+                controller.clearForcedTarget();
+                setSpeed(originalSpeed / 2);
                 break;
             case DEAD:
+                controller.setForcedTarget(Game.current.map.ghostSpawn);
+                setSpeed(Game.DEAD_GHOST_SPEED);
+                getSprite().setScale(0.5f);
                 break;
         }
 
         this.mode = mode;
     }
 
-    public boolean exitedPrison() {
+    public boolean isDead() {
+        return mode == GhostMode.DEAD || mode == GhostMode.ENTER_PRISON;
+    }
+
+    public boolean onPrisonEntry() {
         return Game.current.map.ghostSpawn.equals(getPosition());
+    }
+
+    public boolean onPrisonInside() {
+        return Game.current.map.ghostPrison.equals(getPosition());
+    }
+
+    public boolean isFrightned() {
+        return mode == GhostMode.FRIGHTENED;
     }
 
     public boolean inChaseMode() {
@@ -143,7 +168,7 @@ public class Ghost extends Player {
 
     @Override
     public boolean willHitWall(PlayerDirection direction) {
-        if (mode != GhostMode.EXIT_PRISON && mode != GhostMode.DEAD && Game.current.map.prisonWall.intersect(nextHitbox(direction))) {
+        if (mode != GhostMode.EXIT_PRISON && mode != GhostMode.ENTER_PRISON && mode != GhostMode.DEAD && Game.current.map.prisonWall.intersect(nextHitbox(direction))) {
             return true;
         }
         return super.willHitWall(direction);

@@ -22,9 +22,7 @@ public class Game extends JPanel implements IPanel, IGameEngine {
     public static final int PLAYER_SIZE = 32;
     public static final int TILE_SIZE = STEP_SIZE * 2;
     final static int SPRITE_WIDTH = 28;
-    final static int PAC_SPRITE_COUNT = 10;
-    final static int PAC_DEATH_SPRITE_COUNT = 17;
-    final static int GHOST_SPRITE_COUNT = 4;
+    final static int DEAD_GHOST_SPEED = 4;
     final static int GHOST_PRISON_EXIT_DELAY_MS = 500;
     public static Game current;
     static SplashWindow splashWindow;
@@ -247,6 +245,10 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         }
     }
 
+    public void ghostCaught(Ghost ghost) {
+        ghost.changeMode(GhostMode.DEAD);
+    }
+
     @Override
     public void update() {
         if(restarting) return;
@@ -265,23 +267,48 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         for (Ghost ghost : ghosts) {
             ghost.update();
 
-            // Hitting pacman
-            if (ghost.getHitbox().intersect(pacman.getHitbox())) {
-                caught();
-                return;
+
+            // DEAD
+            if (ghost.isDead()) {
+                if (ghost.onPrisonEntry()) { // On prison entry
+                    ghost.changeMode(GhostMode.ENTER_PRISON);
+                } else if (ghost.onPrisonInside()) { // Inside prison
+                    setInPrison(ghost, level.ghostKillDuration);
+                }
+                continue;
             }
 
-            // Exit prison
-            if (ghost.inPrison() && currentMs > ghostReleaseTime.get(ghost)) {
-                setExitPrison(ghost);
+            // In prison
+            if (ghost.inPrison()) {
+                if (currentMs > ghostReleaseTime.get(ghost)) { // Released
+                    setExitPrison(ghost);
+                }
+                // Exited prison
+                if (ghost.onPrisonEntry()) { // On prison entry
+                    ghost.changeMode(mode);
+                }
+
+                continue;
             }
-            // Exited prison
-            if (ghost.exitedPrison()) {
-                ghost.changeMode(mode);
+
+            // Hitting pacman
+            if (ghost.getHitbox().intersect(pacman.getHitbox())) {
+                if (ghost.isFrightned()) {
+                    ghostCaught(ghost);
+                } else {
+                    caught();
+                    return;
+                }
+
+                continue;
             }
+
             // Change mode
-           if (ghost.controllable() && changeMode) {
-                ghost.changeMode(mode);
+            if (ghost.controllable()) {
+                if (changeMode) {
+                    ghost.changeMode(mode);
+                }
+                continue;
             }
         }
     }

@@ -11,6 +11,7 @@ public class Level {
     public Vector<Actor> ghosts;
     public int chaseDuration;
     public int scatterDuration;
+    public int ghostKillDuration;
 
     public Level(String path) throws Exception {
         BufferedReader reader = new BufferedReader(new FileReader(path));
@@ -19,6 +20,7 @@ public class Level {
         String[] delays = reader.readLine().split(" ");
         chaseDuration = Integer.parseInt(delays[0]);
         scatterDuration = Integer.parseInt(delays[1]);
+        ghostKillDuration = Integer.parseInt(delays[2]);
         pacman = parseActor(reader.readLine());
 
         int ghostCount = Integer.parseInt(reader.readLine());
