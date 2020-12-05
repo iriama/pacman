@@ -14,7 +14,7 @@ public class MainWindow extends JFrame {
         super();
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setTitle(TITLE);
-        setResizable(false);
+        // setResizable(false);
     }
 
     /**

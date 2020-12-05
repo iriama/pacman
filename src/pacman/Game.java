@@ -39,12 +39,15 @@ public class Game extends JPanel implements IPanel, IGameEngine {
     private CoreEngine coreEngine;
     public Map map;
     public Level level;
+    private GhostMode mode;
 
     private HashMap<Ghost, Long> ghostReleaseTime = new HashMap<>();
+    private long changeModeAt = 0;
 
     public Game() {
         coreEngine = new CoreEngine(this, this);
         setBackground(Color.black);
+        mode = GhostMode.CHASE;
     }
 
     public static void main(String[] args) {
@@ -156,6 +159,7 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         // run engine
         Thread coreThread = new Thread(coreEngine);
         coreThread.start();
+        changeModeAt = System.currentTimeMillis() + level.chaseDuration;
     }
 
     private void start() {
@@ -178,15 +182,16 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         g.setColor(color);
     }
 
-    private void debugAI(Graphics g, IAIModel ai) {
+    private void debugAI(Graphics g, Ghost ghost) {
+        IAIModel ai = ghost.getModel();
         if (ai instanceof BlinkyAI) g.setColor(Color.red);
         else if (ai instanceof PinkyAI) g.setColor(Color.pink);
         else if (ai instanceof InkyAI) g.setColor(Color.cyan);
         else if (ai instanceof ClydeAI) g.setColor(Color.orange);
 
-        Point prediction = ai.getPrediction();
-        g.fillRect(prediction.getX(), prediction.getY(), Game.STEP_SIZE, Game.STEP_SIZE);
-        g.drawString(ai.getClass().getSimpleName(), prediction.getX(), prediction.getY() - 2);
+        Point target = ghost.getTarget();
+        g.fillRect(target.getX(), target.getY(), Game.STEP_SIZE, Game.STEP_SIZE);
+        g.drawString(ai.getClass().getSimpleName(), target.getX(), target.getY() - 2);
     }
 
 
@@ -207,8 +212,8 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         // Ghosts hitboxes & IA
         for (Ghost ghost : ghosts) {
             debugPlayer(g, Color.yellow, ghost);
-            if (ghost.getModel() != null)
-                debugAI(g, ghost.getModel());
+            if (!ghost.playerControlled())
+                debugAI(g, ghost);
         }
     }
 
@@ -233,12 +238,30 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         long currentMs = System.currentTimeMillis();
 
         pacman.update();
+
+        boolean changeMode = false;
+        if (currentMs > changeModeAt) {
+            changeMode = true;
+            mode = mode == GhostMode.CHASE ? GhostMode.SCATTER : GhostMode.CHASE;
+            changeModeAt = currentMs + (mode == GhostMode.CHASE ? level.chaseDuration : level.scatterDuration);
+        }
+
         for (Ghost ghost : ghosts) {
-            // If in prison
+            ghost.update();
+
+            // Exit prison
             if (ghost.inPrison() && currentMs > ghostReleaseTime.get(ghost)) {
                 setExitPrison(ghost);
             }
-            ghost.update();
+            // Exited prison
+            if (ghost.exitedPrison()) {
+                ghost.changeMode(mode);
+            }
+
+            // Change mode
+            if (changeMode) {
+                ghost.changeMode(mode);
+            }
         }
     }
 }

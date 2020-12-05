@@ -98,7 +98,7 @@ public class Player {
         return disabled;
     }
 
-    private void attemptChangeDirection(PlayerDirection direction) {
+    public void attemptChangeDirection(PlayerDirection direction) {
         if (isDisabled()) return;
 
         if (willHitWall(direction)) {

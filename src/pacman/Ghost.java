@@ -8,7 +8,7 @@ import framework.physics.PhysicsEngine;
 import framework.rendering.GraphicObject;
 import framework.rendering.RenderEngine;
 import framework.rendering.graphics.SpriteSheet;
-import pacman.AI.GhostController;
+import pacman.AI.*;
 
 import java.io.IOException;
 
@@ -25,7 +25,6 @@ public class Ghost extends Player {
     private String controllerId;
     private IAIModel model = null;
     private GhostController controller;
-    private long lastModeChangeMs;
 
     private GhostMode mode;
 
@@ -34,7 +33,7 @@ public class Ghost extends Player {
     }
 
     public boolean playerControlled() {
-        return model != null;
+        return model == null;
     }
 
     public void setModel(IAIModel model) {
@@ -62,6 +61,10 @@ public class Ghost extends Player {
         return controllerId;
     }
 
+    public Point getTarget() {
+        return controller.getTarget();
+    }
+
 
     public static Ghost createGhost(String skinId, String controllerId, int speed, Point position, int spriteWidth, int spriteCount) throws IOException {
         SpriteSheet left = MemoryDB.getSpriteSheet(skinId + "/left", spriteWidth, spriteCount);
@@ -84,13 +87,8 @@ public class Ghost extends Player {
         return ghost;
     }
 
-    public long getLastModeChangeMs() {
-        return lastModeChangeMs;
-    }
 
     public void changeMode(GhostMode mode) {
-        lastModeChangeMs = System.currentTimeMillis();
-        this.mode = mode;
         switch (mode) {
             case PRISONED:
                 setDisabled(true);
@@ -107,12 +105,34 @@ public class Ghost extends Player {
                 resume();
                 break;
             case SCATTER:
+                Point target = null;
+                if (model instanceof BlinkyAI) target = BlinkyAI.scatterPosition();
+                else if (model instanceof ClydeAI) target = ClydeAI.scatterPosition();
+                else if (model instanceof InkyAI) target = InkyAI.scatterPosition();
+                else if (model instanceof PinkyAI) target = PinkyAI.scatterPosition();
+                controller.setForcedTarget(target);
+                setDisabled(false);
+                resume();
                 break;
             case FRIGHTENED:
                 break;
             case DEAD:
                 break;
         }
+
+        this.mode = mode;
+    }
+
+    public boolean exitedPrison() {
+        return Game.current.map.ghostSpawn.equals(getPosition());
+    }
+
+    public boolean inChaseMode() {
+        return mode == GhostMode.CHASE;
+    }
+
+    public boolean inScatterMode() {
+        return mode == GhostMode.SCATTER;
     }
 
     @Override
@@ -123,14 +143,4 @@ public class Ghost extends Player {
         return super.willHitWall(direction);
     }
 
-    @Override
-    public void update() {
-
-        // Mode calculation
-        if (mode == GhostMode.EXIT_PRISON && Game.current.map.ghostSpawn.equals(getPosition())) {
-            changeMode(GhostMode.CHASE);
-        }
-
-        super.update();
-    }
 }

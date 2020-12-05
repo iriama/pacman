@@ -9,11 +9,16 @@ public class Level {
     public String mapIdentifier;
     public Actor pacman;
     public Vector<Actor> ghosts;
+    public int chaseDuration;
+    public int scatterDuration;
 
     public Level(String path) throws Exception {
         BufferedReader reader = new BufferedReader(new FileReader(path));
 
         mapIdentifier = reader.readLine();
+        String[] delays = reader.readLine().split(" ");
+        chaseDuration = Integer.parseInt(delays[0]);
+        scatterDuration = Integer.parseInt(delays[1]);
         pacman = parseActor(reader.readLine());
 
         int ghostCount = Integer.parseInt(reader.readLine());
@@ -34,14 +39,6 @@ public class Level {
         );
     }
 
-    @Override
-    public String toString() {
-        return "Level{" +
-                "mapIdentifier='" + mapIdentifier + '\'' +
-                ", pacman=" + pacman +
-                ", ghosts=" + ghosts +
-                '}';
-    }
 
     class Actor {
         public String skinId;

@@ -17,7 +17,7 @@ public class InkyAI implements IAIModel {
     }
 
     public static Point scatterPosition() {
-        return new Point(Game.current.map.height - Game.STEP_SIZE, Game.current.map.width - Game.STEP_SIZE);
+        return new Point(Game.current.map.width - Game.STEP_SIZE, Game.current.map.height - Game.STEP_SIZE);
     }
 
     public Point getPrediction() {

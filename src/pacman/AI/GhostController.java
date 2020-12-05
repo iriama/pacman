@@ -37,6 +37,10 @@ public class GhostController implements IAIController {
         forcedTarget = null;
     }
 
+    public Point getTarget() {
+        return forcedTarget == null ? ai.getPrediction() : forcedTarget;
+    }
+
     private boolean prioritize(PlayerDirection direction, PlayerDirection other) {
         if (direction == other) return true;
         if (direction == PlayerDirection.UP) return true;
@@ -47,7 +51,7 @@ public class GhostController implements IAIController {
         return false;
     }
 
-    private PlayerDirection reverse(PlayerDirection direction) {
+    public static PlayerDirection reverse(PlayerDirection direction) {
         switch (direction) {
             case UP:
                 return PlayerDirection.DOWN;
@@ -69,7 +73,7 @@ public class GhostController implements IAIController {
         if (ghost.getX() < 0 || ghost.getX() > Game.current.map.width - Game.PLAYER_SIZE) return;
         if (ghost.getY() < 0 || ghost.getY() > Game.current.map.height - Game.PLAYER_SIZE) return;
 
-        Point target = forcedTarget == null ? ai.getPrediction() : forcedTarget;
+        Point target = getTarget();
         PlayerDirection currentDirection = ghost.getDirection();
 
         Point currentPosition = ghost.getPosition();
