@@ -2,7 +2,7 @@ package pacman.AI;
 
 import framework.AI.IAIModel;
 import framework.geometry.Point;
-import pacman.PacGame;
+import pacman.Game;
 import pacman.Player;
 import pacman.PlayerDirection;
 
@@ -17,13 +17,13 @@ public class InkyAI implements IAIModel {
     }
 
     public static Point scatterPosition() {
-        return new Point(PacGame.game.currentMap.height - PacGame.STEP_SIZE, PacGame.game.currentMap.width - PacGame.STEP_SIZE);
+        return new Point(Game.current.map.height - Game.STEP_SIZE, Game.current.map.width - Game.STEP_SIZE);
     }
 
     public Point getPrediction() {
         PlayerDirection pacmanDirection = pacman.getDirection();
-        int modX = pacman.getModX(pacmanDirection, PacGame.TILE_SIZE * 2);
-        int modY = pacman.getModY(pacmanDirection, PacGame.TILE_SIZE * 2);
+        int modX = pacman.getModX(pacmanDirection, Game.TILE_SIZE * 2);
+        int modY = pacman.getModY(pacmanDirection, Game.TILE_SIZE * 2);
         Point twoTilesAhead = new Point(
                 modX,
                 modY

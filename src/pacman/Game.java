@@ -5,11 +5,7 @@ import framework.IGameEngine;
 import framework.core.CoreEngine;
 import framework.geometry.Point;
 import framework.geometry.Rect;
-import framework.physics.PhysicsEngine;
-import framework.rendering.GraphicObject;
 import framework.rendering.IPanel;
-import framework.rendering.RenderEngine;
-import framework.rendering.graphics.SpriteSheet;
 import pacman.AI.*;
 import pacman.utility.FontsEngine;
 import pacman.windows.MainWindow;
@@ -17,11 +13,9 @@ import pacman.windows.SplashWindow;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.Vector;
 
-public class PacGame extends JPanel implements IPanel, IGameEngine {
+public class Game extends JPanel implements IPanel, IGameEngine {
     // --- Statics
     public static final int STEP_SIZE = 8;
     public static final int PLAYER_SIZE = 32;
@@ -30,22 +24,20 @@ public class PacGame extends JPanel implements IPanel, IGameEngine {
     final static int PAC_SPRITE_COUNT = 10;
     final static int PAC_DEATH_SPRITE_COUNT = 17;
     final static int GHOST_SPRITE_COUNT = 4;
-    public static PacGame game;
+    public static Game current;
     static SplashWindow splashWindow;
     static MainWindow mainWindow;
     static boolean DEBUG = false;
     // ---
 
 
-
-
     private Pacman pacman;
     private Vector<Ghost> ghosts;
     private CoreEngine coreEngine;
-    public Map currentMap;
-    public Level currentLevel;
+    public Map map;
+    public Level level;
 
-    public PacGame() {
+    public Game() {
         coreEngine = new CoreEngine(this, this);
         setBackground(Color.black);
     }
@@ -63,9 +55,9 @@ public class PacGame extends JPanel implements IPanel, IGameEngine {
         FontsEngine.start();
         splashWindow = new SplashWindow();
         mainWindow = new MainWindow();
-        game = new PacGame();
+        current = new Game();
 
-        game.play("test");
+        current.play("test");
     }
 
 
@@ -73,19 +65,19 @@ public class PacGame extends JPanel implements IPanel, IGameEngine {
         // Load assets
         try {
             // Level
-            currentLevel = MemoryDB.getLevel(levelIdentifier);
+            level = MemoryDB.getLevel(levelIdentifier);
 
             // Map
-            currentMap = MemoryDB.getMap(currentLevel.mapIdentifier);
+            map = MemoryDB.getMap(level.mapIdentifier);
 
             // Pacman
-            pacman = Pacman.createPacman(currentLevel.pacman.skinId, currentLevel.pacman.speed, currentMap.pacmanSpawn, SPRITE_WIDTH, PAC_SPRITE_COUNT);
+            pacman = Pacman.createPacman(level.pacman.skinId, level.pacman.speed, map.pacmanSpawn, SPRITE_WIDTH, PAC_SPRITE_COUNT);
             coreEngine.addCharacter(pacman.getCharacter());
 
             // Ghosts
             ghosts = new Vector<>();
-            for (Level.Actor p : currentLevel.ghosts) {
-                Ghost ghost = Ghost.createGhost(p.skinId, p.typeId, p.speed, currentMap.ghostSpawn, SPRITE_WIDTH, GHOST_SPRITE_COUNT);
+            for (Level.Actor p : level.ghosts) {
+                Ghost ghost = Ghost.createGhost(p.skinId, p.typeId, p.speed, map.ghostSpawn, SPRITE_WIDTH, GHOST_SPRITE_COUNT);
                 ghosts.add(ghost);
                 coreEngine.addCharacter(ghost.getCharacter());
             }
@@ -129,7 +121,7 @@ public class PacGame extends JPanel implements IPanel, IGameEngine {
 
 
     private boolean isPlaying() {
-        return currentLevel != null;
+        return level != null;
     }
 
     public void play(String levelIdentifier) {
@@ -139,7 +131,7 @@ public class PacGame extends JPanel implements IPanel, IGameEngine {
         load(levelIdentifier);
 
         // Hook into window
-        mainWindow.setPanel(this, currentMap.width, currentMap.height);
+        mainWindow.setPanel(this, map.width, map.height);
         SwingUtilities.invokeLater(() -> {
             splashWindow.setVisible(false);
             mainWindow.setVisible(true);
@@ -166,7 +158,7 @@ public class PacGame extends JPanel implements IPanel, IGameEngine {
         else if (ai instanceof ClydeAI) g.setColor(Color.orange);
 
         Point prediction = ai.getPrediction();
-        g.fillRect(prediction.getX(), prediction.getY(), PacGame.STEP_SIZE, PacGame.STEP_SIZE);
+        g.fillRect(prediction.getX(), prediction.getY(), Game.STEP_SIZE, Game.STEP_SIZE);
         g.drawString(ai.getClass().getSimpleName(), prediction.getX(), prediction.getY() - 2);
     }
 
@@ -174,15 +166,15 @@ public class PacGame extends JPanel implements IPanel, IGameEngine {
     private void drawDebug(Graphics g) {
         // Walls hitbox
         g.setColor(Color.red);
-        for (Rect wall : currentMap.walls) {
+        for (Rect wall : map.walls) {
             g.drawRect(wall.getX(), wall.getY(), wall.getWidth(), wall.getHeight());
         }
 
         // Prison wall
         g.setColor(Color.white);
-        g.drawRect(currentMap.prisonWall.getX(), currentMap.prisonWall.getY(), currentMap.prisonWall.getWidth(), currentMap.prisonWall.getHeight());
+        g.drawRect(map.prisonWall.getX(), map.prisonWall.getY(), map.prisonWall.getWidth(), map.prisonWall.getHeight());
 
-        // PacGame hitboxes
+        // Game hitboxes
         debugPlayer(g, Color.green, pacman);
 
         // Ghosts hitboxes & IA
@@ -200,7 +192,7 @@ public class PacGame extends JPanel implements IPanel, IGameEngine {
         if (!isPlaying()) return;
 
         // Map
-        g.drawImage(currentMap.image, 0, 0, null);
+        g.drawImage(map.image, 0, 0, null);
 
         // Engine
         coreEngine.renderDraw((Graphics2D) g);

@@ -47,7 +47,7 @@ public class Ghost extends Player {
         GraphicObject pGraph = RenderEngine.createObject(right);
         pGraph.getSprite().loop(200 / spriteCount);
 
-        Character character = CoreEngine.createCharacter(pGraph, PhysicsEngine.createObject(position.getX(), PacGame.PLAYER_SIZE, position.getY(), PacGame.PLAYER_SIZE));
+        Character character = CoreEngine.createCharacter(pGraph, PhysicsEngine.createObject(position.getX(), Game.PLAYER_SIZE, position.getY(), Game.PLAYER_SIZE));
         Ghost ghost = new Ghost(character, speed);
         ghost.setControllerId(controllerId);
 

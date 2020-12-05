@@ -2,7 +2,7 @@ package pacman.AI;
 
 import framework.AI.IAIModel;
 import framework.geometry.Point;
-import pacman.PacGame;
+import pacman.Game;
 import pacman.Player;
 
 public class BlinkyAI implements IAIModel {
@@ -13,7 +13,7 @@ public class BlinkyAI implements IAIModel {
     }
 
     public static Point scatterPosition() {
-        return new Point(PacGame.game.currentMap.width - PacGame.STEP_SIZE, 0);
+        return new Point(Game.current.map.width - Game.STEP_SIZE, 0);
     }
 
     public Point getPrediction() {

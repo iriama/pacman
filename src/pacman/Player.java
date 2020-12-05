@@ -79,7 +79,7 @@ public class Player {
         Rect nextHitbox = nextHitbox(direction);
 
         // Walls
-        for (Rect wall : PacGame.game.currentMap.walls) {
+        for (Rect wall : Game.current.map.walls) {
             if (nextHitbox.intersect(wall)) {
                 return true;
             }
@@ -170,9 +170,9 @@ public class Player {
         Rect hitbox = getHitbox();
         return new Rect(
                 hitbox.getX(),
-                PacGame.PLAYER_SIZE,
+                Game.PLAYER_SIZE,
                 hitbox.getY(),
-                PacGame.PLAYER_SIZE
+                Game.PLAYER_SIZE
         );
     }
 
@@ -186,6 +186,6 @@ public class Player {
 
     public boolean onTile() {
         Point position = getPosition();
-        return position.getX() % PacGame.STEP_SIZE == 0 && position.getY() % PacGame.STEP_SIZE == 0;
+        return position.getX() % Game.STEP_SIZE == 0 && position.getY() % Game.STEP_SIZE == 0;
     }
 }

@@ -3,7 +3,7 @@ package pacman.AI;
 import framework.AI.IAIController;
 import framework.AI.IAIModel;
 import framework.geometry.Point;
-import pacman.PacGame;
+import pacman.Game;
 import pacman.Player;
 import pacman.PlayerDirection;
 
@@ -62,8 +62,8 @@ public class GhostController implements IAIController {
         for (PlayerDirection direction : PlayerDirection.values()) {
             if (direction == reverse(currentDirection) || ghost.willHitWall(direction)) continue;
 
-            int modX = direction == PlayerDirection.LEFT ? -PacGame.STEP_SIZE : direction == PlayerDirection.RIGHT ? PacGame.STEP_SIZE : 0;
-            int modY = direction == PlayerDirection.UP ? -PacGame.STEP_SIZE : direction == PlayerDirection.DOWN ? PacGame.STEP_SIZE : 0;
+            int modX = direction == PlayerDirection.LEFT ? -Game.STEP_SIZE : direction == PlayerDirection.RIGHT ? Game.STEP_SIZE : 0;
+            int modY = direction == PlayerDirection.UP ? -Game.STEP_SIZE : direction == PlayerDirection.DOWN ? Game.STEP_SIZE : 0;
 
             Point nextPosition = new Point(
                     currentPosition.getX() + modX,
