@@ -28,6 +28,7 @@ public class Ghost extends Player {
 
     private GhostMode mode;
 
+
     public Ghost(Character character, int speed) {
         super(character, speed);
     }
@@ -49,6 +50,10 @@ public class Ghost extends Player {
         return mode == GhostMode.PRISONED;
     }
 
+    public boolean controllable() {
+        return mode == GhostMode.CHASE || mode == GhostMode.SCATTER;
+    }
+
     public IAIModel getModel() {
         return model;
     }
@@ -66,16 +71,16 @@ public class Ghost extends Player {
     }
 
 
-    public static Ghost createGhost(String skinId, String controllerId, int speed, Point position, int spriteWidth, int spriteCount) throws IOException {
-        SpriteSheet left = MemoryDB.getSpriteSheet(skinId + "/left", spriteWidth, spriteCount);
-        SpriteSheet right = MemoryDB.getSpriteSheet(skinId + "/right", spriteWidth, spriteCount);
-        SpriteSheet up = MemoryDB.getSpriteSheet(skinId + "/up", spriteWidth, spriteCount);
-        SpriteSheet down = MemoryDB.getSpriteSheet(skinId + "/down", spriteWidth, spriteCount);
+    public static Ghost createGhost(String skinId, String controllerId, int speed, Point position) throws IOException {
+        SpriteSheet left = MemoryDB.getSpriteSheet(skinId + "/left", Game.SPRITE_WIDTH);
+        SpriteSheet right = MemoryDB.getSpriteSheet(skinId + "/right", Game.SPRITE_WIDTH);
+        SpriteSheet up = MemoryDB.getSpriteSheet(skinId + "/up", Game.SPRITE_WIDTH);
+        SpriteSheet down = MemoryDB.getSpriteSheet(skinId + "/down", Game.SPRITE_WIDTH);
 
         GraphicObject pGraph = RenderEngine.createObject(up);
-        pGraph.getSprite().loop(200 / spriteCount);
+        pGraph.getSprite().loop(200 / up.getSpriteCount());
 
-        Character character = CoreEngine.createCharacter(pGraph, PhysicsEngine.createObject(position.getX(), spriteWidth, position.getY(), spriteWidth));
+        Character character = CoreEngine.createCharacter(pGraph, PhysicsEngine.createObject(position.getX(), Game.SPRITE_WIDTH, position.getY(), Game.SPRITE_WIDTH));
         Ghost ghost = new Ghost(character, speed);
         ghost.setControllerId(controllerId);
 
@@ -92,6 +97,7 @@ public class Ghost extends Player {
         switch (mode) {
             case PRISONED:
                 setDisabled(true);
+                changeDirection(PlayerDirection.UP);
                 stop();
                 break;
             case EXIT_PRISON:

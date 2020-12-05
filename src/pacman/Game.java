@@ -14,7 +14,6 @@ import pacman.windows.SplashWindow;
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Vector;
 
 public class Game extends JPanel implements IPanel, IGameEngine {
@@ -79,18 +78,15 @@ public class Game extends JPanel implements IPanel, IGameEngine {
             map = MemoryDB.getMap(level.mapIdentifier);
 
             // Pacman
-            pacman = Pacman.createPacman(level.pacman.skinId, level.pacman.speed, map.pacmanSpawn, SPRITE_WIDTH, PAC_SPRITE_COUNT);
+            pacman = Pacman.createPacman(level.pacman.skinId, level.pacman.speed, map.pacmanSpawn);
             coreEngine.addCharacter(pacman.getCharacter());
 
             // Ghosts
             ghosts = new Vector<>();
-            int i = 0;
             for (Level.Actor p : level.ghosts) {
-                Ghost ghost = Ghost.createGhost(p.skinId, p.typeId, p.speed, map.ghostPrison, SPRITE_WIDTH, GHOST_SPRITE_COUNT);
-                setInPrison(ghost, i * GHOST_PRISON_EXIT_DELAY_MS);
-                ghosts.add(ghost);
+                Ghost ghost = Ghost.createGhost(p.skinId, p.typeId, p.speed, map.ghostPrison);
                 coreEngine.addCharacter(ghost.getCharacter());
-                i++;
+                ghosts.add(ghost);
             }
 
             // Set preset arrows to pacman
@@ -123,6 +119,9 @@ public class Game extends JPanel implements IPanel, IGameEngine {
                 ghost.setModel(model);
                 coreEngine.addAIController(ghost.getController());
             }
+
+            // Start
+            restart();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -162,15 +161,6 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         changeModeAt = System.currentTimeMillis() + level.chaseDuration;
     }
 
-    private void start() {
-        // Get the ghosts out one at the time
-        for (Ghost ghost: ghosts) {
-            ghost.changeMode(GhostMode.EXIT_PRISON);
-            try {
-                Thread.sleep(GHOST_PRISON_EXIT_DELAY_MS);
-            } catch (InterruptedException e) { e.printStackTrace(); }
-        }
-    }
 
     private void debugPlayer(Graphics g, Color color, Player player) {
         g.setColor(color);
@@ -233,8 +223,34 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         if (DEBUG) drawDebug(g);
     }
 
+    private boolean restarting = false;
+
+    public void restart() {
+        mode = GhostMode.CHASE;
+        changeModeAt = System.currentTimeMillis() + level.chaseDuration;
+        pacman.setPosition(map.pacmanSpawn);
+        pacman.resurrect();
+        int i = 0;
+        for (Ghost ghost: ghosts) {
+            ghost.setPosition(map.ghostPrison);
+            setInPrison(ghost, i*GHOST_PRISON_EXIT_DELAY_MS);
+            i++;
+        }
+        restarting = false;
+    }
+
+    public void caught() {
+        restarting = true;
+        pacman.kill(() -> restart());
+        for (Ghost ghost: ghosts) {
+            ghost.setDisabled(true);
+        }
+    }
+
     @Override
     public void update() {
+        if(restarting) return;
+
         long currentMs = System.currentTimeMillis();
 
         pacman.update();
@@ -249,6 +265,12 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         for (Ghost ghost : ghosts) {
             ghost.update();
 
+            // Hitting pacman
+            if (ghost.getHitbox().intersect(pacman.getHitbox())) {
+                caught();
+                return;
+            }
+
             // Exit prison
             if (ghost.inPrison() && currentMs > ghostReleaseTime.get(ghost)) {
                 setExitPrison(ghost);
@@ -257,9 +279,8 @@ public class Game extends JPanel implements IPanel, IGameEngine {
             if (ghost.exitedPrison()) {
                 ghost.changeMode(mode);
             }
-
             // Change mode
-            if (changeMode) {
+           if (ghost.controllable() && changeMode) {
                 ghost.changeMode(mode);
             }
         }

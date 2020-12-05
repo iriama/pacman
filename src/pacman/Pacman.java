@@ -6,27 +6,55 @@ import framework.geometry.Point;
 import framework.physics.PhysicsEngine;
 import framework.rendering.GraphicObject;
 import framework.rendering.RenderEngine;
+import framework.rendering.graphics.ISpriteEvent;
+import framework.rendering.graphics.Sprite;
 import framework.rendering.graphics.SpriteSheet;
 
 import java.io.IOException;
 
 public class Pacman extends Player{
 
-    public Pacman(Character character, int speed) {
+    SpriteSheet deathSheet;
+    SpriteSheet defaultSheet;
+
+    public Pacman(Character character, int speed, SpriteSheet defaultSheet, SpriteSheet deathSheet) {
         super(character, speed);
+        this.deathSheet = deathSheet;
+        this.defaultSheet = defaultSheet;
     }
 
-    public static Pacman createPacman(String skinId, int speed, Point position, int spriteWidth, int spriteCount) throws IOException {
-        SpriteSheet left = MemoryDB.getSpriteSheet(skinId + "/left", spriteWidth, spriteCount);
-        SpriteSheet right = MemoryDB.getSpriteSheet(skinId + "/right", spriteWidth, spriteCount);
-        SpriteSheet up = MemoryDB.getSpriteSheet(skinId + "/up", spriteWidth, spriteCount);
-        SpriteSheet down = MemoryDB.getSpriteSheet(skinId + "/down", spriteWidth, spriteCount);
+    public void resurrect() {
+        setDisabled(false);
+        Sprite sprite = getSprite();
+        sprite.setSpriteSheet(defaultSheet);
+        sprite.setFrame(2);
+        sprite.loop(200 / defaultSheet.getSpriteCount());
+        changeDirection(PlayerDirection.UP);
+    }
+
+    public void kill(ISpriteEvent onfinish) {
+        setDisabled(true);
+        Sprite sprite = getSprite();
+        sprite.setSpriteSheet(deathSheet);
+        sprite.setFrame(0);
+        sprite.setLoop(false);
+        sprite.play(50);
+        sprite.onPlayFinish(onfinish);
+    }
+
+    public static Pacman createPacman(String skinId, int speed, Point position) throws IOException {
+        SpriteSheet left = MemoryDB.getSpriteSheet(skinId + "/left", Game.SPRITE_WIDTH);
+        SpriteSheet right = MemoryDB.getSpriteSheet(skinId + "/right", Game.SPRITE_WIDTH);
+        SpriteSheet up = MemoryDB.getSpriteSheet(skinId + "/up", Game.SPRITE_WIDTH);
+        SpriteSheet down = MemoryDB.getSpriteSheet(skinId + "/down", Game.SPRITE_WIDTH);
+        SpriteSheet deathSheet = MemoryDB.getSpriteSheet(skinId + "/dead", Game.SPRITE_WIDTH);
+
 
         GraphicObject pGraph = RenderEngine.createObject(up);
-        pGraph.getSprite().loop(200 / spriteCount);
+        pGraph.getSprite().loop(200 / up.getSpriteCount());
 
-        Character character = CoreEngine.createCharacter(pGraph, PhysicsEngine.createObject(position.getX(), spriteWidth, position.getY(), spriteWidth));
-        Pacman pacman = new Pacman(character, speed);
+        Character character = CoreEngine.createCharacter(pGraph, PhysicsEngine.createObject(position.getX(), Game.SPRITE_WIDTH, position.getY(), Game.SPRITE_WIDTH));
+        Pacman pacman = new Pacman(character, speed, up, deathSheet);
 
         pacman.bindDirection(PlayerDirection.UP, up);
         pacman.bindDirection(PlayerDirection.DOWN, down);

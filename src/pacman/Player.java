@@ -24,7 +24,7 @@ public class Player {
     private boolean disabled;
 
 
-    public Player( Character character, int speed) {
+    public Player(Character character, int speed) {
         direction = PlayerDirection.UP;
         currentVelocity = 0;
         currentVelocityCount = 0;
@@ -91,11 +91,23 @@ public class Player {
     }
 
     public void setDisabled(boolean disabled) {
+        if (disabled) {
+            queue = null;
+            setVelocity(0, 0);
+        }
         this.disabled = disabled;
     }
 
     public boolean isDisabled() {
         return disabled;
+    }
+
+    public void hide() {
+        getCharacter().getGraphicObject().hide();
+    }
+
+    public void show() {
+        getCharacter().getGraphicObject().show();
     }
 
     public void attemptChangeDirection(PlayerDirection direction) {
@@ -107,6 +119,10 @@ public class Player {
         }
 
         changeDirection(direction);
+    }
+
+    public void setVelocity(int x, int y) {
+        getCharacter().getPhyObject().setVelocity(x, y);
     }
 
     public void changeDirection(PlayerDirection direction) {
@@ -194,7 +210,7 @@ public class Player {
     }
 
 
-    private Sprite getSprite() {
+    protected Sprite getSprite() {
         return character.getGraphicObject().getSprite();
     }
 
@@ -234,6 +250,11 @@ public class Player {
 
     public Point getCentredPosition() {
         return getHitbox().getCenter();
+    }
+
+    public void setPosition(Point position) {
+        setX(position.getX());
+        setY(position.getY());
     }
 
     public boolean onTile() {

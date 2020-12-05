@@ -13,9 +13,9 @@ public class MemoryDB {
     private static HashMap<String, Map> maps = new HashMap<>();
     private static HashMap<String, Level> levels = new HashMap<>();
 
-    public static SpriteSheet getSpriteSheet(String identifier, int spriteWidth, int spriteCount) throws IOException {
+    public static SpriteSheet getSpriteSheet(String identifier, int spriteWidth) throws IOException {
         if (spriteSheets.containsKey(identifier)) return spriteSheets.get(identifier);
-        SpriteSheet spriteSheet = new SpriteSheet("ressources/sprites/" + identifier + ".png", spriteWidth, spriteCount);
+        SpriteSheet spriteSheet = new SpriteSheet("ressources/sprites/" + identifier + ".png", spriteWidth);
         spriteSheets.put(identifier, spriteSheet);
         return spriteSheet;
     }

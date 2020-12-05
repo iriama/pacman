@@ -30,11 +30,10 @@ public class RenderEngine implements IRenderEngine {
      *
      * @param spriteSheetPath path to the sprite sheet file
      * @param spriteWidth     width of one sprite
-     * @param spriteCount     number of sprites on the sprite sheet
      * @return graphic object
      */
-    public static GraphicObject createObject(String spriteSheetPath, int spriteWidth, int spriteCount) throws IOException {
-        return createObject(new SpriteSheet(spriteSheetPath, spriteWidth, spriteCount));
+    public static GraphicObject createObject(String spriteSheetPath, int spriteWidth) throws IOException {
+        return createObject(new SpriteSheet(spriteSheetPath, spriteWidth));
     }
 
     /**
