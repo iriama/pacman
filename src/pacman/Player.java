@@ -21,10 +21,9 @@ public class Player {
     private Keyboard keyboard;
     private PlayerDirection queue;
     private boolean stopped;
-    private String typeId;
 
 
-    public Player(String typeId, Character character, int speed) {
+    public Player( Character character, int speed) {
         direction = PlayerDirection.RIGHT;
         currentVelocity = 0;
         currentVelocityCount = 0;
@@ -34,12 +33,12 @@ public class Player {
         directionsSheet = new HashMap<>();
         this.character = character;
         this.speed = speed;
-        this.typeId = typeId;
     }
 
-    public String getTypeId() {
-        return typeId;
+    public Character getCharacter() {
+        return character;
     }
+
 
     public PlayerDirection getDirection() {
         return direction;
@@ -67,7 +66,7 @@ public class Player {
         return direction == PlayerDirection.UP ? -step : direction == PlayerDirection.DOWN ? step : 0;
     }
 
-    private Rect nextWallHitbox(PlayerDirection direction) {
+    protected Rect nextHitbox(PlayerDirection direction) {
         int modX = getModX(direction, 1);
         int modY = getModY(direction, 1);
 
@@ -77,12 +76,11 @@ public class Player {
     public boolean willHitWall(PlayerDirection direction) {
         if (stopped) return false;
 
-        Rect nextWallHitbox = nextWallHitbox(direction);
-        // PRISON WALL
-        if (Pacman.game.currentMap.prisonWall.intersect(nextWallHitbox)) return true;
-        // Other walls
-        for (Rect wall : Pacman.game.currentMap.walls) {
-            if (nextWallHitbox.intersect(wall)) {
+        Rect nextHitbox = nextHitbox(direction);
+
+        // Walls
+        for (Rect wall : PacGame.game.currentMap.walls) {
+            if (nextHitbox.intersect(wall)) {
                 return true;
             }
         }
@@ -110,7 +108,6 @@ public class Player {
     }
 
     private void stop() {
-        //direction = PlayerDirection.NONE;
         stopped = true;
         Sprite sprite = getSprite();
         sprite.pause();
@@ -173,12 +170,11 @@ public class Player {
         Rect hitbox = getHitbox();
         return new Rect(
                 hitbox.getX(),
-                Pacman.PLAYER_SIZE,
+                PacGame.PLAYER_SIZE,
                 hitbox.getY(),
-                Pacman.PLAYER_SIZE
+                PacGame.PLAYER_SIZE
         );
     }
-
 
     public Point getPosition() {
         return character.getPhyObject().getPosition();
@@ -190,6 +186,6 @@ public class Player {
 
     public boolean onTile() {
         Point position = getPosition();
-        return position.getX() % Pacman.STEP_SIZE == 0 && position.getY() % Pacman.STEP_SIZE == 0;
+        return position.getX() % PacGame.STEP_SIZE == 0 && position.getY() % PacGame.STEP_SIZE == 0;
     }
 }

@@ -109,6 +109,12 @@ public class CoreEngine implements ICoreEngine, Runnable {
         return addCharacter(character);
     }
 
+    public static Character createCharacter(GraphicObject graphicObject, PhyObject phyObject) {
+        Character character = new Character(graphicObject, phyObject, IdFactory.nextId());
+
+        return character;
+    }
+
     public ISource addInputSource(ISource source) {
         return inputEngine.addSource(source);
     }

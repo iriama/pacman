@@ -2,7 +2,7 @@ package pacman.AI;
 
 import framework.AI.IAIModel;
 import framework.geometry.Point;
-import pacman.Pacman;
+import pacman.PacGame;
 import pacman.Player;
 import pacman.PlayerDirection;
 
@@ -20,8 +20,8 @@ public class PinkyAI implements IAIModel {
 
     public Point getPrediction() {
         PlayerDirection pacmanDirection = pacman.getDirection();
-        int modX = pacman.getModX(pacmanDirection, Pacman.TILE_SIZE * 4);
-        int modY = pacman.getModY(pacmanDirection, Pacman.TILE_SIZE * 4);
+        int modX = pacman.getModX(pacmanDirection, PacGame.TILE_SIZE * 4);
+        int modY = pacman.getModY(pacmanDirection, PacGame.TILE_SIZE * 4);
 
         Point fourTilesAhead = new Point(
                 modX,
