@@ -36,8 +36,9 @@ public class Game extends JPanel implements IPanel, IGameEngine {
     public final static int SPRITE_WIDTH = 28;
     public final static int DEAD_GHOST_SPEED = 4;
     public final static int GHOST_PRISON_EXIT_DELAY_MS = 500;
+    private final static int JETON_SCORE_VALUE = 1;
+    private final static int GHOST_EAT_SCORE_VALUE = 5;
     public static Game current;
-    static SplashWindow splashWindow;
     static MainWindow mainWindow;
     static boolean DEBUG = false;
     // ---
@@ -49,52 +50,59 @@ public class Game extends JPanel implements IPanel, IGameEngine {
     private Vector<Character> specialJetons;
     private CoreEngine coreEngine;
     private GhostMode mode;
-
+    private int score = 0;
+    private int time = 0;
+    private int lives = 1;
+    private int saveScore = 0;
 
     private HashMap<Ghost, Long> ghostReleaseTime = new HashMap<>();
     private HashMap<Ghost, Long> ghostFrightnedEndTime = new HashMap<>();
     private long changeModeAt = 0;
     private boolean restarting = false;
+    private boolean finished = false;
 
-    public Game() {
+    private StatusBar statusBar;
+    private IGameEvent onSuccess;
+    private IGameEvent onFail;
+    private String levelIdentifier;
+    private String pacmanPreset;
+
+
+    public void SoloGame(int saveScore, String levelIdentifier, String preset, StatusBar statusBar, IGameEvent onSuccess, IGameEvent onFail) {
+        current = this;
+        build();
+        this.statusBar = statusBar;
+        this.onSuccess = onSuccess;
+        this.onFail = onFail;
         coreEngine = new CoreEngine(this, this);
+        this.levelIdentifier = levelIdentifier;
+        this.saveScore = saveScore;
+        this.pacmanPreset = preset;
+        play();
+    }
+
+    private void build() {
         setBackground(Color.black);
-        mode = GhostMode.CHASE;
+        setLayout(null);
     }
 
-    public static void main(String[] args) {
-        for (String arg : args) {
-            if (!arg.startsWith("-")) continue;
-            switch (arg) {
-                case "-debug":
-                    DEBUG = true;
-                    break;
-            }
-        }
-
-        FontsEngine.start();
-        splashWindow = new SplashWindow();
-        mainWindow = new MainWindow();
-        current = new Game();
-
-        current.play("test");
-    }
-
-    public void load(String levelIdentifier) {
+    private void load() {
         // Load assets
         try {
-            // Level
+            // ---- Level
             level = MemoryDB.getLevel(levelIdentifier);
 
-            // Map
+            // ---- Map
             map = MemoryDB.getMap(level.mapIdentifier);
 
-            // Pacman
+
+            // ---- Pacman
             pacman = Pacman.createPacman(level.pacman.skinId, level.pacman.speed, map.pacmanSpawn);
             coreEngine.addCharacter(pacman.getCharacter());
 
-            this.specialJetons = new Vector<>();
+            // ---- JETONS
             // Add special jetons
+            this.specialJetons = new Vector<>();
             for (Rect special : map.specialJetons) {
                 this.specialJetons.add(
                         coreEngine.addCharacter(
@@ -121,7 +129,8 @@ public class Game extends JPanel implements IPanel, IGameEngine {
                 );
             }
 
-            // Ghosts
+
+            // ---- Ghosts
             ghosts = new Vector<>();
             for (Actor p : level.ghosts) {
                 Ghost ghost = Ghost.createGhost(p.skinId, p.typeId, p.speed, map.ghostPrison);
@@ -129,14 +138,14 @@ public class Game extends JPanel implements IPanel, IGameEngine {
                 ghosts.add(ghost);
             }
 
-            // Set preset arrows to pacman
+            // ---- INPUT
             coreEngine.addInputSource(
                     pacman.bindControls(
-                            MemoryDB.loadPreset("arrows")
+                            MemoryDB.loadPreset(pacmanPreset)
                     )
             );
 
-            // Set AI's based on typeId
+            // ---- IA
             for (Ghost ghost : ghosts) {
                 IAIModel model = null;
 
@@ -161,13 +170,49 @@ public class Game extends JPanel implements IPanel, IGameEngine {
             }
 
 
-            // Start
-            restart();
+            // ---- COUNTERS
+            resetScore();
+            resetTime();
+            resetLives();
+
+            // ---- PLAY
+            replay();
 
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
         }
+    }
+
+    private void resetTime() {
+        lastSecondTick = null;
+        time = 0;
+        statusBar.setTime(time);
+    }
+
+    private void incrementTime(int value) {
+        time += value;
+        statusBar.setTime(time);
+    }
+
+    private void resetLives() {
+        lives = level.lives;
+        statusBar.setLives(lives);
+    }
+
+    private void decrementLives() {
+        lives--;
+        statusBar.setLives(lives);
+    }
+
+    private void resetScore() {
+        score = saveScore;
+        statusBar.setScore(score);
+    }
+
+    private void incrementScore(int value) {
+        score += value;
+        statusBar.setScore(score);
     }
 
     private void generateJetons(Vector<Rect> jetons, Point current) {
@@ -216,22 +261,24 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         return level != null;
     }
 
-    public void play(String levelIdentifier) {
-        // Load game
-        mainWindow.setVisible(false);
-        SwingUtilities.invokeLater(() -> splashWindow.setVisible(true));
-        load(levelIdentifier);
+    public void play() {
+        // -- LOAD GAME
+        load();
+
+        // Setup other components
+        statusBar.setBounds(map.width, 0, StatusBar.WIDTH, map.height);
+        add(statusBar);
+
+        statusBar.setLevel(levelIdentifier);
 
         // Hook into window
-        mainWindow.setPanel(this, map.width, map.height);
-        SwingUtilities.invokeLater(() -> {
-            splashWindow.setVisible(false);
-            mainWindow.setVisible(true);
-        });
+        mainWindow.setPanel(this, map.width + StatusBar.WIDTH, map.height);
 
         // run engine
         Thread coreThread = new Thread(coreEngine);
         coreThread.start();
+
+        // after engine running
         changeModeAt = System.currentTimeMillis() + level.chaseDuration;
     }
 
@@ -300,7 +347,13 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         if (DEBUG) drawDebug(g);
     }
 
-    public void restart() {
+
+    public void replay() {
+        if (lives < 1) {
+            onFail.action(score, lives, time);
+            return;
+        }
+
         mode = GhostMode.CHASE;
         changeModeAt = System.currentTimeMillis() + level.chaseDuration;
         pacman.setPosition(map.pacmanSpawn);
@@ -316,19 +369,30 @@ public class Game extends JPanel implements IPanel, IGameEngine {
 
     public void caught() {
         restarting = true;
-        pacman.kill(() -> restart());
+        pacman.kill(() -> replay());
         for (Ghost ghost : ghosts) {
             ghost.setDisabled(true);
         }
+        decrementLives();
     }
 
     public void ghostCaught(Ghost ghost) {
         ghost.changeMode(GhostMode.DEAD);
+        incrementScore(GHOST_EAT_SCORE_VALUE);
+    }
+
+    private void checkCleard() {
+        if (jetons.size() == 0 && specialJetons.size() == 0) {
+            finished = true;
+            onSuccess.action(score, lives, time);
+        }
     }
 
     private void eat(Character jeton) {
         jetons.remove(jeton);
         coreEngine.removeCharacter(jeton);
+        incrementScore(JETON_SCORE_VALUE);
+        checkCleard();
     }
 
     private void eatSpecial(Character special) {
@@ -341,13 +405,28 @@ public class Game extends JPanel implements IPanel, IGameEngine {
             ghostFrightnedEndTime.put(ghost, System.currentTimeMillis() + level.frightnedDuration);
             ghost.changeMode(GhostMode.FRIGHTENED);
         }
+        incrementScore(JETON_SCORE_VALUE);
+        checkCleard();
     }
+
+    private Long lastSecondTick = null;
 
     @Override
     public void update() {
-        if (restarting) return;
+        if (restarting || finished) return;
 
         long currentMs = System.currentTimeMillis();
+
+        if (lastSecondTick == null)
+            lastSecondTick = currentMs;
+
+        // Time
+        if (currentMs - lastSecondTick > 1000) {
+            lastSecondTick = currentMs;
+            incrementTime(1);
+            lastSecondTick = currentMs;
+        }
+
 
         pacman.update();
 

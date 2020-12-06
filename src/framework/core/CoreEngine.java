@@ -30,6 +30,7 @@ public class CoreEngine implements ICoreEngine, Runnable {
     private IGameEngine gameEngine;
     private IAIEngine aiEngine;
     private Vector<Character> characters;
+    Object _lock = new Object();
 
     public CoreEngine(IPanel panel, IGameEngine gameEngine) {
         renderEngine = new RenderEngine(panel);
@@ -162,5 +163,6 @@ public class CoreEngine implements ICoreEngine, Runnable {
         for (Character character : characters) {
             removeCharacter(character);
         }
+
     }
 }

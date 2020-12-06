@@ -1,0 +1,9 @@
+map_1
+5000 5000 5000 7000
+1
+pacman player 4
+4
+red blinky 2
+orange clyde 2
+pink pinky 2
+cyan inky 2

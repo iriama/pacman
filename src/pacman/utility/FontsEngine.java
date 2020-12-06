@@ -17,6 +17,7 @@ public class FontsEngine {
     public static void start() {
         try {
             registerFont("ressources/fonts/pacfont.ttf");
+            registerFont("ressources/fonts/arcadeclassic.ttf");
         } catch (Exception e) {
             System.err.println(e);
             System.exit(1);
