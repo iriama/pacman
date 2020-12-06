@@ -64,6 +64,8 @@ public class Pacman extends Player{
         return pacman;
     }
 
+
+
     @Override
     public boolean willHitWall(PlayerDirection direction) {
         return nextHitbox(direction).intersect(Game.current.map.prisonWall) || super.willHitWall(direction);

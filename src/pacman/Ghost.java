@@ -29,10 +29,15 @@ public class Ghost extends Player {
     private GhostController controller;
     private GhostMode mode;
     int originalSpeed;
+    public HashMap<PlayerDirection, SpriteSheet> weakSheets;
+    public HashMap<PlayerDirection, SpriteSheet> dangerSheets;
+
+    HashMap<PlayerDirection, SpriteSheet> currentSheets;
 
     public Ghost(Character character, int speed) {
         super(character, speed);
         originalSpeed = speed;
+        currentSheets = directionsSheet;
     }
 
     public boolean playerControlled() {
@@ -72,7 +77,7 @@ public class Ghost extends Player {
         return controller.getTarget();
     }
 
-    public HashMap<PlayerDirection, SpriteSheet> weakSheets;
+
 
     public static Ghost createGhost(String skinId, String controllerId, int speed, Point position) throws IOException {
         SpriteSheet left = MemoryDB.getSpriteSheet(skinId + "/left", Game.SPRITE_WIDTH);
@@ -85,6 +90,11 @@ public class Ghost extends Player {
         SpriteSheet weak_right = MemoryDB.getSpriteSheet("weak/right", Game.SPRITE_WIDTH);
         SpriteSheet weak_up = MemoryDB.getSpriteSheet("weak/up", Game.SPRITE_WIDTH);
         SpriteSheet weak_down = MemoryDB.getSpriteSheet("weak/down", Game.SPRITE_WIDTH);
+
+        SpriteSheet danger_left = MemoryDB.getSpriteSheet("dangerous/left", Game.SPRITE_WIDTH);
+        SpriteSheet danger_right = MemoryDB.getSpriteSheet("dangerous/right", Game.SPRITE_WIDTH);
+        SpriteSheet danger_up = MemoryDB.getSpriteSheet("dangerous/up", Game.SPRITE_WIDTH);
+        SpriteSheet danger_down = MemoryDB.getSpriteSheet("dangerous/down", Game.SPRITE_WIDTH);
 
         GraphicObject pGraph = RenderEngine.createObject(up);
         pGraph.getSprite().loop(200 / up.getSpriteCount());
@@ -99,6 +109,12 @@ public class Ghost extends Player {
         ghost.weakSheets.put(PlayerDirection.LEFT, weak_left);
         ghost.weakSheets.put(PlayerDirection.RIGHT, weak_right);
 
+        ghost.dangerSheets = new HashMap<>();
+        ghost.dangerSheets.put(PlayerDirection.UP, danger_up);
+        ghost.dangerSheets.put(PlayerDirection.DOWN, danger_down);
+        ghost.dangerSheets.put(PlayerDirection.LEFT, danger_left);
+        ghost.dangerSheets.put(PlayerDirection.RIGHT, danger_right);
+
         ghost.bindDirection(PlayerDirection.UP, up);
         ghost.bindDirection(PlayerDirection.DOWN, down);
         ghost.bindDirection(PlayerDirection.LEFT, left);
@@ -112,37 +128,59 @@ public class Ghost extends Player {
     public void changeDirection(PlayerDirection direction) {
         super.changeDirection(direction);
 
-        if (isFrightned() || isDead()) {
-            getCharacter().getGraphicObject().getSprite().setSpriteSheet(
-                    weakSheets.get(direction)
-            );
-        }
+        applySprite();
+    }
+
+    private void applySprite() {
+        getCharacter().getGraphicObject().getSprite().setSpriteSheet(
+                currentSheets.get(getDirection())
+        );
+    }
+
+    private void setFrightenedSprite() {
+        currentSheets = weakSheets;
+        applySprite();
+    }
+
+    public void setDangerSprite() {
+        currentSheets = dangerSheets;
+        applySprite();
+    }
+
+    private void setNormalSprite() {
+        currentSheets = directionsSheet;
+
+        applySprite();
+    }
+
+    private void endFrighten() {
+        setNormalSprite();
+        setSpeed(originalSpeed);
     }
 
     public void changeMode(GhostMode mode) {
         if (mode == this.mode) return;
         switch (mode) {
             case PRISONED:
-                setSpeed(originalSpeed);
+                endFrighten();
                 getSprite().setScale(1f);
                 setDisabled(true);
                 changeDirection(PlayerDirection.UP);
-                stop();
                 break;
             case EXIT_PRISON:
                 controller.setForcedTarget(Game.current.map.ghostSpawn);
                 setDisabled(false);
-                resume();
                 break;
             case ENTER_PRISON:
                 controller.setForcedTarget(Game.current.map.ghostPrison);
                 break;
             case CHASE:
+                endFrighten();
                 controller.clearForcedTarget();
                 setDisabled(false);
-                resume();
                 break;
             case SCATTER:
+                endFrighten();
                 Point target = null;
                 if (model instanceof BlinkyAI) target = BlinkyAI.scatterPosition();
                 else if (model instanceof ClydeAI) target = ClydeAI.scatterPosition();
@@ -150,13 +188,14 @@ public class Ghost extends Player {
                 else if (model instanceof PinkyAI) target = PinkyAI.scatterPosition();
                 controller.setForcedTarget(target);
                 setDisabled(false);
-                resume();
                 break;
             case FRIGHTENED:
+                setFrightenedSprite();
                 controller.clearForcedTarget();
                 setSpeed(originalSpeed / 2);
                 break;
             case DEAD:
+                endFrighten();
                 controller.setForcedTarget(Game.current.map.ghostSpawn);
                 setSpeed(Game.DEAD_GHOST_SPEED);
                 getSprite().setScale(0.5f);

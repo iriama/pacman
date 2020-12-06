@@ -16,6 +16,7 @@ public class Map {
     public int width;
     public int height;
     public Vector<Rect> walls;
+    public Vector<Rect> specialJetons;
     public Rect prisonWall;
     public Point pacmanSpawn;
     public Point ghostSpawn;
@@ -23,6 +24,7 @@ public class Map {
 
     public Map(String path) throws Exception {
         walls = new Vector<>();
+        specialJetons = new Vector<>();
         pacmanSpawn = new Point();
         ghostSpawn = new Point();
         ghostPrison = new Point();
@@ -51,7 +53,9 @@ public class Map {
                     Integer.parseInt(split[4])
             );
 
-            if (type.equals("wall"))
+            if (type.equals("special_jeton"))
+                specialJetons.add(rect);
+            else if (type.equals("wall"))
                 walls.add(rect);
             else if (type.equals("prison_wall"))
                 prisonWall = rect;

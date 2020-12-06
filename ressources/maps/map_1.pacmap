@@ -4,6 +4,10 @@ ghost_prison 208 216 32 32
 ghost_spawn 208 168 32 32
 pacman_spawn 232 408 32 32
 prison_wall 208 200 32 8
+special_jeton 16 48 16 16
+special_jeton 16 368 16 16
+special_jeton 416 368 16 16
+special_jeton 416 48 16 16
 wall 0 0 456 8
 wall 440 8 16 152
 wall 360 152 80 8

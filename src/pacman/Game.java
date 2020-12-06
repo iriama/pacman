@@ -2,10 +2,15 @@ package pacman;
 
 import framework.AI.IAIModel;
 import framework.IGameEngine;
+import framework.core.Character;
 import framework.core.CoreEngine;
 import framework.geometry.Point;
 import framework.geometry.Rect;
+import framework.physics.PhyObject;
+import framework.physics.PhysicsEngine;
+import framework.rendering.GraphicObject;
 import framework.rendering.IPanel;
+import framework.rendering.RenderEngine;
 import pacman.AI.*;
 import pacman.utility.FontsEngine;
 import pacman.windows.MainWindow;
@@ -19,7 +24,8 @@ import java.util.Vector;
 public class Game extends JPanel implements IPanel, IGameEngine {
     // --- Statics
     public static final int STEP_SIZE = 8;
-    public static final int PLAYER_SIZE = 32;
+    public static final int JETON_SIZE = STEP_SIZE * 2;
+    public static final int PLAYER_SIZE = STEP_SIZE * 4;
     public static final int TILE_SIZE = STEP_SIZE * 2;
     final static int SPRITE_WIDTH = 28;
     final static int DEAD_GHOST_SPEED = 4;
@@ -33,12 +39,16 @@ public class Game extends JPanel implements IPanel, IGameEngine {
 
     private Pacman pacman;
     private Vector<Ghost> ghosts;
+    private Vector<Character> jetons;
+    private Vector<Character> specialJetons;
     private CoreEngine coreEngine;
     public Map map;
     public Level level;
     private GhostMode mode;
 
+
     private HashMap<Ghost, Long> ghostReleaseTime = new HashMap<>();
+    private HashMap<Ghost, Long> ghostFrightnedEndTime = new HashMap<>();
     private long changeModeAt = 0;
 
     public Game() {
@@ -79,6 +89,34 @@ public class Game extends JPanel implements IPanel, IGameEngine {
             pacman = Pacman.createPacman(level.pacman.skinId, level.pacman.speed, map.pacmanSpawn);
             coreEngine.addCharacter(pacman.getCharacter());
 
+            this.specialJetons = new Vector<>();
+            // Add special jetons
+            for (Rect special: map.specialJetons) {
+                this.specialJetons.add(
+                        coreEngine.addCharacter(
+                                RenderEngine.createObject(
+                                        MemoryDB.getSpriteSheet("game/special", JETON_SIZE)
+                                ),
+                                PhysicsEngine.createObject(special.getX(), special.getWidth(), special.getY(), special.getHeight())
+                        )
+                );
+            }
+
+            // Recursively generate basic jetons
+            Vector<Rect> temp = new Vector<>();
+            generateJetons(temp, pacman.getPosition().extend(new Point(STEP_SIZE, STEP_SIZE)));
+            // Add basic jetons to core engine
+            this.jetons = new Vector<>();
+            for (Rect jeton : temp) {
+                this.jetons.add(
+                        coreEngine.addCharacter(
+                                RenderEngine.createObject(
+                                        MemoryDB.getSpriteSheet("game/jeton", JETON_SIZE)
+                                ),
+                                PhysicsEngine.createObject(jeton.getX(), jeton.getWidth(), jeton.getY(), jeton.getHeight())                        )
+                );
+            }
+
             // Ghosts
             ghosts = new Vector<>();
             for (Level.Actor p : level.ghosts) {
@@ -118,12 +156,48 @@ public class Game extends JPanel implements IPanel, IGameEngine {
                 coreEngine.addAIController(ghost.getController());
             }
 
+
+
             // Start
             restart();
 
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
+        }
+    }
+
+
+    private void generateJetons(Vector<Rect> jetons, Point current) {
+        outerLoop:
+        for (PlayerDirection direction: PlayerDirection.values()) {
+            int modX = direction == PlayerDirection.LEFT ? -JETON_SIZE : direction == PlayerDirection.RIGHT ? JETON_SIZE : 0;
+            int modY = direction == PlayerDirection.UP ? -JETON_SIZE : direction == PlayerDirection.DOWN ? JETON_SIZE : 0;
+
+            Rect jeton = new Rect(
+                    current.getX() + modX,
+                    JETON_SIZE,
+                    current.getY() + modY,
+                    JETON_SIZE
+            );
+
+            if (jetons.contains(jeton) || jeton.getX() < 0 || jeton.getX() >= map.width || jeton.getY() < 0 || jeton.getY() >= map.height)
+                continue;
+
+            if (jeton.intersect(map.prisonWall)) continue;
+            for (Rect wall: map.walls) {
+                if (jeton.intersect(wall)) continue outerLoop;
+            }
+
+            jetons.add(jeton);
+            generateJetons(jetons, jeton.getPosition());
+
+            // Cleanup jetons on pacman
+            if (jeton.intersect(pacman.getWallHitbox()))
+                jetons.remove(jeton);
+            // Cleanup jetons on special jetons
+            if (map.specialJetons.contains(jeton))
+                jetons.remove(jeton);
         }
     }
 
@@ -162,7 +236,7 @@ public class Game extends JPanel implements IPanel, IGameEngine {
 
     private void debugPlayer(Graphics g, Color color, Player player) {
         g.setColor(color);
-        Rect hitbox = player.getHitbox();
+        Rect hitbox = player.getEffectiveHitbox();
         g.drawRect(hitbox.getX(), hitbox.getY(), hitbox.getWidth(), hitbox.getHeight());
         g.setColor(Color.white);
         Rect wallHitbox = player.getWallHitbox();
@@ -196,12 +270,18 @@ public class Game extends JPanel implements IPanel, IGameEngine {
 
         // Game hitboxes
         debugPlayer(g, Color.green, pacman);
-
         // Ghosts hitboxes & IA
         for (Ghost ghost : ghosts) {
             debugPlayer(g, Color.yellow, ghost);
             if (!ghost.playerControlled())
                 debugAI(g, ghost);
+        }
+
+        // Jetons
+        for (int i=0; i<jetons.size(); i++) {
+            g.setColor(Color.CYAN);
+            Rect hitbox = jetons.get(i).getPhyObject().getHitbox();
+            g.drawRect(hitbox.getX(), hitbox.getY(), hitbox.getWidth(), hitbox.getHeight());
         }
     }
 
@@ -249,6 +329,23 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         ghost.changeMode(GhostMode.DEAD);
     }
 
+    private void eat(Character jeton) {
+        jetons.remove(jeton);
+        coreEngine.removeCharacter(jeton);
+    }
+
+    private void eatSpecial(Character special) {
+        specialJetons.remove(special);
+        coreEngine.removeCharacter(special);
+
+        for (Ghost ghost: ghosts) {
+            if (!ghost.controllable()) continue;
+
+            ghostFrightnedEndTime.put(ghost, System.currentTimeMillis() + level.frightnedDuration);
+            ghost.changeMode(GhostMode.FRIGHTENED);
+        }
+    }
+
     @Override
     public void update() {
         if(restarting) return;
@@ -256,6 +353,24 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         long currentMs = System.currentTimeMillis();
 
         pacman.update();
+
+        // Jetons
+        Rect pacmanHitbox = pacman.getEffectiveHitbox();
+        for (Character jeton: jetons) {
+            Rect jbox = jeton.getPhyObject().getHitbox();
+            if (jbox.intersect(pacmanHitbox)) {
+                eat(jeton);
+                break;
+            }
+        }
+        // Jeton Special
+        for (Character special : specialJetons) {
+            Rect jbox = special.getPhyObject().getHitbox();
+            if (jbox.intersect(pacmanHitbox)) {
+                eatSpecial(special);
+                break;
+            }
+        }
 
         boolean changeMode = false;
         if (currentMs > changeModeAt) {
@@ -267,7 +382,6 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         for (Ghost ghost : ghosts) {
             ghost.update();
 
-
             // DEAD
             if (ghost.isDead()) {
                 if (ghost.onPrisonEntry()) { // On prison entry
@@ -278,6 +392,30 @@ public class Game extends JPanel implements IPanel, IGameEngine {
                 continue;
             }
 
+            // Hitting pacman
+            if (ghost.getEffectiveHitbox().intersect(pacmanHitbox)) {
+                if (ghost.isFrightned()) {
+                    ghostCaught(ghost);
+                } else {
+                    caught();
+                    return;
+                }
+
+                continue;
+            }
+
+            // Frightned
+            if (ghost.isFrightned()) {
+                long endTime = ghostFrightnedEndTime.get(ghost);
+                if (currentMs > endTime) {
+                    ghost.changeMode(mode);
+                } else if (currentMs + level.frightnedDuration/10 > endTime) {
+                    ghost.setDangerSprite();
+                }
+                continue;
+            }
+
+
             // In prison
             if (ghost.inPrison()) {
                 if (currentMs > ghostReleaseTime.get(ghost)) { // Released
@@ -286,18 +424,6 @@ public class Game extends JPanel implements IPanel, IGameEngine {
                 // Exited prison
                 if (ghost.onPrisonEntry()) { // On prison entry
                     ghost.changeMode(mode);
-                }
-
-                continue;
-            }
-
-            // Hitting pacman
-            if (ghost.getHitbox().intersect(pacman.getHitbox())) {
-                if (ghost.isFrightned()) {
-                    ghostCaught(ghost);
-                } else {
-                    caught();
-                    return;
                 }
 
                 continue;

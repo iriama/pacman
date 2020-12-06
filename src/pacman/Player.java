@@ -17,7 +17,7 @@ public class Player {
     private int currentVelocityCount;
     private int currentVelocity;
     private int speed;
-    private HashMap<PlayerDirection, SpriteSheet> directionsSheet;
+    protected HashMap<PlayerDirection, SpriteSheet> directionsSheet;
     private Keyboard keyboard;
     private PlayerDirection queue;
     private boolean stopped;
@@ -236,6 +236,17 @@ public class Player {
         );
     }
 
+    public Rect getEffectiveHitbox() {
+        Rect base = getHitbox();
+
+        return new Rect(
+                base.getX() + Game.STEP_SIZE,
+                base.getWidth() / 2,
+                base.getY() + Game.STEP_SIZE,
+                base.getHeight() / 2
+        );
+    }
+
     public Point getPosition() {
         return character.getPhyObject().getPosition();
     }
@@ -259,6 +270,8 @@ public class Player {
     public Point getCentredPosition() {
         return getHitbox().getCenter();
     }
+
+
 
     public void setPosition(Point position) {
         setX(position.getX());

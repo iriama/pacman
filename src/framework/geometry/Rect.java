@@ -38,6 +38,10 @@ public class Rect {
         this.x = x;
     }
 
+    public Point getPosition() {
+        return new Point(getX(), getY());
+    }
+
     public Point getCenter() {
         return new Point(getX() + getWidth() / 2, getY() + getHeight() / 2);
     }
