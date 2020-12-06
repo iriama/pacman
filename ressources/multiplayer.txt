@@ -1,0 +1,14 @@
+map_1
+skin red
+skin cyan
+skin orange
+skin pink
+skin devil
+preset tgfh
+preset zsqd
+preset ikjl
+preset numpad
+preset fvcb
+lives 3
+pacman_speed 2
+ghost_speed 2

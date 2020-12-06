@@ -9,10 +9,7 @@ import framework.geometry.Rect;
 import framework.physics.PhysicsEngine;
 import framework.rendering.IPanel;
 import framework.rendering.RenderEngine;
-import pacman.AI.BlinkyAI;
-import pacman.AI.ClydeAI;
-import pacman.AI.InkyAI;
-import pacman.AI.PinkyAI;
+import pacman.AI.*;
 import pacman.game.*;
 import pacman.parsing.Actor;
 import pacman.parsing.Level;
@@ -24,6 +21,7 @@ import pacman.windows.SplashWindow;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -75,10 +73,41 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         this.onSuccess = onSuccess;
         this.onFail = onFail;
         coreEngine = new CoreEngine(this, this);
-        this.levelIdentifier = levelIdentifier;
         this.saveScore = saveScore;
         this.pacmanPreset = preset;
-        play();
+        this.levelIdentifier = levelIdentifier;
+        play(true);
+    }
+
+    public void MultiGame(Vector<GPanel> panels, StatusBar statusBar, IGameEvent onSuccess, IGameEvent onFail) throws Exception {
+        current = this;
+        build();
+        this.statusBar = statusBar;
+        this.onSuccess = onSuccess;
+        this.onFail = onFail;
+        coreEngine = new CoreEngine(this, this);
+        this.saveScore = 0;
+        this.pacmanPreset = "arrows";
+
+        multi = true;
+
+        load();
+        ghosts = new Vector<>();
+        for (GPanel panel: panels) {
+            Ghost ghost = Ghost.createGhost(panel.skin, "player", MemoryDB.getMultiGhostSpeed(), map.ghostPrison);
+            coreEngine.addCharacter(ghost.getCharacter());
+            ghosts.add(ghost);
+            ghost.setModel(null);
+            coreEngine.addInputSource(
+                    ghost.bindControls(
+                            MemoryDB.loadPreset(panel.keyset)
+                    )
+            );
+            coreEngine.addAIController(ghost.getController());
+        }
+
+        play(false);
+        replay();
     }
 
     private void build() {
@@ -86,18 +115,21 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         setLayout(null);
     }
 
+    private boolean multi = false;
+
     private void load() {
         // Load assets
         try {
             // ---- Level
-            level = MemoryDB.getLevel(levelIdentifier);
+            if (!multi)
+                level = MemoryDB.getLevel(levelIdentifier);
 
             // ---- Map
-            map = MemoryDB.getMap(level.mapIdentifier);
+            map = MemoryDB.getMap(multi ? MemoryDB.getMultiMapId() : level.mapIdentifier);
 
 
             // ---- Pacman
-            pacman = Pacman.createPacman(level.pacman.skinId, level.pacman.speed, map.pacmanSpawn);
+            pacman = Pacman.createPacman(multi ? "pacman" : level.pacman.skinId, multi ? MemoryDB.getMultiPacSpeed() : level.pacman.speed, map.pacmanSpawn);
             coreEngine.addCharacter(pacman.getCharacter());
 
             // ---- JETONS
@@ -129,15 +161,6 @@ public class Game extends JPanel implements IPanel, IGameEngine {
                 );
             }
 
-
-            // ---- Ghosts
-            ghosts = new Vector<>();
-            for (Actor p : level.ghosts) {
-                Ghost ghost = Ghost.createGhost(p.skinId, p.typeId, p.speed, map.ghostPrison);
-                coreEngine.addCharacter(ghost.getCharacter());
-                ghosts.add(ghost);
-            }
-
             // ---- INPUT
             coreEngine.addInputSource(
                     pacman.bindControls(
@@ -145,28 +168,39 @@ public class Game extends JPanel implements IPanel, IGameEngine {
                     )
             );
 
-            // ---- IA
-            for (Ghost ghost : ghosts) {
-                IAIModel model = null;
 
-                if (ghost.getControllerId().equals("player")) continue;
-                else if (ghost.getControllerId().equals("clyde")) {
-                    model = new ClydeAI(pacman, ghost);
-                } else if (ghost.getControllerId().equals("pinky")) {
-                    model = new PinkyAI(pacman);
-                } else if (ghost.getControllerId().equals("inky")) {
-                    innerLoop:
-                    for (Ghost g : ghosts) {
-                        if (g.getControllerId().equals("blinky")) {
-                            model = new InkyAI(pacman, g);
-                            break innerLoop;
-                        }
-                    }
+            // ---- Ghosts
+            if (!multi) {
+                ghosts = new Vector<>();
+                for (Actor p : level.ghosts) {
+                    Ghost ghost = Ghost.createGhost(p.skinId, p.typeId, p.speed, map.ghostPrison);
+                    coreEngine.addCharacter(ghost.getCharacter());
+                    ghosts.add(ghost);
                 }
 
-                if (model == null) model = new BlinkyAI(pacman); // defaults to blinky
-                ghost.setModel(model);
-                coreEngine.addAIController(ghost.getController());
+                // ---- IA
+                for (Ghost ghost : ghosts) {
+                    IAIModel model = null;
+
+                    if (ghost.getControllerId().equals("player")) continue;
+                    else if (ghost.getControllerId().equals("clyde")) {
+                        model = new ClydeAI(pacman, ghost);
+                    } else if (ghost.getControllerId().equals("pinky")) {
+                        model = new PinkyAI(pacman);
+                    } else if (ghost.getControllerId().equals("inky")) {
+                        innerLoop:
+                        for (Ghost g : ghosts) {
+                            if (g.getControllerId().equals("blinky")) {
+                                model = new InkyAI(pacman, g);
+                                break innerLoop;
+                            }
+                        }
+                    }
+
+                    if (model == null) model = new BlinkyAI(pacman); // defaults to blinky
+                    ghost.setModel(model);
+                    coreEngine.addAIController(ghost.getController());
+                }
             }
 
 
@@ -176,7 +210,8 @@ public class Game extends JPanel implements IPanel, IGameEngine {
             resetLives();
 
             // ---- PLAY
-            replay();
+            if (!multi)
+                replay();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -196,7 +231,7 @@ public class Game extends JPanel implements IPanel, IGameEngine {
     }
 
     private void resetLives() {
-        lives = level.lives;
+        lives = multi ? MemoryDB.getMultiLives() : level.lives;
         statusBar.setLives(lives);
     }
 
@@ -258,18 +293,19 @@ public class Game extends JPanel implements IPanel, IGameEngine {
     }
 
     private boolean isPlaying() {
-        return level != null;
+        return multi || level != null;
     }
 
-    public void play() {
+    public void play(boolean load) {
         // -- LOAD GAME
-        load();
+        if (load)
+            load();
 
         // Setup other components
         statusBar.setBounds(map.width, 0, StatusBar.WIDTH, map.height);
         add(statusBar);
 
-        statusBar.setLevel(levelIdentifier);
+        statusBar.setLevel(multi ? "MULTI" : levelIdentifier);
 
         // Hook into window
         mainWindow.setPanel(this, map.width + StatusBar.WIDTH, map.height);
@@ -279,7 +315,8 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         coreThread.start();
 
         // after engine running
-        changeModeAt = System.currentTimeMillis() + level.chaseDuration;
+        if (!multi)
+            changeModeAt = System.currentTimeMillis() + level.chaseDuration;
     }
 
     private void debugPlayer(Graphics g, Color color, Player player) {
@@ -345,6 +382,8 @@ public class Game extends JPanel implements IPanel, IGameEngine {
 
         // Debug
         if (DEBUG) drawDebug(g);
+
+        g.drawString("hi", 100, 100);
     }
 
 
@@ -355,7 +394,9 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         }
 
         mode = GhostMode.CHASE;
-        changeModeAt = System.currentTimeMillis() + level.chaseDuration;
+        if (!multi)
+            changeModeAt = System.currentTimeMillis() + level.chaseDuration;
+
         pacman.setPosition(map.pacmanSpawn);
         pacman.resurrect();
         int i = 0;
@@ -402,7 +443,7 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         for (Ghost ghost : ghosts) {
             if (!ghost.controllable()) continue;
 
-            ghostFrightnedEndTime.put(ghost, System.currentTimeMillis() + level.frightnedDuration);
+            ghostFrightnedEndTime.put(ghost, System.currentTimeMillis() + (multi ? Multi.FRIGHTNED_TIME : level.frightnedDuration));
             ghost.changeMode(GhostMode.FRIGHTENED);
         }
         incrementScore(JETON_SCORE_VALUE);
@@ -449,10 +490,12 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         }
 
         boolean changeMode = false;
-        if (currentMs > changeModeAt) {
-            changeMode = true;
-            mode = mode == GhostMode.CHASE ? GhostMode.SCATTER : GhostMode.CHASE;
-            changeModeAt = currentMs + (mode == GhostMode.CHASE ? level.chaseDuration : level.scatterDuration);
+        if (!multi) {
+            if (currentMs > changeModeAt) {
+                changeMode = true;
+                mode = mode == GhostMode.CHASE ? GhostMode.SCATTER : GhostMode.CHASE;
+                changeModeAt = currentMs + (mode == GhostMode.CHASE ? level.chaseDuration : level.scatterDuration);
+            }
         }
 
         for (Ghost ghost : ghosts) {
@@ -463,7 +506,7 @@ public class Game extends JPanel implements IPanel, IGameEngine {
                 if (ghost.onPrisonEntry()) { // On prison entry
                     ghost.changeMode(GhostMode.ENTER_PRISON);
                 } else if (ghost.onPrisonInside()) { // Inside prison
-                    setInPrison(ghost, level.ghostKillDuration);
+                    setInPrison(ghost, (multi ? Multi.PRISON_TIME : level.ghostKillDuration));
                 }
                 continue;
             }
@@ -485,7 +528,7 @@ public class Game extends JPanel implements IPanel, IGameEngine {
                 long endTime = ghostFrightnedEndTime.get(ghost);
                 if (currentMs > endTime) {
                     ghost.changeMode(mode);
-                } else if (currentMs + Math.max(1000, level.frightnedDuration / 5) > endTime) {
+                } else if (currentMs + Math.max(1000, (multi ? Multi.FRIGHTNED_TIME : level.frightnedDuration) / 5) > endTime) {
                     ghost.setDangerSprite();
                 }
                 continue;
@@ -506,7 +549,7 @@ public class Game extends JPanel implements IPanel, IGameEngine {
             }
 
             // Change mode
-            if (ghost.controllable()) {
+            if (!multi && ghost.controllable()) {
                 if (changeMode) {
                     ghost.changeMode(mode);
                 }

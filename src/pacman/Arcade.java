@@ -17,7 +17,6 @@ public class Arcade {
         Arcade.preset = preset;
         Arcade.name = name;
         Arcade.menu = menu;
-        System.out.println(name);
         currentLevel = 0;
         score = 0;
         statusBar = new StatusBar();

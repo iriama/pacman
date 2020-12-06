@@ -23,8 +23,6 @@ public class RetroButton extends JLabel {
 
         this.onClick = onClick;
         this.text = text.toUpperCase();
-        this.width = width;
-        this.height = height;
         this.color = color;
         this.font = font;
 

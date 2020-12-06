@@ -117,8 +117,14 @@ public class Player {
         getCharacter().getGraphicObject().show();
     }
 
+    private boolean autoPilot = false;
+
+    public void setAutoPilot(boolean autoPilot) {
+        this.autoPilot = autoPilot;
+    }
+
     public void attemptChangeDirection(PlayerDirection direction) {
-        if (isDisabled()) return;
+        if (autoPilot || isDisabled()) return;
 
         if (willHitWall(direction)) {
             queue = direction;

@@ -1,0 +1,4 @@
+red
+cyan
+orange
+pink

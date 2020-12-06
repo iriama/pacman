@@ -149,17 +149,21 @@ public class Ghost extends Player {
     public void changeMode(GhostMode mode) {
         if (mode == this.mode) return;
         setDisabled(false);
+        setAutoPilot(false);
         switch (mode) {
             case PRISONED:
+                setAutoPilot(true);
                 setDisabled(true);
                 endFrighten();
                 getSprite().setScale(1f);
                 changeDirection(PlayerDirection.UP);
                 break;
             case EXIT_PRISON:
+                setAutoPilot(true);
                 controller.setForcedTarget(Game.current.map.ghostSpawn);
                 break;
             case ENTER_PRISON:
+                setAutoPilot(true);
                 controller.setForcedTarget(Game.current.map.ghostPrison);
                 break;
             case CHASE:
@@ -181,6 +185,7 @@ public class Ghost extends Player {
                 setSpeed(originalSpeed / 2);
                 break;
             case DEAD:
+                setAutoPilot(true);
                 endFrighten();
                 controller.setForcedTarget(Game.current.map.ghostSpawn);
                 setSpeed(Game.DEAD_GHOST_SPEED);

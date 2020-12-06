@@ -71,7 +71,7 @@ public class GhostController implements IAIController {
     }
 
     public void update() {
-        if ((lastPosition != null && lastPosition.equals(ghost.getPosition())) || ghost.isDisabled() || ai == null || !ghost.onTile())
+        if ((lastPosition != null && lastPosition.equals(ghost.getPosition())) || ghost.isDisabled() || (ai == null && forcedTarget == null) || !ghost.onTile())
             return;
 
         // out of stage
@@ -119,7 +119,7 @@ public class GhostController implements IAIController {
 
         if (bestDirection == currentDirection) return;
 
-        ghost.attemptChangeDirection(bestDirection);
+        ghost.changeDirection(bestDirection);
         lastPosition = new Point(ghost.getX(), ghost.getY());
     }
 

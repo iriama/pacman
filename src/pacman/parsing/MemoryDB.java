@@ -14,7 +14,13 @@ public class MemoryDB {
     private static HashMap<String, Map> maps = new HashMap<>();
     private static HashMap<String, Level> levels = new HashMap<>();
     private static Vector<Score> scores = new Vector<>();
+    private static Vector<String> multiPresets = new Vector<>();
+    private static Vector<String> multiSkins = new Vector<>();
+    private static String multiMapId = "";
     private static final int MAX_SCORE_COUNT = 10;
+    private static int multiLives = 3;
+    private static int multiPacSpeed = 2;
+    private static int multiGhostSpeed = 2;
 
     public static SpriteSheet getSpriteSheet(String identifier, int spriteWidth) throws IOException {
         if (spriteSheets.containsKey(identifier)) return spriteSheets.get(identifier);
@@ -93,6 +99,68 @@ public class MemoryDB {
                 System.exit(1);
             }
         }
+    }
+
+    private static void setMulti() {
+        try {
+
+            BufferedReader reader = new BufferedReader(new FileReader("ressources/multiplayer.txt"));
+            multiMapId = reader.readLine();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] split = line.split(" ");
+                if (line == "" || split.length != 2) continue;
+
+                if (split[0].equals("skin")) {
+                    multiSkins.add(split[1]);
+                } else if (split[0].equals("preset")) {
+                    multiPresets.add(split[1]);
+                } else if (split[0].equals("lives")) {
+                    multiLives = Integer.parseInt(split[1]);
+                } else if (split[0].equals("pacman_speed")) {
+                    multiPacSpeed = Integer.parseInt(split[1]);
+                } else if (split[0].equals("ghost_speed")) {
+                    multiGhostSpeed = Integer.parseInt(split[1]);
+                }
+            }
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    public static Vector<String> getMultiPresets() {
+        if (multiPresets.size() > 0)
+            return multiPresets;
+
+        setMulti();
+        return  multiPresets;
+    }
+
+    public static String getMultiMapId() {
+        return multiMapId;
+    }
+
+    public static int getMultiLives() {
+        return multiLives;
+    }
+
+    public static int getMultiGhostSpeed() {
+        return multiGhostSpeed;
+    }
+
+    public static int getMultiPacSpeed() {
+        return multiPacSpeed;
+    }
+
+    public static Vector<String> getMultiSkins() {
+        if (multiSkins.size() > 0)
+            return multiSkins;
+
+        setMulti();
+        return  multiSkins;
     }
 
     public static Vector<Score> getScores() {

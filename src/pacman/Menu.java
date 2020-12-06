@@ -1,13 +1,19 @@
 package pacman;
 
+import framework.rendering.graphics.SpriteSheet;
 import pacman.parsing.MemoryDB;
 import pacman.utility.UI;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Menu extends JPanel {
@@ -18,7 +24,7 @@ public class Menu extends JPanel {
     Font arcade40 =  UI.getSizedFont("arcadeclassic", 40);
 
     public static int WIDTH = 500;
-    public static int HEIGHT = 500;
+    public static int HEIGHT = 520;
     private static String[] authors = { "AMAIRI Hatem", "BADDOUJ Youssef", "CHANAA Reda", "EL MOUHTADI Sohaib", "TAKHCHI Mohamed" };
 
     public Menu() {
@@ -163,8 +169,7 @@ public class Menu extends JPanel {
             String points = new String(new char[nbPoints]).replace("\0", ".");
 
             JLabel row = UI.getCenteredTxtLabel(i + ". " + entry.name + " " + points + " " + entry.value, Color.WHITE, arcade20);
-            //if (score.equals(entry)) row.setForeground(Color.yellow);
-            /*else*/ row.setForeground(Color.white);
+            row.setForeground(Color.white);
 
             add(row);
             i++;
@@ -177,26 +182,233 @@ public class Menu extends JPanel {
         repaint();
     }
 
+
+    HashMap<String, Boolean> skins = new HashMap<>();
+    HashMap<String, Boolean> keys = new HashMap<>();
+
+    private GPanel ghostPanel() {
+        SpriteSheet spriteSheet = null;
+
+
+        String skin = "";
+        for (String k: skins.keySet()) {
+            if (!skins.get(k)) {
+                skin = k;
+                skins.put(k, true);
+                break;
+            }
+        }
+
+        String keyStr = "";
+        for (String k: keys.keySet()) {
+            if (!keys.get(k)) {
+                keyStr = k;
+                keys.put(k, true);
+                break;
+            }
+        }
+
+        try {
+             spriteSheet = MemoryDB.getSpriteSheet(skin + "/right", 28);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        GPanel panel = new GPanel(skin, keyStr);
+        panel.setLayout(new FlowLayout());
+        JLabel txt = UI.getCenteredTxtLabel("  " + skin.toUpperCase() + "- KEYS : ", Color.WHITE, arcade10);
+        AtomicReference<RetroButton> apreset = new AtomicReference<RetroButton>();
+        Vector<String> ignoredKeys = new Vector<>();
+        ignoredKeys.add(keyStr);
+        apreset.set(new RetroButton(keyStr.toUpperCase(), Color.GRAY, arcade10, () -> {
+            boolean found = false;
+            while(!found) {
+                for (String k : keys.keySet()) {
+                    if (ignoredKeys.contains(k)) continue;
+
+                    if (!keys.get(k) || k == panel.keyset) {
+                        keys.put(panel.keyset, false);
+                        panel.keyset = k;
+                        keys.put(k, true);
+                        ignoredKeys.add(k);
+                        apreset.get().setText(k.toUpperCase());
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) ignoredKeys.clear();
+            }
+        }));
+
+        panel.setBackground(Color.black);
+        panel.setMaximumSize(new Dimension(WIDTH, 38));
+        JLabel img = new JLabel();
+        img.setIcon(new ImageIcon(spriteSheet.getSpriteImage(0)));
+
+        Vector<String> ignoredSkins = new Vector<>();
+        ignoredSkins.add(skin);
+        panel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        panel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+
+                boolean found = false;
+                while(!found) {
+                    for (String k : skins.keySet()) {
+                        if (ignoredSkins.contains(k)) continue;
+
+                        if (!skins.get(k) || k == panel.skin) {
+                            skins.put(panel.skin, false);
+                            panel.skin = k;
+                            skins.put(k, true);
+                            ignoredSkins.add(k);
+                            txt.setText("  " + panel.skin.toUpperCase() + "- KEYS : ");
+
+                            try {
+                                SpriteSheet spriteSheet = MemoryDB.getSpriteSheet(panel.skin + "/right", 28);
+                                img.setIcon(new ImageIcon(spriteSheet.getSpriteImage(0)));
+
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                                System.exit(1);
+                            }
+
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found) ignoredSkins.clear();
+                }
+            }
+        });
+
+        panel.add(img);
+        panel.add(txt);
+        panel.add(apreset.get());
+
+        return panel;
+    }
+
     private void multiMenu() {
         removeAll();
 
+        skins = new HashMap<>();
+        Vector<String> _skins = MemoryDB.getMultiSkins();
+        for (String skin: _skins) {
+            skins.put(skin, false);
+        }
+        Vector<String> _presets = MemoryDB.getMultiPresets();
+        keys = new HashMap<>();
+        for (String preset: _presets) {
+            keys.put(preset, false);
+        }
+
+        int maxPlayers = Math.min(_presets.size(), _skins.size());
+
         JLabel menuTxt = UI.getCenteredTxtLabel("MULTIPLAYER", Color.yellow, arcade40);
+        JLabel status = UI.getCenteredTxtLabel("PACMAN vs 0 GHOST(S)", Color.GREEN, arcade20);
+
 
         RetroButton ret = new RetroButton("RETURN", Color.CYAN, arcade20, () -> mainMenu());
 
+        AtomicInteger nbGhosts = new AtomicInteger(0);
+
+        JPanel gParent = new JPanel();
+        gParent.setLayout(new BoxLayout(gParent, BoxLayout.Y_AXIS));
+        gParent.setBackground(Color.red);
+
+        Vector<GPanel> gpanels = new Vector<>();
+
+        RetroButton add = new RetroButton("+", Color.GREEN, arcade20, () -> {
+            if (nbGhosts.get() >= maxPlayers)
+                return;
+
+            nbGhosts.set(nbGhosts.get()+1);
+            status.setText("PACMAN vs " + nbGhosts.get() + " GHOST(S)");
+            gpanels.add(ghostPanel());
+
+            gParent.removeAll();
+
+            for (GPanel p: gpanels) {
+                gParent.add(p);
+            }
+
+            gParent.revalidate();
+            gParent.repaint();
+        });
+        RetroButton remove = new RetroButton("-", Color.RED, arcade20, () -> {
+            if (nbGhosts.get() <= 0)
+                return;
+
+            nbGhosts.set(nbGhosts.get()-1);
+            status.setText("PACMAN vs " + nbGhosts.get() + " GHOST(S)");
+            GPanel last = gpanels.lastElement();
+            skins.put(last.skin, false);
+            keys.put(last.keyset, false);
+
+            gpanels.removeElement(last);
+            gParent.removeAll();
+
+            for (GPanel p: gpanels) {
+                gParent.add(p);
+            }
+
+            gParent.revalidate();
+            gParent.repaint();
+        });
+
+        RetroButton start = new RetroButton("START", Color.yellow, arcade20, () -> {
+            if (gpanels.size() < 1) return;
+
+            Multi.start(this, gpanels);
+
+        });
+
+        JPanel controls = new JPanel();
+        controls.setBackground(Color.black);
+        controls.add(add);
+        controls.add(remove);
+        controls.setMaximumSize(new Dimension(WIDTH, 40));
+
         add(UI.getSeparator(50));
         add(menuTxt);
-        add(UI.getSeparator(100));
+        add(UI.getSeparator(50));
+        add(status);
+        add(UI.getSeparator(20));
 
 
         // stuff
+        add(controls);
+        add(gParent);
 
-        add(UI.getSeparator(50));
+        add(UI.getSeparator(20));
+        add(start);
+        add(UI.getSeparator(20));
         add(ret);
 
         revalidate();
         repaint();
     }
 
+
+    public void multiOverMenu(String text) {
+        removeAll();
+
+        JLabel menuTxt = UI.getCenteredTxtLabel(text, Color.yellow, arcade40);
+
+        RetroButton ret = new RetroButton("RETURN", Color.GREEN, arcade20, () -> multiMenu());
+
+        add(UI.getSeparator(50));
+        add(menuTxt);
+        add(UI.getSeparator(100));
+        add(ret);
+
+        revalidate();
+        repaint();
+    }
 
 }
