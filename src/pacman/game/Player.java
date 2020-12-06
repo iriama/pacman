@@ -1,4 +1,4 @@
-package pacman;
+package pacman.game;
 
 import framework.core.Character;
 import framework.geometry.Point;
@@ -8,6 +8,8 @@ import framework.input.sources.Keyboard;
 import framework.physics.PhyObject;
 import framework.rendering.graphics.Sprite;
 import framework.rendering.graphics.SpriteSheet;
+import pacman.Game;
+import pacman.parsing.Preset;
 
 import java.util.HashMap;
 

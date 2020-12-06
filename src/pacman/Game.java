@@ -13,6 +13,11 @@ import pacman.AI.BlinkyAI;
 import pacman.AI.ClydeAI;
 import pacman.AI.InkyAI;
 import pacman.AI.PinkyAI;
+import pacman.game.*;
+import pacman.parsing.Actor;
+import pacman.parsing.Level;
+import pacman.parsing.Map;
+import pacman.parsing.MemoryDB;
 import pacman.utility.FontsEngine;
 import pacman.windows.MainWindow;
 import pacman.windows.SplashWindow;
@@ -28,9 +33,9 @@ public class Game extends JPanel implements IPanel, IGameEngine {
     public static final int JETON_SIZE = STEP_SIZE * 2;
     public static final int PLAYER_SIZE = STEP_SIZE * 4;
     public static final int TILE_SIZE = STEP_SIZE * 2;
-    final static int SPRITE_WIDTH = 28;
-    final static int DEAD_GHOST_SPEED = 4;
-    final static int GHOST_PRISON_EXIT_DELAY_MS = 500;
+    public final static int SPRITE_WIDTH = 28;
+    public final static int DEAD_GHOST_SPEED = 4;
+    public final static int GHOST_PRISON_EXIT_DELAY_MS = 500;
     public static Game current;
     static SplashWindow splashWindow;
     static MainWindow mainWindow;
@@ -118,7 +123,7 @@ public class Game extends JPanel implements IPanel, IGameEngine {
 
             // Ghosts
             ghosts = new Vector<>();
-            for (Level.Actor p : level.ghosts) {
+            for (Actor p : level.ghosts) {
                 Ghost ghost = Ghost.createGhost(p.skinId, p.typeId, p.speed, map.ghostPrison);
                 coreEngine.addCharacter(ghost.getCharacter());
                 ghosts.add(ghost);

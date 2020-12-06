@@ -1,4 +1,4 @@
-package pacman;
+package pacman.game;
 
 public enum PlayerDirection {
     UP,

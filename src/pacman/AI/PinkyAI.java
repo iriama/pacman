@@ -3,8 +3,8 @@ package pacman.AI;
 import framework.AI.IAIModel;
 import framework.geometry.Point;
 import pacman.Game;
-import pacman.Player;
-import pacman.PlayerDirection;
+import pacman.game.Player;
+import pacman.game.PlayerDirection;
 
 public class PinkyAI implements IAIModel {
 

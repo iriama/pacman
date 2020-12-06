@@ -1,4 +1,4 @@
-package pacman;
+package pacman.game;
 
 import framework.AI.IAIModel;
 import framework.core.Character;
@@ -9,19 +9,11 @@ import framework.rendering.GraphicObject;
 import framework.rendering.RenderEngine;
 import framework.rendering.graphics.SpriteSheet;
 import pacman.AI.*;
+import pacman.Game;
+import pacman.parsing.MemoryDB;
 
 import java.io.IOException;
 import java.util.HashMap;
-
-enum GhostMode {
-    PRISONED,
-    EXIT_PRISON,
-    ENTER_PRISON,
-    CHASE,
-    SCATTER,
-    FRIGHTENED,
-    DEAD
-}
 
 public class Ghost extends Player {
     public HashMap<PlayerDirection, SpriteSheet> weakSheets;
@@ -156,16 +148,16 @@ public class Ghost extends Player {
 
     public void changeMode(GhostMode mode) {
         if (mode == this.mode) return;
+        setDisabled(false);
         switch (mode) {
             case PRISONED:
+                setDisabled(true);
                 endFrighten();
                 getSprite().setScale(1f);
-                setDisabled(true);
                 changeDirection(PlayerDirection.UP);
                 break;
             case EXIT_PRISON:
                 controller.setForcedTarget(Game.current.map.ghostSpawn);
-                setDisabled(false);
                 break;
             case ENTER_PRISON:
                 controller.setForcedTarget(Game.current.map.ghostPrison);
@@ -173,7 +165,6 @@ public class Ghost extends Player {
             case CHASE:
                 endFrighten();
                 controller.clearForcedTarget();
-                setDisabled(false);
                 break;
             case SCATTER:
                 endFrighten();
@@ -183,7 +174,6 @@ public class Ghost extends Player {
                 else if (model instanceof InkyAI) target = InkyAI.scatterPosition();
                 else if (model instanceof PinkyAI) target = PinkyAI.scatterPosition();
                 controller.setForcedTarget(target);
-                setDisabled(false);
                 break;
             case FRIGHTENED:
                 setFrightenedSprite();

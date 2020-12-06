@@ -3,7 +3,7 @@ package pacman.AI;
 import framework.AI.IAIModel;
 import framework.geometry.Point;
 import pacman.Game;
-import pacman.Player;
+import pacman.game.Player;
 
 public class BlinkyAI implements IAIModel {
     private Player pacman;

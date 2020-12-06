@@ -1,4 +1,4 @@
-package pacman;
+package pacman.game;
 
 import framework.core.Character;
 import framework.core.CoreEngine;
@@ -9,6 +9,8 @@ import framework.rendering.RenderEngine;
 import framework.rendering.graphics.ISpriteEvent;
 import framework.rendering.graphics.Sprite;
 import framework.rendering.graphics.SpriteSheet;
+import pacman.Game;
+import pacman.parsing.MemoryDB;
 
 import java.io.IOException;
 

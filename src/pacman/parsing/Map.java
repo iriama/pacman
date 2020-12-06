@@ -1,4 +1,4 @@
-package pacman;
+package pacman.parsing;
 
 import framework.geometry.Point;
 import framework.geometry.Rect;

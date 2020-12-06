@@ -4,8 +4,8 @@ import framework.AI.IAIController;
 import framework.AI.IAIModel;
 import framework.geometry.Point;
 import pacman.Game;
-import pacman.Ghost;
-import pacman.PlayerDirection;
+import pacman.game.Ghost;
+import pacman.game.PlayerDirection;
 
 import java.util.Arrays;
 import java.util.Collections;

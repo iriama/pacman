@@ -1,4 +1,4 @@
-package pacman;
+package pacman.parsing;
 
 import framework.rendering.graphics.SpriteSheet;
 
