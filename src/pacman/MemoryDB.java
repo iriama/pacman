@@ -1,6 +1,5 @@
 package pacman;
 
-import framework.AI.IAIModel;
 import framework.rendering.graphics.SpriteSheet;
 
 import java.io.IOException;

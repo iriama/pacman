@@ -43,7 +43,7 @@ public class Map {
         height = Integer.parseInt(dimensions[1]);
 
         String line;
-        while((line = reader.readLine()) != null) {
+        while ((line = reader.readLine()) != null) {
             String[] split = line.split(" ");
             String type = split[0];
             Rect rect = new Rect(

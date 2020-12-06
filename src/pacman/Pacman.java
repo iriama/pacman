@@ -12,7 +12,7 @@ import framework.rendering.graphics.SpriteSheet;
 
 import java.io.IOException;
 
-public class Pacman extends Player{
+public class Pacman extends Player {
 
     SpriteSheet deathSheet;
     SpriteSheet defaultSheet;
@@ -21,25 +21,6 @@ public class Pacman extends Player{
         super(character, speed);
         this.deathSheet = deathSheet;
         this.defaultSheet = defaultSheet;
-    }
-
-    public void resurrect() {
-        setDisabled(false);
-        Sprite sprite = getSprite();
-        sprite.setSpriteSheet(defaultSheet);
-        sprite.setFrame(2);
-        sprite.loop(200 / defaultSheet.getSpriteCount());
-        changeDirection(PlayerDirection.UP);
-    }
-
-    public void kill(ISpriteEvent onfinish) {
-        setDisabled(true);
-        Sprite sprite = getSprite();
-        sprite.setSpriteSheet(deathSheet);
-        sprite.setFrame(0);
-        sprite.setLoop(false);
-        sprite.play(50);
-        sprite.onPlayFinish(onfinish);
     }
 
     public static Pacman createPacman(String skinId, int speed, Point position) throws IOException {
@@ -64,7 +45,24 @@ public class Pacman extends Player{
         return pacman;
     }
 
+    public void resurrect() {
+        setDisabled(false);
+        Sprite sprite = getSprite();
+        sprite.setSpriteSheet(defaultSheet);
+        sprite.setFrame(2);
+        sprite.loop(200 / defaultSheet.getSpriteCount());
+        changeDirection(PlayerDirection.UP);
+    }
 
+    public void kill(ISpriteEvent onfinish) {
+        setDisabled(true);
+        Sprite sprite = getSprite();
+        sprite.setSpriteSheet(deathSheet);
+        sprite.setFrame(0);
+        sprite.setLoop(false);
+        sprite.play(50);
+        sprite.onPlayFinish(onfinish);
+    }
 
     @Override
     public boolean willHitWall(PlayerDirection direction) {

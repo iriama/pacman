@@ -12,12 +12,12 @@ import framework.rendering.graphics.SpriteSheet;
 import java.util.HashMap;
 
 public class Player {
+    protected HashMap<PlayerDirection, SpriteSheet> directionsSheet;
     private Character character;
     private PlayerDirection direction;
     private int currentVelocityCount;
     private int currentVelocity;
     private int speed;
-    protected HashMap<PlayerDirection, SpriteSheet> directionsSheet;
     private Keyboard keyboard;
     private PlayerDirection queue;
     private boolean stopped;
@@ -37,12 +37,9 @@ public class Player {
         this.speed = speed;
     }
 
+
     public void setSpeed(int speed) {
         this.speed = speed;
-    }
-
-    public int getSpeed() {
-        return speed;
     }
 
     public Character getCharacter() {
@@ -98,16 +95,16 @@ public class Player {
         return false;
     }
 
+    public boolean isDisabled() {
+        return disabled;
+    }
+
     public void setDisabled(boolean disabled) {
         if (disabled) {
             queue = null;
             setVelocity(0, 0);
         }
         this.disabled = disabled;
-    }
-
-    public boolean isDisabled() {
-        return disabled;
     }
 
     public void hide() {
@@ -178,7 +175,7 @@ public class Player {
             return;
         }
         if (getY() <= -Game.PLAYER_SIZE) {
-           setY(Game.current.map.height);
+            setY(Game.current.map.height);
             return;
         }
         if (getY() >= Game.current.map.height) {
@@ -251,16 +248,21 @@ public class Player {
         return character.getPhyObject().getPosition();
     }
 
+    public void setPosition(Point position) {
+        setX(position.getX());
+        setY(position.getY());
+    }
+
     public int getX() {
         return getPosition().getX();
     }
 
-    public int getY() {
-        return getPosition().getY();
-    }
-
     public void setX(int x) {
         getPosition().setX(x);
+    }
+
+    public int getY() {
+        return getPosition().getY();
     }
 
     public void setY(int y) {
@@ -269,13 +271,6 @@ public class Player {
 
     public Point getCentredPosition() {
         return getHitbox().getCenter();
-    }
-
-
-
-    public void setPosition(Point position) {
-        setX(position.getX());
-        setY(position.getY());
     }
 
     public boolean onTile() {

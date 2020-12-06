@@ -5,7 +5,6 @@ import framework.AI.IAIModel;
 import framework.geometry.Point;
 import pacman.Game;
 import pacman.Ghost;
-import pacman.Player;
 import pacman.PlayerDirection;
 
 import java.util.Arrays;
@@ -28,6 +27,21 @@ public class GhostController implements IAIController {
     public GhostController(Ghost ghost, IAIModel ai) {
         this(ghost);
         setAI(ai);
+    }
+
+    public static PlayerDirection reverse(PlayerDirection direction) {
+        switch (direction) {
+            case UP:
+                return PlayerDirection.DOWN;
+            case DOWN:
+                return PlayerDirection.UP;
+            case RIGHT:
+                return PlayerDirection.LEFT;
+            case LEFT:
+                return PlayerDirection.RIGHT;
+        }
+
+        return null;
     }
 
     public void setAI(IAIModel ai) {
@@ -56,23 +70,9 @@ public class GhostController implements IAIController {
         return false;
     }
 
-    public static PlayerDirection reverse(PlayerDirection direction) {
-        switch (direction) {
-            case UP:
-                return PlayerDirection.DOWN;
-            case DOWN:
-                return PlayerDirection.UP;
-            case RIGHT:
-                return PlayerDirection.LEFT;
-            case LEFT:
-                return PlayerDirection.RIGHT;
-        }
-
-        return null;
-    }
-
     public void update() {
-        if ((lastPosition != null && lastPosition.equals(ghost.getPosition())) || ghost.isDisabled() || ai == null || !ghost.onTile()) return;
+        if ((lastPosition != null && lastPosition.equals(ghost.getPosition())) || ghost.isDisabled() || ai == null || !ghost.onTile())
+            return;
 
         // out of stage
         if (ghost.getX() < 0 || ghost.getX() > Game.current.map.width - Game.PLAYER_SIZE) return;
@@ -90,7 +90,7 @@ public class GhostController implements IAIController {
         if (pickRandom) {
             List<PlayerDirection> list = Arrays.asList(array);
             Collections.shuffle(list);
-            array = (PlayerDirection[])list.toArray();
+            array = (PlayerDirection[]) list.toArray();
         }
 
         for (PlayerDirection direction : array) {

@@ -40,6 +40,12 @@ public class CoreEngine implements ICoreEngine, Runnable {
         characters = new Vector<Character>();
     }
 
+    public static Character createCharacter(GraphicObject graphicObject, PhyObject phyObject) {
+        Character character = new Character(graphicObject, phyObject, IdFactory.nextId());
+
+        return character;
+    }
+
     /**
      * Update the framework.core engine
      */
@@ -95,7 +101,6 @@ public class CoreEngine implements ICoreEngine, Runnable {
         others.start();
     }
 
-
     /**
      * Adds a character to the framework.core engine
      *
@@ -107,12 +112,6 @@ public class CoreEngine implements ICoreEngine, Runnable {
         Character character = new Character(graphicObject, phyObject, IdFactory.nextId());
 
         return addCharacter(character);
-    }
-
-    public static Character createCharacter(GraphicObject graphicObject, PhyObject phyObject) {
-        Character character = new Character(graphicObject, phyObject, IdFactory.nextId());
-
-        return character;
     }
 
     public ISource addInputSource(ISource source) {

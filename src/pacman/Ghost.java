@@ -24,60 +24,20 @@ enum GhostMode {
 }
 
 public class Ghost extends Player {
+    public HashMap<PlayerDirection, SpriteSheet> weakSheets;
+    public HashMap<PlayerDirection, SpriteSheet> dangerSheets;
+    int originalSpeed;
+    HashMap<PlayerDirection, SpriteSheet> currentSheets;
     private String controllerId;
     private IAIModel model = null;
     private GhostController controller;
     private GhostMode mode;
-    int originalSpeed;
-    public HashMap<PlayerDirection, SpriteSheet> weakSheets;
-    public HashMap<PlayerDirection, SpriteSheet> dangerSheets;
-
-    HashMap<PlayerDirection, SpriteSheet> currentSheets;
 
     public Ghost(Character character, int speed) {
         super(character, speed);
         originalSpeed = speed;
         currentSheets = directionsSheet;
     }
-
-    public boolean playerControlled() {
-        return model == null;
-    }
-
-    public void setModel(IAIModel model) {
-        this.model = model;
-        controller = new GhostController(this, model);
-    }
-
-    public GhostController getController() {
-        return controller;
-    }
-
-    public boolean inPrison() {
-        return mode == GhostMode.PRISONED || mode == GhostMode.EXIT_PRISON;
-    }
-
-    public boolean controllable() {
-        return mode == GhostMode.CHASE || mode == GhostMode.SCATTER;
-    }
-
-    public IAIModel getModel() {
-        return model;
-    }
-
-    public void setControllerId(String controllerId) {
-        this.controllerId = controllerId;
-    }
-
-    public String getControllerId() {
-        return controllerId;
-    }
-
-    public Point getTarget() {
-        return controller.getTarget();
-    }
-
-
 
     public static Ghost createGhost(String skinId, String controllerId, int speed, Point position) throws IOException {
         SpriteSheet left = MemoryDB.getSpriteSheet(skinId + "/left", Game.SPRITE_WIDTH);
@@ -123,6 +83,42 @@ public class Ghost extends Player {
         return ghost;
     }
 
+    public boolean playerControlled() {
+        return model == null;
+    }
+
+    public GhostController getController() {
+        return controller;
+    }
+
+    public boolean inPrison() {
+        return mode == GhostMode.PRISONED || mode == GhostMode.EXIT_PRISON;
+    }
+
+    public boolean controllable() {
+        return mode == GhostMode.CHASE || mode == GhostMode.SCATTER;
+    }
+
+    public IAIModel getModel() {
+        return model;
+    }
+
+    public void setModel(IAIModel model) {
+        this.model = model;
+        controller = new GhostController(this, model);
+    }
+
+    public String getControllerId() {
+        return controllerId;
+    }
+
+    public void setControllerId(String controllerId) {
+        this.controllerId = controllerId;
+    }
+
+    public Point getTarget() {
+        return controller.getTarget();
+    }
 
     @Override
     public void changeDirection(PlayerDirection direction) {
@@ -221,13 +217,6 @@ public class Ghost extends Player {
         return mode == GhostMode.FRIGHTENED;
     }
 
-    public boolean inChaseMode() {
-        return mode == GhostMode.CHASE;
-    }
-
-    public boolean inScatterMode() {
-        return mode == GhostMode.SCATTER;
-    }
 
     @Override
     public boolean willHitWall(PlayerDirection direction) {
