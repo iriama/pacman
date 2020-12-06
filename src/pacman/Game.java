@@ -382,8 +382,6 @@ public class Game extends JPanel implements IPanel, IGameEngine {
 
         // Debug
         if (DEBUG) drawDebug(g);
-
-        g.drawString("hi", 100, 100);
     }
 
 

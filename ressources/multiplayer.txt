@@ -4,11 +4,11 @@ skin cyan
 skin orange
 skin pink
 skin devil
-preset tgfh
 preset zsqd
 preset ikjl
+preset tgfh
 preset numpad
-preset fvcb
+preset wxcv
 lives 3
 pacman_speed 2
 ghost_speed 2

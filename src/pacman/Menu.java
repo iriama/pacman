@@ -200,11 +200,17 @@ public class Menu extends JPanel {
         }
 
         String keyStr = "";
-        for (String k: keys.keySet()) {
-            if (!keys.get(k)) {
-                keyStr = k;
-                keys.put(k, true);
-                break;
+        if (keys.containsKey("zsqd") && !keys.get("zsqd")) {
+            keyStr = "zsqd";
+            keys.put(keyStr, true);
+        }
+        else {
+            for (String k : keys.keySet()) {
+                if (!keys.get(k)) {
+                    keyStr = k;
+                    keys.put(k, true);
+                    break;
+                }
             }
         }
 
