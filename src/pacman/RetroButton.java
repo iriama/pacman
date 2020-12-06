@@ -7,7 +7,6 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 public class RetroButton extends JLabel {
 
@@ -67,7 +66,7 @@ public class RetroButton extends JLabel {
 
 
     private Border border(Color color) {
-        Border margin = new EmptyBorder(4,4,4,4);
+        Border margin = new EmptyBorder(4, 4, 4, 4);
         return new CompoundBorder(BorderFactory.createLineBorder(color, 2, true), margin);
     }
 

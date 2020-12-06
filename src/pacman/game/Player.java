@@ -24,6 +24,7 @@ public class Player {
     private PlayerDirection queue;
     private boolean stopped;
     private boolean disabled;
+    private boolean autoPilot = false;
 
 
     public Player(Character character, int speed) {
@@ -39,7 +40,6 @@ public class Player {
         this.speed = speed;
     }
 
-
     public void setSpeed(int speed) {
         this.speed = speed;
     }
@@ -47,7 +47,6 @@ public class Player {
     public Character getCharacter() {
         return character;
     }
-
 
     public PlayerDirection getDirection() {
         return direction;
@@ -65,7 +64,6 @@ public class Player {
 
         return keyboard;
     }
-
 
     public int getModX(PlayerDirection direction, int step) {
         return direction == PlayerDirection.LEFT ? -step : direction == PlayerDirection.RIGHT ? step : 0;
@@ -116,8 +114,6 @@ public class Player {
     public void show() {
         getCharacter().getGraphicObject().show();
     }
-
-    private boolean autoPilot = false;
 
     public void setAutoPilot(boolean autoPilot) {
         this.autoPilot = autoPilot;

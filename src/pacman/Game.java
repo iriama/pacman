@@ -9,19 +9,19 @@ import framework.geometry.Rect;
 import framework.physics.PhysicsEngine;
 import framework.rendering.IPanel;
 import framework.rendering.RenderEngine;
-import pacman.AI.*;
+import pacman.AI.BlinkyAI;
+import pacman.AI.ClydeAI;
+import pacman.AI.InkyAI;
+import pacman.AI.PinkyAI;
 import pacman.game.*;
 import pacman.parsing.Actor;
 import pacman.parsing.Level;
 import pacman.parsing.Map;
 import pacman.parsing.MemoryDB;
-import pacman.utility.FontsEngine;
 import pacman.windows.MainWindow;
-import pacman.windows.SplashWindow;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -64,7 +64,8 @@ public class Game extends JPanel implements IPanel, IGameEngine {
     private IGameEvent onFail;
     private String levelIdentifier;
     private String pacmanPreset;
-
+    private boolean multi = false;
+    private Long lastSecondTick = null;
 
     public void SoloGame(int saveScore, String levelIdentifier, String preset, StatusBar statusBar, IGameEvent onSuccess, IGameEvent onFail) {
         current = this;
@@ -93,7 +94,7 @@ public class Game extends JPanel implements IPanel, IGameEngine {
 
         load();
         ghosts = new Vector<>();
-        for (GPanel panel: panels) {
+        for (GPanel panel : panels) {
             Ghost ghost = Ghost.createGhost(panel.skin, "player", MemoryDB.getMultiGhostSpeed(), map.ghostPrison);
             coreEngine.addCharacter(ghost.getCharacter());
             ghosts.add(ghost);
@@ -114,8 +115,6 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         setBackground(Color.black);
         setLayout(null);
     }
-
-    private boolean multi = false;
 
     private void load() {
         // Load assets
@@ -384,7 +383,6 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         if (DEBUG) drawDebug(g);
     }
 
-
     public void replay() {
         if (lives < 1) {
             onFail.action(score, lives, time);
@@ -447,8 +445,6 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         incrementScore(JETON_SCORE_VALUE);
         checkCleard();
     }
-
-    private Long lastSecondTick = null;
 
     @Override
     public void update() {

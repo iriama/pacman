@@ -12,7 +12,7 @@ public class UI {
 
     public static JLabel getSeparator(int size) {
         JLabel separator = new JLabel();
-        separator.setBorder(new EmptyBorder(size,0,0,0));
+        separator.setBorder(new EmptyBorder(size, 0, 0, 0));
 
         return separator;
     }
@@ -26,7 +26,7 @@ public class UI {
     }
 
     public static JLabel getCenteredTxtLabel(String text, Color color, Font font) {
-        JLabel label  = UI.getTxtLabel(text, color, font);
+        JLabel label = UI.getTxtLabel(text, color, font);
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
         return label;
     }

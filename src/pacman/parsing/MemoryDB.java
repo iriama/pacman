@@ -9,6 +9,7 @@ import java.util.Vector;
 
 public class MemoryDB {
 
+    private static final int MAX_SCORE_COUNT = 10;
     private static HashMap<String, SpriteSheet> spriteSheets = new HashMap<>();
     private static HashMap<String, Preset> presets = new HashMap<>();
     private static HashMap<String, Map> maps = new HashMap<>();
@@ -17,7 +18,6 @@ public class MemoryDB {
     private static Vector<String> multiPresets = new Vector<>();
     private static Vector<String> multiSkins = new Vector<>();
     private static String multiMapId = "";
-    private static final int MAX_SCORE_COUNT = 10;
     private static int multiLives = 3;
     private static int multiPacSpeed = 2;
     private static int multiGhostSpeed = 2;
@@ -72,8 +72,7 @@ public class MemoryDB {
             scores.add(new Score(score.name, score.value));
             scores.sort((a, b) -> b.value - a.value);
             modified = true;
-        }
-        else {
+        } else {
             for (int i = 0; i < scores.size(); i++) {
                 Score curr = scores.get(i);
                 if (score.value > curr.value) {
@@ -86,7 +85,7 @@ public class MemoryDB {
 
         if (modified) {
             String str = "";
-            for (Score entry: scores) {
+            for (Score entry : scores) {
                 str += entry.name + " " + entry.value + "\n";
             }
 
@@ -136,7 +135,7 @@ public class MemoryDB {
             return multiPresets;
 
         setMulti();
-        return  multiPresets;
+        return multiPresets;
     }
 
     public static String getMultiMapId() {
@@ -160,7 +159,7 @@ public class MemoryDB {
             return multiSkins;
 
         setMulti();
-        return  multiSkins;
+        return multiSkins;
     }
 
     public static Vector<Score> getScores() {
@@ -176,7 +175,7 @@ public class MemoryDB {
                 BufferedReader reader = new BufferedReader(new FileReader(f));
 
                 String line;
-                while((line = reader.readLine()) != null) {
+                while ((line = reader.readLine()) != null) {
                     String[] split = line.split(" ");
                     if (line == "" || split.length != 2) continue;
                     scores.add(new Score(split[0], Integer.parseInt(split[1])));

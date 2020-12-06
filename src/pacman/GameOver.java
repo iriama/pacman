@@ -11,8 +11,8 @@ public class GameOver extends JPanel {
     JPanel table;
     JLabel scoreLabel;
 
-    Font arcade40 =  UI.getSizedFont("arcadeclassic", 40);
-    Font arcade20 =  UI.getSizedFont("arcadeclassic", 20);
+    Font arcade40 = UI.getSizedFont("arcadeclassic", 40);
+    Font arcade20 = UI.getSizedFont("arcadeclassic", 20);
     private IEvent restart;
 
     private Score score;
@@ -36,7 +36,7 @@ public class GameOver extends JPanel {
         scoreLabel.setText(Integer.toString(score.value));
 
         table.removeAll();
-        for (Score entry: best) {
+        for (Score entry : best) {
 
             int nbPoints = Math.max(0, 12 - entry.name.length() + Integer.toString(entry.value).length());
             String points = new String(new char[nbPoints]).replace("\0", ".");

@@ -3,7 +3,6 @@ package pacman;
 import pacman.utility.FontsEngine;
 import pacman.windows.MainWindow;
 import pacman.windows.SplashWindow;
-import sun.applet.Main;
 
 import javax.swing.*;
 

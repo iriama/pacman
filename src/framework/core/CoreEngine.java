@@ -23,14 +23,13 @@ public class CoreEngine implements ICoreEngine, Runnable {
 
     final int TICKS = 50;
     final int FPS = 60;
-
+    Object _lock = new Object();
     private IRenderEngine renderEngine;
     private IPhysicsEngine physicsEngine;
     private I_InputEngine inputEngine;
     private IGameEngine gameEngine;
     private IAIEngine aiEngine;
     private Vector<Character> characters;
-    Object _lock = new Object();
 
     public CoreEngine(IPanel panel, IGameEngine gameEngine) {
         renderEngine = new RenderEngine(panel);

@@ -1,6 +1,5 @@
 package pacman;
 
-import pacman.utility.FontsEngine;
 import pacman.utility.UI;
 
 import javax.swing.*;
@@ -25,7 +24,6 @@ public class StatusBar extends JPanel {
     }
 
 
-
     private void build() {
         setBackground(Color.black);
         arcadeFont = UI.getSizedFont("arcadeclassic", 20);
@@ -44,7 +42,7 @@ public class StatusBar extends JPanel {
         score = UI.getTxtLabel("0", Color.WHITE, arcadeFont);
 
         // TIME
-        JLabel timeTxt =  UI.getTxtLabel("TIME", Color.RED, arcadeFont);
+        JLabel timeTxt = UI.getTxtLabel("TIME", Color.RED, arcadeFont);
         time = UI.getTxtLabel("0", Color.WHITE, arcadeFont);
 
         // LIVES
@@ -54,19 +52,19 @@ public class StatusBar extends JPanel {
 
         inner.add(UI.getSeparator(MARGIN));
         inner.add(levelTxt);
-        inner.add(UI.getSeparator(MARGIN/2));
+        inner.add(UI.getSeparator(MARGIN / 2));
         inner.add(level);
         inner.add(UI.getSeparator(MARGIN));
         inner.add(scoreTxt);
-        inner.add(UI.getSeparator(MARGIN/2));
+        inner.add(UI.getSeparator(MARGIN / 2));
         inner.add(score);
         inner.add(UI.getSeparator(MARGIN));
         inner.add(timeTxt);
-        inner.add(UI.getSeparator(MARGIN/2));
+        inner.add(UI.getSeparator(MARGIN / 2));
         inner.add(time);
         inner.add(UI.getSeparator(MARGIN));
         inner.add(livesTxt);
-        inner.add(UI.getSeparator(MARGIN/2));
+        inner.add(UI.getSeparator(MARGIN / 2));
         inner.add(lives);
 
         add(inner);

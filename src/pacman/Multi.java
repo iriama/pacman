@@ -5,10 +5,10 @@ import java.util.Vector;
 
 public class Multi {
 
-    private static Menu menu;
-    private static StatusBar statusBar;
     public static final int PRISON_TIME = 5000;
     public static final int FRIGHTNED_TIME = 7000;
+    private static Menu menu;
+    private static StatusBar statusBar;
 
     public static void start(Menu menu, Vector<GPanel> ghosts) {
         Multi.menu = menu;

@@ -25,11 +25,10 @@ public class Arcade {
 
     private static void next() {
         String level = levels[currentLevel];
-        statusBar.WIDTH = 90 + level.length()*5;
+        statusBar.WIDTH = 90 + level.length() * 5;
         Game game = new Game();
         game.SoloGame(score, level, preset, statusBar, (s, l, t) -> onSuccess(s, l, t), (s, l, t) -> onFail(s, l, t));
     }
-
 
 
     private static void onSuccess(int score, int lives, int time) {

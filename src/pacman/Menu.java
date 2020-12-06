@@ -4,11 +4,9 @@ import framework.rendering.graphics.SpriteSheet;
 import pacman.parsing.MemoryDB;
 import pacman.utility.UI;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Vector;
@@ -18,14 +16,15 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class Menu extends JPanel {
 
-    Font pac40 =  UI.getSizedFont("pacfont", 40);
-    Font arcade10 =  UI.getSizedFont("arcadeclassic", 10);
-    Font arcade20 =  UI.getSizedFont("arcadeclassic", 20);
-    Font arcade40 =  UI.getSizedFont("arcadeclassic", 40);
-
     public static int WIDTH = 500;
     public static int HEIGHT = 520;
-    private static String[] authors = { "AMAIRI Hatem", "BADDOUJ Youssef", "CHANAA Reda", "EL MOUHTADI Sohaib", "TAKHCHI Mohamed" };
+    private static String[] authors = {"AMAIRI Hatem", "BADDOUJ Youssef", "CHANAA Reda", "EL MOUHTADI Sohaib", "TAKHCHI Mohamed"};
+    Font pac40 = UI.getSizedFont("pacfont", 40);
+    Font arcade10 = UI.getSizedFont("arcadeclassic", 10);
+    Font arcade20 = UI.getSizedFont("arcadeclassic", 20);
+    Font arcade40 = UI.getSizedFont("arcadeclassic", 40);
+    HashMap<String, Boolean> skins = new HashMap<>();
+    HashMap<String, Boolean> keys = new HashMap<>();
 
     public Menu() {
         super();
@@ -56,7 +55,7 @@ public class Menu extends JPanel {
         add(multi);
         add(UI.getSeparator(50));
         add(copy);
-        for (String author: authors) {
+        for (String author : authors) {
             add(UI.getSeparator(10));
             add(UI.getCenteredTxtLabel(author, Color.GRAY, arcade10));
         }
@@ -164,7 +163,7 @@ public class Menu extends JPanel {
 
 
         int i = 1;
-        for (Score entry: scores) {
+        for (Score entry : scores) {
             int nbPoints = Math.max(0, 12 - entry.name.length() + Integer.toString(entry.value).length());
             String points = new String(new char[nbPoints]).replace("\0", ".");
 
@@ -182,16 +181,12 @@ public class Menu extends JPanel {
         repaint();
     }
 
-
-    HashMap<String, Boolean> skins = new HashMap<>();
-    HashMap<String, Boolean> keys = new HashMap<>();
-
     private GPanel ghostPanel() {
         SpriteSheet spriteSheet = null;
 
 
         String skin = "";
-        for (String k: skins.keySet()) {
+        for (String k : skins.keySet()) {
             if (!skins.get(k)) {
                 skin = k;
                 skins.put(k, true);
@@ -203,8 +198,7 @@ public class Menu extends JPanel {
         if (keys.containsKey("zsqd") && !keys.get("zsqd")) {
             keyStr = "zsqd";
             keys.put(keyStr, true);
-        }
-        else {
+        } else {
             for (String k : keys.keySet()) {
                 if (!keys.get(k)) {
                     keyStr = k;
@@ -215,7 +209,7 @@ public class Menu extends JPanel {
         }
 
         try {
-             spriteSheet = MemoryDB.getSpriteSheet(skin + "/right", 28);
+            spriteSheet = MemoryDB.getSpriteSheet(skin + "/right", 28);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
@@ -229,7 +223,7 @@ public class Menu extends JPanel {
         ignoredKeys.add(keyStr);
         apreset.set(new RetroButton(keyStr.toUpperCase(), Color.GRAY, arcade10, () -> {
             boolean found = false;
-            while(!found) {
+            while (!found) {
                 for (String k : keys.keySet()) {
                     if (ignoredKeys.contains(k)) continue;
 
@@ -262,7 +256,7 @@ public class Menu extends JPanel {
                 super.mouseClicked(e);
 
                 boolean found = false;
-                while(!found) {
+                while (!found) {
                     for (String k : skins.keySet()) {
                         if (ignoredSkins.contains(k)) continue;
 
@@ -304,12 +298,12 @@ public class Menu extends JPanel {
 
         skins = new HashMap<>();
         Vector<String> _skins = MemoryDB.getMultiSkins();
-        for (String skin: _skins) {
+        for (String skin : _skins) {
             skins.put(skin, false);
         }
         Vector<String> _presets = MemoryDB.getMultiPresets();
         keys = new HashMap<>();
-        for (String preset: _presets) {
+        for (String preset : _presets) {
             keys.put(preset, false);
         }
 
@@ -325,7 +319,7 @@ public class Menu extends JPanel {
 
         JPanel gParent = new JPanel();
         gParent.setLayout(new BoxLayout(gParent, BoxLayout.Y_AXIS));
-        gParent.setBackground(Color.red);
+        gParent.setBackground(Color.black);
 
         Vector<GPanel> gpanels = new Vector<>();
 
@@ -333,13 +327,13 @@ public class Menu extends JPanel {
             if (nbGhosts.get() >= maxPlayers)
                 return;
 
-            nbGhosts.set(nbGhosts.get()+1);
+            nbGhosts.set(nbGhosts.get() + 1);
             status.setText("PACMAN vs " + nbGhosts.get() + " GHOST(S)");
             gpanels.add(ghostPanel());
 
             gParent.removeAll();
 
-            for (GPanel p: gpanels) {
+            for (GPanel p : gpanels) {
                 gParent.add(p);
             }
 
@@ -350,7 +344,7 @@ public class Menu extends JPanel {
             if (nbGhosts.get() <= 0)
                 return;
 
-            nbGhosts.set(nbGhosts.get()-1);
+            nbGhosts.set(nbGhosts.get() - 1);
             status.setText("PACMAN vs " + nbGhosts.get() + " GHOST(S)");
             GPanel last = gpanels.lastElement();
             skins.put(last.skin, false);
@@ -359,7 +353,7 @@ public class Menu extends JPanel {
             gpanels.removeElement(last);
             gParent.removeAll();
 
-            for (GPanel p: gpanels) {
+            for (GPanel p : gpanels) {
                 gParent.add(p);
             }
 

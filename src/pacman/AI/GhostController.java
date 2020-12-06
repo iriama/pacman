@@ -90,7 +90,7 @@ public class GhostController implements IAIController {
         if (pickRandom) {
             List<PlayerDirection> list = Arrays.asList(array);
             Collections.shuffle(list);
-            array = (PlayerDirection[]) list.toArray();
+            array = list.toArray(new PlayerDirection[array.length]);
         }
 
         for (PlayerDirection direction : array) {
