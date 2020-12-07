@@ -1,0 +1,7 @@
+mapIdentifier
+chaseDuration scatterDuration ghostKillDuration frightnedDuration
+lives
+pacman_skin player speed
+ghostCount
+skin AI speed
+...

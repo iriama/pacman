@@ -16,6 +16,9 @@ public class Score {
         if (name.length() > 10)
             name = name.substring(0, 9);
 
+        // sanitize
+        name = name.replaceAll(" ", "_");
+
         this.name = name.toUpperCase();
         this.value = value;
     }
