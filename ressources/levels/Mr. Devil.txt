@@ -1,0 +1,6 @@
+map_1
+5000 5000 5000 7000
+10
+pacman player 2
+1
+devil clyde 5

@@ -396,11 +396,11 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         }
 
         // Jetons
-        for (Character jeton : jetons) {
-            g.setColor(Color.CYAN);
-            Rect hitbox = jeton.getPhyObject().getHitbox();
-            g.drawRect(hitbox.getX(), hitbox.getY(), hitbox.getWidth(), hitbox.getHeight());
-        }
+//        for (Character jeton : jetons) {
+//            g.setColor(Color.CYAN);
+//            Rect hitbox = jeton.getPhyObject().getHitbox();
+//            g.drawRect(hitbox.getX(), hitbox.getY(), hitbox.getWidth(), hitbox.getHeight());
+//        }
     }
 
     @Override

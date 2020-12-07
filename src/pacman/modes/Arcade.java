@@ -11,6 +11,7 @@ import pacman.parsing.MemoryDB;
  */
 public class Arcade {
 
+    public static int forceLevel = 0;
     private static int currentLevel;
     private static int score;
     private static String preset;
@@ -31,7 +32,7 @@ public class Arcade {
         Arcade.preset = preset;
         Arcade.name = name;
         Arcade.menu = menu;
-        currentLevel = 0;
+        currentLevel = forceLevel;
         score = 0;
         statusBar = new StatusBar();
         next();
