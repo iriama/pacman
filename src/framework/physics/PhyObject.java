@@ -3,11 +3,14 @@ package framework.physics;
 import framework.geometry.Point;
 import framework.geometry.Rect;
 
+/**
+ * Physical object
+ */
 public class PhyObject {
-    private Point position;
+    private final Point position;
     private Point velocity;
-    private Rect hitbox;
-    private int id;
+    private final Rect hitbox;
+    private final int id;
 
     public PhyObject(int id) {
         position = new Point();

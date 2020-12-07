@@ -4,12 +4,15 @@ import framework.utility.IdFactory;
 
 import java.util.Vector;
 
+/**
+ * Physics engine
+ */
 public class PhysicsEngine implements IPhysicsEngine {
 
-    private Vector<PhyObject> objects;
+    private final Vector<PhyObject> objects;
 
     public PhysicsEngine() {
-        objects = new Vector<PhyObject>();
+        objects = new Vector<>();
     }
 
     /**

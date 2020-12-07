@@ -1,7 +1,10 @@
-package pacman;
+package pacman.game;
 
 import java.util.Objects;
 
+/**
+ * Player score
+ */
 public class Score {
 
     public String name;

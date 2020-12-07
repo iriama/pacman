@@ -2,9 +2,12 @@ package pacman.AI;
 
 import framework.AI.IAIModel;
 import framework.geometry.Point;
-import pacman.Game;
+import pacman.game.Game;
 import pacman.game.Player;
 
+/**
+ * Clyde AI
+ */
 public class ClydeAI implements IAIModel {
 
     Player pacman;
@@ -14,6 +17,7 @@ public class ClydeAI implements IAIModel {
         this.pacman = pacman;
         this.ghost = ghost;
     }
+
 
     public static Point scatterPosition() {
         return new Point(0, Game.current.map.height - Game.STEP_SIZE);

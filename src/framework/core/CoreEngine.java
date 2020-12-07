@@ -23,13 +23,12 @@ public class CoreEngine implements ICoreEngine, Runnable {
 
     final int TICKS = 50;
     final int FPS = 60;
-    Object _lock = new Object();
-    private IRenderEngine renderEngine;
-    private IPhysicsEngine physicsEngine;
-    private I_InputEngine inputEngine;
-    private IGameEngine gameEngine;
-    private IAIEngine aiEngine;
-    private Vector<Character> characters;
+    private final IRenderEngine renderEngine;
+    private final IPhysicsEngine physicsEngine;
+    private final I_InputEngine inputEngine;
+    private final IGameEngine gameEngine;
+    private final IAIEngine aiEngine;
+    private final Vector<Character> characters;
 
     public CoreEngine(IPanel panel, IGameEngine gameEngine) {
         renderEngine = new RenderEngine(panel);
@@ -37,13 +36,19 @@ public class CoreEngine implements ICoreEngine, Runnable {
         inputEngine = new InputEngine();
         aiEngine = new AIEngine();
         this.gameEngine = gameEngine;
-        characters = new Vector<Character>();
+        characters = new Vector<>();
     }
 
+    /**
+     * Creates a Character
+     *
+     * @param graphicObject graphic Object
+     * @param phyObject     physical Object
+     * @return Character
+     */
     public static Character createCharacter(GraphicObject graphicObject, PhyObject phyObject) {
-        Character character = new Character(graphicObject, phyObject, IdFactory.nextId());
 
-        return character;
+        return new Character(graphicObject, phyObject, IdFactory.nextId());
     }
 
     /**
@@ -67,6 +72,7 @@ public class CoreEngine implements ICoreEngine, Runnable {
                 renderEngine.update();
                 elapsed = System.currentTimeMillis() - start;
                 try {
+                    //noinspection BusyWait
                     Thread.sleep(Math.max(0, 1000 / FPS - elapsed));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -90,6 +96,7 @@ public class CoreEngine implements ICoreEngine, Runnable {
                 }
                 elapsed = System.currentTimeMillis() - start;
                 try {
+                    //noinspection BusyWait
                     Thread.sleep(Math.max(0, 10 - elapsed));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -114,10 +121,22 @@ public class CoreEngine implements ICoreEngine, Runnable {
         return addCharacter(character);
     }
 
+    /**
+     * Adds an input source
+     *
+     * @param source source
+     * @return added source
+     */
     public ISource addInputSource(ISource source) {
         return inputEngine.addSource(source);
     }
 
+    /**
+     * Adds an AI controller
+     *
+     * @param controller controller
+     * @return added controller
+     */
     public IAIController addAIController(IAIController controller) {
         return aiEngine.addController(controller);
     }
@@ -158,6 +177,9 @@ public class CoreEngine implements ICoreEngine, Runnable {
         renderEngine.draw(g);
     }
 
+    /**
+     * Remove all characters
+     */
     public void clear() {
         for (Character character : characters) {
             removeCharacter(character);

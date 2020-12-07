@@ -1,4 +1,4 @@
-package pacman;
+package pacman.game;
 
 import framework.AI.IAIModel;
 import framework.IGameEngine;
@@ -13,7 +13,9 @@ import pacman.AI.BlinkyAI;
 import pacman.AI.ClydeAI;
 import pacman.AI.InkyAI;
 import pacman.AI.PinkyAI;
-import pacman.game.*;
+import pacman.UI.MultiGhost;
+import pacman.UI.StatusBar;
+import pacman.modes.Multiplayer;
 import pacman.parsing.Actor;
 import pacman.parsing.Level;
 import pacman.parsing.Map;
@@ -25,6 +27,9 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Vector;
 
+/**
+ * Pacman Game class
+ */
 public class Game extends JPanel implements IPanel, IGameEngine {
     // --- Statics
     public static final int STEP_SIZE = 8;
@@ -32,13 +37,15 @@ public class Game extends JPanel implements IPanel, IGameEngine {
     public static final int PLAYER_SIZE = STEP_SIZE * 4;
     public static final int TILE_SIZE = STEP_SIZE * 2;
     public final static int SPRITE_WIDTH = 28;
+    @SuppressWarnings("SuspiciousNameCombination")
+    public final static int SPRITE_HEIGHT = SPRITE_WIDTH;
     public final static int DEAD_GHOST_SPEED = 4;
     public final static int GHOST_PRISON_EXIT_DELAY_MS = 500;
     private final static int JETON_SCORE_VALUE = 1;
     private final static int GHOST_EAT_SCORE_VALUE = 5;
     public static Game current;
-    static MainWindow mainWindow;
-    static boolean DEBUG = false;
+    public static MainWindow mainWindow;
+    public static boolean DEBUG = false;
     // ---
     public Map map;
     public Level level;
@@ -53,21 +60,31 @@ public class Game extends JPanel implements IPanel, IGameEngine {
     private int lives = 1;
     private int saveScore = 0;
 
-    private HashMap<Ghost, Long> ghostReleaseTime = new HashMap<>();
-    private HashMap<Ghost, Long> ghostFrightnedEndTime = new HashMap<>();
+    private final HashMap<Ghost, Long> ghostReleaseTime = new HashMap<>();
+    private final HashMap<Ghost, Long> ghostFrightnedEndTime = new HashMap<>();
     private long changeModeAt = 0;
     private boolean restarting = false;
     private boolean finished = false;
 
     private StatusBar statusBar;
-    private IGameEvent onSuccess;
-    private IGameEvent onFail;
+    private IGameResult onSuccess;
+    private IGameResult onFail;
     private String levelIdentifier;
     private String pacmanPreset;
     private boolean multi = false;
     private Long lastSecondTick = null;
 
-    public void SoloGame(int saveScore, String levelIdentifier, String preset, StatusBar statusBar, IGameEvent onSuccess, IGameEvent onFail) {
+    /**
+     * Starts a solo game
+     *
+     * @param saveScore       previous score
+     * @param levelIdentifier level id
+     * @param preset          keyboard preset id
+     * @param statusBar       status bar to attach to
+     * @param onSuccess       on level passed
+     * @param onFail          on level lost
+     */
+    public void SoloGame(int saveScore, String levelIdentifier, String preset, StatusBar statusBar, IGameResult onSuccess, IGameResult onFail) {
         current = this;
         build();
         this.statusBar = statusBar;
@@ -80,7 +97,16 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         play(true);
     }
 
-    public void MultiGame(Vector<GPanel> panels, StatusBar statusBar, IGameEvent onSuccess, IGameEvent onFail) throws Exception {
+    /**
+     * Starts a multiplayer game
+     *
+     * @param multiGhosts ghosts
+     * @param statusBar   status bar to attach to
+     * @param onSuccess   on level passed
+     * @param onFail      on level failed
+     * @throws Exception exeception
+     */
+    public void MultiGame(Vector<MultiGhost> multiGhosts, StatusBar statusBar, IGameResult onSuccess, IGameResult onFail) throws Exception {
         current = this;
         build();
         this.statusBar = statusBar;
@@ -94,7 +120,7 @@ public class Game extends JPanel implements IPanel, IGameEngine {
 
         load();
         ghosts = new Vector<>();
-        for (GPanel panel : panels) {
+        for (MultiGhost panel : multiGhosts) {
             Ghost ghost = Ghost.createGhost(panel.skin, "player", MemoryDB.getMultiGhostSpeed(), map.ghostPrison);
             coreEngine.addCharacter(ghost.getCharacter());
             ghosts.add(ghost);
@@ -181,19 +207,23 @@ public class Game extends JPanel implements IPanel, IGameEngine {
                 for (Ghost ghost : ghosts) {
                     IAIModel model = null;
 
-                    if (ghost.getControllerId().equals("player")) continue;
-                    else if (ghost.getControllerId().equals("clyde")) {
-                        model = new ClydeAI(pacman, ghost);
-                    } else if (ghost.getControllerId().equals("pinky")) {
-                        model = new PinkyAI(pacman);
-                    } else if (ghost.getControllerId().equals("inky")) {
-                        innerLoop:
-                        for (Ghost g : ghosts) {
-                            if (g.getControllerId().equals("blinky")) {
-                                model = new InkyAI(pacman, g);
-                                break innerLoop;
+                    switch (ghost.getControllerId()) {
+                        case "player":
+                            continue;
+                        case "clyde":
+                            model = new ClydeAI(pacman, ghost);
+                            break;
+                        case "pinky":
+                            model = new PinkyAI(pacman);
+                            break;
+                        case "inky":
+                            for (Ghost g : ghosts) {
+                                if (g.getControllerId().equals("blinky")) {
+                                    model = new InkyAI(pacman, g);
+                                    break;
+                                }
                             }
-                        }
+                            break;
                     }
 
                     if (model == null) model = new BlinkyAI(pacman); // defaults to blinky
@@ -295,6 +325,11 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         return multi || level != null;
     }
 
+    /**
+     * Loads and starts the game
+     *
+     * @param load load the game
+     */
     public void play(boolean load) {
         // -- LOAD GAME
         if (load)
@@ -361,9 +396,9 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         }
 
         // Jetons
-        for (int i = 0; i < jetons.size(); i++) {
+        for (Character jeton : jetons) {
             g.setColor(Color.CYAN);
-            Rect hitbox = jetons.get(i).getPhyObject().getHitbox();
+            Rect hitbox = jeton.getPhyObject().getHitbox();
             g.drawRect(hitbox.getX(), hitbox.getY(), hitbox.getWidth(), hitbox.getHeight());
         }
     }
@@ -383,7 +418,7 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         if (DEBUG) drawDebug(g);
     }
 
-    public void replay() {
+    private void replay() {
         if (lives < 1) {
             onFail.action(score, lives, time);
             return;
@@ -404,16 +439,16 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         restarting = false;
     }
 
-    public void caught() {
+    private void caught() {
         restarting = true;
-        pacman.kill(() -> replay());
+        pacman.kill(this::replay);
         for (Ghost ghost : ghosts) {
             ghost.setDisabled(true);
         }
         decrementLives();
     }
 
-    public void ghostCaught(Ghost ghost) {
+    private void ghostCaught(Ghost ghost) {
         ghost.changeMode(GhostMode.DEAD);
         incrementScore(GHOST_EAT_SCORE_VALUE);
     }
@@ -439,7 +474,7 @@ public class Game extends JPanel implements IPanel, IGameEngine {
         for (Ghost ghost : ghosts) {
             if (!ghost.controllable()) continue;
 
-            ghostFrightnedEndTime.put(ghost, System.currentTimeMillis() + (multi ? Multi.FRIGHTNED_TIME : level.frightnedDuration));
+            ghostFrightnedEndTime.put(ghost, System.currentTimeMillis() + (multi ? Multiplayer.FRIGHTNED_TIME : level.frightnedDuration));
             ghost.changeMode(GhostMode.FRIGHTENED);
         }
         incrementScore(JETON_SCORE_VALUE);
@@ -500,7 +535,7 @@ public class Game extends JPanel implements IPanel, IGameEngine {
                 if (ghost.onPrisonEntry()) { // On prison entry
                     ghost.changeMode(GhostMode.ENTER_PRISON);
                 } else if (ghost.onPrisonInside()) { // Inside prison
-                    setInPrison(ghost, (multi ? Multi.PRISON_TIME : level.ghostKillDuration));
+                    setInPrison(ghost, (multi ? Multiplayer.PRISON_TIME : level.ghostKillDuration));
                 }
                 continue;
             }
@@ -522,7 +557,7 @@ public class Game extends JPanel implements IPanel, IGameEngine {
                 long endTime = ghostFrightnedEndTime.get(ghost);
                 if (currentMs > endTime) {
                     ghost.changeMode(mode);
-                } else if (currentMs + Math.max(1000, (multi ? Multi.FRIGHTNED_TIME : level.frightnedDuration) / 5) > endTime) {
+                } else if (currentMs + Math.max(1000, (multi ? Multiplayer.FRIGHTNED_TIME : level.frightnedDuration) / 5) > endTime) {
                     ghost.setDangerSprite();
                 }
                 continue;
@@ -547,7 +582,6 @@ public class Game extends JPanel implements IPanel, IGameEngine {
                 if (changeMode) {
                     ghost.changeMode(mode);
                 }
-                continue;
             }
         }
     }

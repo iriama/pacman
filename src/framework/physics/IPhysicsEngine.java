@@ -1,5 +1,8 @@
 package framework.physics;
 
+/**
+ * Physics engine interface
+ */
 public interface IPhysicsEngine {
     PhyObject addObject(PhyObject object);
 

@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.Vector;
 
+/**
+ * Parsed level from level file
+ */
 public class Level {
 
     public String mapIdentifier;

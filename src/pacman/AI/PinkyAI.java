@@ -2,10 +2,13 @@ package pacman.AI;
 
 import framework.AI.IAIModel;
 import framework.geometry.Point;
-import pacman.Game;
+import pacman.game.Game;
 import pacman.game.Player;
 import pacman.game.PlayerDirection;
 
+/**
+ * Pinky AI
+ */
 public class PinkyAI implements IAIModel {
 
     Player pacman;

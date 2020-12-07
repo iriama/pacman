@@ -11,16 +11,16 @@ import java.io.IOException;
 import java.util.Vector;
 
 /**
- * Engine responsable of framework.rendering graphic objects
+ * Rendering engine
  */
 public class RenderEngine implements IRenderEngine {
 
     private final Vector<GraphicObject> objects;
-    private Point camera;
-    private IPanel panel;
+    private final Point camera;
+    private final IPanel panel;
 
     public RenderEngine(IPanel panel) {
-        objects = new Vector<GraphicObject>();
+        objects = new Vector<>();
         camera = new Point(0, 0);
         this.panel = panel;
     }

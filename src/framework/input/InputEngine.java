@@ -8,17 +8,17 @@ import java.util.Vector;
  * Input Engine
  */
 public class InputEngine implements I_InputEngine {
-    Vector<ISource> sources;
+    private final Vector<ISource> sources;
 
     public InputEngine() {
-        this.sources = new Vector<ISource>();
+        this.sources = new Vector<>();
     }
 
     /**
      * Adds a new source to the InputEngine
      *
      * @param source new source
-     * @return
+     * @return added source
      */
     public ISource addSource(ISource source) {
         sources.add(source);

@@ -11,6 +11,9 @@ import java.io.FileReader;
 import java.nio.file.Paths;
 import java.util.Vector;
 
+/**
+ * Parsed map from map file
+ */
 public class Map {
     public BufferedImage image;
     public int width;
@@ -53,18 +56,26 @@ public class Map {
                     Integer.parseInt(split[4])
             );
 
-            if (type.equals("special_jeton"))
-                specialJetons.add(rect);
-            else if (type.equals("wall"))
-                walls.add(rect);
-            else if (type.equals("prison_wall"))
-                prisonWall = rect;
-            else if (type.equals("pacman_spawn"))
-                pacmanSpawn.set(rect.getX(), rect.getY());
-            else if (type.equals("ghost_spawn"))
-                ghostSpawn.set(rect.getX(), rect.getY());
-            else if (type.equals("ghost_prison"))
-                ghostPrison.set(rect.getX(), rect.getY());
+            switch (type) {
+                case "special_jeton":
+                    specialJetons.add(rect);
+                    break;
+                case "wall":
+                    walls.add(rect);
+                    break;
+                case "prison_wall":
+                    prisonWall = rect;
+                    break;
+                case "pacman_spawn":
+                    pacmanSpawn.set(rect.getX(), rect.getY());
+                    break;
+                case "ghost_spawn":
+                    ghostSpawn.set(rect.getX(), rect.getY());
+                    break;
+                case "ghost_prison":
+                    ghostPrison.set(rect.getX(), rect.getY());
+                    break;
+            }
         }
     }
 }

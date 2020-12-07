@@ -2,6 +2,9 @@ package framework.rendering;
 
 import java.awt.*;
 
+/**
+ * Render engine interface
+ */
 public interface IRenderEngine {
     GraphicObject addObject(GraphicObject object);
 

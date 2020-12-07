@@ -1,12 +1,12 @@
-package pacman;
+package pacman.UI;
 
 import javax.swing.*;
 
-public class GPanel extends JPanel {
+public class MultiGhost extends JPanel {
     public String skin;
     public String keyset;
 
-    public GPanel(String skin, String keyset) {
+    public MultiGhost(String skin, String keyset) {
         this.skin = skin;
         this.keyset = keyset;
     }

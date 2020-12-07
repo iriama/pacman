@@ -2,8 +2,11 @@ package framework.AI;
 
 import java.util.Vector;
 
+/**
+ * Artificial Intelligence Engine
+ */
 public class AIEngine implements IAIEngine {
-    Vector<IAIController> controllers;
+    private final Vector<IAIController> controllers;
 
     public AIEngine() {
         controllers = new Vector<>();

@@ -3,6 +3,9 @@ package pacman.parsing;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
+/**
+ * Key preset parsed from preset file
+ */
 public class Preset {
     public int keyUp;
     public int keyDown;

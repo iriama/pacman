@@ -1,5 +1,8 @@
 package pacman.parsing;
 
+/**
+ * Parsed actor from level file
+ */
 public class Actor {
     public String skinId;
     public String typeId;

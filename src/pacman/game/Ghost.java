@@ -9,12 +9,15 @@ import framework.rendering.GraphicObject;
 import framework.rendering.RenderEngine;
 import framework.rendering.graphics.SpriteSheet;
 import pacman.AI.*;
-import pacman.Game;
 import pacman.parsing.MemoryDB;
 
 import java.io.IOException;
 import java.util.HashMap;
 
+
+/**
+ * Ghost character
+ */
 public class Ghost extends Player {
     public HashMap<PlayerDirection, SpriteSheet> weakSheets;
     public HashMap<PlayerDirection, SpriteSheet> dangerSheets;
@@ -31,6 +34,16 @@ public class Ghost extends Player {
         currentSheets = directionsSheet;
     }
 
+    /**
+     * Creates a ghost character
+     *
+     * @param skinId       skinId
+     * @param controllerId controllerId
+     * @param speed        speed
+     * @param position     position
+     * @return Ghost
+     * @throws IOException IOException
+     */
     public static Ghost createGhost(String skinId, String controllerId, int speed, Point position) throws IOException {
         SpriteSheet left = MemoryDB.getSpriteSheet(skinId + "/left", Game.SPRITE_WIDTH);
         SpriteSheet right = MemoryDB.getSpriteSheet(skinId + "/right", Game.SPRITE_WIDTH);
@@ -51,7 +64,7 @@ public class Ghost extends Player {
         GraphicObject pGraph = RenderEngine.createObject(up);
         pGraph.getSprite().loop(200 / up.getSpriteCount());
 
-        Character character = CoreEngine.createCharacter(pGraph, PhysicsEngine.createObject(position.getX(), Game.SPRITE_WIDTH, position.getY(), Game.SPRITE_WIDTH));
+        Character character = CoreEngine.createCharacter(pGraph, PhysicsEngine.createObject(position.getX(), Game.SPRITE_WIDTH, position.getY(), Game.SPRITE_HEIGHT));
         Ghost ghost = new Ghost(character, speed);
         ghost.setControllerId(controllerId);
 
@@ -75,35 +88,75 @@ public class Ghost extends Player {
         return ghost;
     }
 
+    /**
+     * Determines if the ghost is player controlled
+     *
+     * @return boolean
+     */
     public boolean playerControlled() {
         return model == null;
     }
 
+    /**
+     * Return the ghost controller
+     *
+     * @return GhostController
+     */
     public GhostController getController() {
         return controller;
     }
 
+    /**
+     * If ghost is in prison
+     *
+     * @return boolean
+     */
     public boolean inPrison() {
         return mode == GhostMode.PRISONED || mode == GhostMode.EXIT_PRISON;
     }
 
+    /**
+     * If ghost can be controlled (in chase or scatter mode)
+     *
+     * @return boolean
+     */
     public boolean controllable() {
         return mode == GhostMode.CHASE || mode == GhostMode.SCATTER;
     }
 
+    /**
+     * Return the AI of the ghost
+     *
+     * @return IAIModel
+     */
     public IAIModel getModel() {
         return model;
     }
 
+    /**
+     * Sets the AI of the ghost
+     *
+     * @param model IAIModel
+     */
     public void setModel(IAIModel model) {
         this.model = model;
         controller = new GhostController(this, model);
     }
 
+    /**
+     * Return the ghost controller id
+     *
+     * @return String
+     */
     public String getControllerId() {
         return controllerId;
     }
 
+    /**
+     * Sets the ghost controller id
+     *
+     * @param controllerId String
+     */
     public void setControllerId(String controllerId) {
         this.controllerId = controllerId;
     }
@@ -112,6 +165,11 @@ public class Ghost extends Player {
         return controller.getTarget();
     }
 
+    /**
+     * Change the ghost direction
+     *
+     * @param direction PlayerDirection
+     */
     @Override
     public void changeDirection(PlayerDirection direction) {
         super.changeDirection(direction);
@@ -130,6 +188,9 @@ public class Ghost extends Player {
         applySprite();
     }
 
+    /**
+     * Sets the danger sprite
+     */
     public void setDangerSprite() {
         currentSheets = dangerSheets;
         applySprite();
@@ -146,6 +207,11 @@ public class Ghost extends Player {
         setSpeed(originalSpeed);
     }
 
+    /**
+     * Changes the ghost mode
+     *
+     * @param mode GhostMode
+     */
     public void changeMode(GhostMode mode) {
         if (mode == this.mode) return;
         setDisabled(false);
@@ -196,23 +262,49 @@ public class Ghost extends Player {
         this.mode = mode;
     }
 
+    /**
+     * Return true if the ghost is in dead mode or entering prison
+     *
+     * @return boolean
+     */
     public boolean isDead() {
         return mode == GhostMode.DEAD || mode == GhostMode.ENTER_PRISON;
     }
 
+    /**
+     * Return true if the ghost is in prison or exiting
+     *
+     * @return boolean
+     */
     public boolean onPrisonEntry() {
         return Game.current.map.ghostSpawn.equals(getPosition());
     }
 
+    /**
+     * Return true if the ghost is inside the prison
+     *
+     * @return boolean
+     */
     public boolean onPrisonInside() {
         return Game.current.map.ghostPrison.equals(getPosition());
     }
 
+    /**
+     * Return true if the ghost is frightned
+     *
+     * @return boolean
+     */
     public boolean isFrightned() {
         return mode == GhostMode.FRIGHTENED;
     }
 
 
+    /**
+     * Return true if the ghost will hit the wall if he changes direction
+     *
+     * @param direction PlayerDirection
+     * @return boolean
+     */
     @Override
     public boolean willHitWall(PlayerDirection direction) {
         if (mode != GhostMode.EXIT_PRISON && mode != GhostMode.ENTER_PRISON && mode != GhostMode.DEAD && Game.current.map.prisonWall.intersect(nextHitbox(direction))) {

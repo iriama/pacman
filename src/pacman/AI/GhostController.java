@@ -3,7 +3,7 @@ package pacman.AI;
 import framework.AI.IAIController;
 import framework.AI.IAIModel;
 import framework.geometry.Point;
-import pacman.Game;
+import pacman.game.Game;
 import pacman.game.Ghost;
 import pacman.game.PlayerDirection;
 
@@ -11,6 +11,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Ghost controller system
+ */
 public class GhostController implements IAIController {
 
     Ghost ghost;
@@ -44,18 +47,36 @@ public class GhostController implements IAIController {
         return null;
     }
 
+    /**
+     * Sets the controller AI
+     *
+     * @param ai IAIModel
+     */
     public void setAI(IAIModel ai) {
         this.ai = ai;
     }
 
+    /**
+     * Force target
+     *
+     * @param target target
+     */
     public void setForcedTarget(Point target) {
         forcedTarget = target;
     }
 
+    /**
+     * Clear forced target
+     */
     public void clearForcedTarget() {
         forcedTarget = null;
     }
 
+    /**
+     * Gets current targert
+     *
+     * @return Point
+     */
     public Point getTarget() {
         return forcedTarget == null ? ai.getPrediction() : forcedTarget;
     }
@@ -64,10 +85,7 @@ public class GhostController implements IAIController {
         if (direction == other) return true;
         if (direction == PlayerDirection.UP) return true;
         if (direction == PlayerDirection.LEFT && other != PlayerDirection.UP) return true;
-        if (direction == PlayerDirection.DOWN && other != PlayerDirection.UP && other != PlayerDirection.LEFT)
-            return true;
-
-        return false;
+        return direction == PlayerDirection.DOWN && other != PlayerDirection.UP && other != PlayerDirection.LEFT;
     }
 
     public void update() {

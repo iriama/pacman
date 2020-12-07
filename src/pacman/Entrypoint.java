@@ -1,20 +1,24 @@
 package pacman;
 
+import pacman.UI.Menu;
+import pacman.game.Game;
 import pacman.utility.FontsEngine;
 import pacman.windows.MainWindow;
 import pacman.windows.SplashWindow;
 
 import javax.swing.*;
 
+/**
+ * Entrypoint of the program
+ */
 public class Entrypoint {
 
     public static void main(String[] args) throws InterruptedException {
         for (String arg : args) {
             if (!arg.startsWith("-")) continue;
-            switch (arg) {
-                case "-debug":
-                    Game.DEBUG = true;
-                    break;
+            if ("-debug".equals(arg)) {
+                Game.DEBUG = true;
+                break;
             }
         }
 

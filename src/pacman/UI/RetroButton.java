@@ -1,4 +1,6 @@
-package pacman;
+package pacman.UI;
+
+import pacman.game.IEvent;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -8,14 +10,15 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+/**
+ * Retro button
+ */
 public class RetroButton extends JLabel {
 
-    private int width;
-    private int height;
-    private Color color;
-    private Font font;
-    private String text;
-    private IEvent onClick;
+    private final Color color;
+    private final Font font;
+    private final String text;
+    private final IEvent onClick;
 
     public RetroButton(String text, Color color, Font font, IEvent onClick) {
         super();

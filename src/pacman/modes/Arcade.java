@@ -1,7 +1,14 @@
-package pacman;
+package pacman.modes;
 
+import pacman.UI.Menu;
+import pacman.UI.StatusBar;
+import pacman.game.Game;
+import pacman.game.Score;
 import pacman.parsing.MemoryDB;
 
+/**
+ * Arcade mode
+ */
 public class Arcade {
 
     private static int currentLevel;
@@ -10,9 +17,16 @@ public class Arcade {
     private static String name;
     private static Menu menu;
 
-    private static String[] levels = MemoryDB.getArcadeSequence();
+    private static final String[] levels = MemoryDB.getArcadeSequence();
     private static StatusBar statusBar;
 
+    /**
+     * Starts arcade mode
+     *
+     * @param menu   Menu
+     * @param name   player name
+     * @param preset player key preset id
+     */
     public static void start(Menu menu, String name, String preset) {
         Arcade.preset = preset;
         Arcade.name = name;
@@ -25,9 +39,9 @@ public class Arcade {
 
     private static void next() {
         String level = levels[currentLevel];
-        statusBar.WIDTH = 90 + level.length() * 5;
+        StatusBar.WIDTH = 90 + level.length() * 5;
         Game game = new Game();
-        game.SoloGame(score, level, preset, statusBar, (s, l, t) -> onSuccess(s, l, t), (s, l, t) -> onFail(s, l, t));
+        game.SoloGame(score, level, preset, statusBar, Arcade::onSuccess, Arcade::onFail);
     }
 
 

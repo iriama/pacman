@@ -2,11 +2,14 @@ package pacman.AI;
 
 import framework.AI.IAIModel;
 import framework.geometry.Point;
-import pacman.Game;
+import pacman.game.Game;
 import pacman.game.Player;
 
+/**
+ * Blinky AI
+ */
 public class BlinkyAI implements IAIModel {
-    private Player pacman;
+    private final Player pacman;
 
     public BlinkyAI(Player pacman) {
         this.pacman = pacman;
