@@ -1,4 +1,4 @@
-map_1.png
+map_2.png
 448 496
 ghost_prison 208 216 32 32
 ghost_spawn 208 168 32 32
