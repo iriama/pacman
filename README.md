@@ -3,6 +3,8 @@
 Jeu classique PACMAN avec un mode histoire, divers boss et un mode multijoueur local.
 realisé dans le cadre d'un projet pour l'UE Génie Logiciel (M1) à Aix-Marseille Université.
 
+Jeu compilé disponsible dans la section [release](https://github.com/iriama/pacman/releases/).
+
 ## Captures d'écran
 
 ![Screenshot1](screenshot1.png)
